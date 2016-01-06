@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Redmi Note 2 Tool</string>
+
+    <string name="title_section1">CPU</string>
+    <string name="title_section2">Other</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_setOnBoot">Set on Boot</string>
+
+    <string name="action_save">Save</string>
+
+    <string name="action_default">Load suggested values</string>
+
+    <string name="main_section_label">Max Frequency</string>
+    <string name="frequency">Unlimited</string>
+    <string name="touchboost">TouchBoost</string>
+    <string name="cores">Cores</string>
+    <string name="tbFrequency">Frequency</string>
+</resources>
