@@ -48,21 +48,21 @@ public class SUCommand {
     }
 
 
-    public static void executeSu(final String[] cmds, Shell.OnCommandLineListener ll) {
+    public static void executeSu(final String[] cmds, Shell.OnCommandResultListener ll) {
         final Shell.Builder builder = new Shell.Builder();
-        builder.addCommand(cmds);
-        builder.setOnSTDOUTLineListener(ll);
+        builder.addCommand(cmds, 0, ll);
         builder.useSU();
         Thread abc = new Thread(new Runnable() {
             @Override
             public void run() {
-                builder.open();
+                Shell.Interactive sh=builder.open();
+                sh.close();
             }
         });
         abc.start();
     }
 
-    public static void mountSD() {
+    public static void mountSD(Shell.OnCommandResultListener ll) {
         String cmds[] = {
                 "e2fsck -fy /dev/block/mmcblk1p1",
                 "mount -o remount,rw /",
@@ -73,8 +73,24 @@ public class SUCommand {
                 "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
                 "/system/bin/vold &"
         };
-        executeSu(cmds,null);
+        executeSu(cmds, ll);
     }
+
+    public static void mountSD() {
+        mountSD(null);
+    }
+
+    public static void formatSD(Shell.OnCommandResultListener ll) {
+        String cmds[] = {
+                "umount /storage/sdcard1",
+                "umount /storage/sdcard2",
+                "killall sdcard",
+                "umount /mnt/media_rw/sdcard1",
+                "mke2fs -t ext4 -m 0 /dev/block/mmcblk1p1",
+        };
+        executeSu(cmds,ll);
+    }
+
     public static void interTweak(Context context) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
         String cmds[] = {
@@ -93,7 +109,7 @@ public class SUCommand {
         };
         executeSu(cmds,null);
     }
-    public static void saveTouchBoost(String cores, String freq) {
+    public static void saveTouchBoost(String cores, String freq, Shell.OnCommandResultListener ll) {
         String cmds[] = {
                 "mount -o remount,rw /system",
                 "cd /system/etc",
@@ -102,15 +118,14 @@ public class SUCommand {
                 "chmod 644 perfservscntbl.txt",
                 "mount -o remount,ro /system",
         };
-        executeSu(cmds,null);
+        executeSu(cmds,ll);
     }
 
-    public static /*List<String>*/ void getTouchBoost(Shell.OnCommandLineListener ll) {
+    public static /*List<String>*/ void getTouchBoost(Shell.OnCommandResultListener ll) {
         String cmds[] = {
                 "cd /system/etc",
                 "cat perfservscntbl.txt",
         };
-        final String ret="";
         executeSu(cmds,ll);
     }
 }

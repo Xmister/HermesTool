@@ -20,6 +20,7 @@ public class MainFragment extends MyFragment {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private static MainFragment self=null;
         private static MainActivity a;
         private static Button   maxFreq,
                                 freq;
@@ -31,11 +32,12 @@ public class MainFragment extends MyFragment {
          * number.
          */
         public static MainFragment newInstance(int sectionNumber) {
-            MainFragment fragment = new MainFragment();
+            if ( self == null )
+                self = new MainFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
+            self.setArguments(args);
+            return self;
         }
 
         public MainFragment() {
@@ -57,8 +59,8 @@ public class MainFragment extends MyFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if ( Constants.frequencyItems != null ) {
-                    a.setP("tbFreq",""+which);
-                    freq.setText(Constants.frequencyNames[which]);
+                    a.setP("tbFreq",""+which+1);
+                    freq.setText(Constants.frequencyNames[which+1]);
                 }
             }
         };
@@ -94,15 +96,19 @@ public class MainFragment extends MyFragment {
         freq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", Constants.frequencyNames, tdi, null, null);
+                String tmpNames[] = new String[Constants.frequencyNames.length - 1];
+                for (int i = 1; i < Constants.frequencyNames.length; i++) {
+                    tmpNames[i-1] = Constants.frequencyNames[i];
+                }
+                ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
                 md.show(getFragmentManager(), "tbfreq");
             }
         });
         cbTouchBoost.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                a.setP("cbTouchBoost",""+isChecked);
-                GridLayout grTouch= (GridLayout)getActivity().findViewById(R.id.grTouch);
+                a.setP("cbTouchBoost", "" + isChecked);
+                GridLayout grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
                 if (isChecked)
                     grTouch.setVisibility(View.VISIBLE);
                 else
@@ -121,7 +127,7 @@ public class MainFragment extends MyFragment {
     public void loadDefaults() {
         a.setP("maxfreq", "0");
         maxFreq.setText("Unlimited");
-        a.setP("tbFreq", "2");
+        a.setP("tbFreq", "1");
         freq.setText("806MHz");
         a.setP("tCores", "2");
         tCores.setText("2");

@@ -9,7 +9,7 @@
 
     <string name="action_setOnBoot">Set on Boot</string>
 
-    <string name="action_save">Save</string>
+    <string name="action_save">Save&amp;Apply</string>
 
     <string name="action_default">Load suggested values</string>
 
@@ -18,4 +18,9 @@
     <string name="touchboost">Modify TouchBoost</string>
     <string name="cores">Cores</string>
     <string name="tbFrequency">Frequency</string>
+
+    <string name="mount_label">Mount SD as ext4</string>
+    <string name="cbAutoMount">Mount SD as ext4 on boot</string>
+    <string name="formatSD">Format SD card to ext4</string>
+    <string name="mountSD">Mount SD card as ext4</string>
 </resources>

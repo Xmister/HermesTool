@@ -21,6 +21,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -47,35 +48,6 @@ public class MainActivity extends Activity
 
     private Properties p = new Properties();
     private boolean onBoot =false;
-
-    private Thread needReboot=null;
-
-    private Runnable needRebootRun = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(5000);
-            } catch (Exception e) {
-
-            }
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("System modified")
-                            .setMessage("System partition modified. You need to reboot for the changes to take effect")
-                            .setPositiveButton("Reboot Now", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    SUCommand.executeSu("sync;reboot");
-                                }
-                            })
-                            .setNegativeButton("Reboot Later",null);
-                    builder.show();
-                }
-            });
-        }
-    };
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -106,6 +78,13 @@ public class MainActivity extends Activity
             p.setProperty(key,value);
         }
         onBoot=Boolean.valueOf(sharedPreferences.getString("onboot","false"));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Shell.SU.available();
+            }
+        }).start();
+
     }
 
     @Override
@@ -115,11 +94,13 @@ public class MainActivity extends Activity
         FragmentTransaction fT=fragmentManager.beginTransaction();
         switch (position) {
             case 0:
-                curFrag=MainFragment.newInstance(position + 1);
-                fT.replace(R.id.container, curFrag);
+                curFrag = MainFragment.newInstance(position + 1);
                 break;
-
+            case 1:
+                curFrag = OtherFragment.newInstance(position + 1);
+                break;
         }
+        fT.replace(R.id.container, curFrag);
         fT.commit();
     }
 
@@ -187,14 +168,18 @@ public class MainActivity extends Activity
                 saveValues();
                 SUCommand.interTweak(this);
                 if ( getP("cbTouchBoost").equals("true") ) {
-                    SUCommand.getTouchBoost(new Shell.OnCommandLineListener() {
+                    SUCommand.getTouchBoost(new Shell.OnCommandResultListener() {
                         @Override
-                        public void onCommandResult(int commandCode, int exitCode) {
-
+                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                            for (String line : output) {
+                                if ( onLine(line) ) {
+                                    updateTB();
+                                    break;
+                                }
+                            }
                         }
 
-                        @Override
-                        public void onLine(String line) {
+                        private boolean onLine(String line) {
                             if (line.length()>1) {
                                 StringTokenizer st = new StringTokenizer(line,", ");
                                 if (st.hasMoreTokens()) {
@@ -203,7 +188,7 @@ public class MainActivity extends Activity
                                         st.nextToken();
                                         if (st.hasMoreTokens()) {
                                             if (!st.nextToken().equals(getP("tCores"))) {
-                                                updateTB();
+                                                return true;
                                             }
                                         }
                                     }
@@ -211,18 +196,16 @@ public class MainActivity extends Activity
                                         st.nextToken();
                                         if (st.hasMoreTokens()) {
                                             if (!st.nextToken().equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))]+"000")) {
-                                                updateTB();
+                                                return true;
                                             }
                                         }
                                     }
                                 }
                             }
+                            return false;
                         }
                     });
                 }
-                return true;
-            case R.id.action_mount:
-                SUCommand.mountSD();
                 return true;
         }
 
@@ -237,14 +220,80 @@ public class MainActivity extends Activity
                 Toast.makeText(MainActivity.this, "Please wait...", Toast.LENGTH_LONG).show();
             }
         });
-        SUCommand.saveTouchBoost(getP("tCores"), getP("tbFreq"));
-        if (needReboot == null || !needReboot.isAlive()) {
-            needReboot = new Thread(needRebootRun);
-            needReboot.start();
-        }
-    }
+        SUCommand.saveTouchBoost(getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
+            @Override
+            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                        SUCommand.getTouchBoost(new Shell.OnCommandResultListener() {
+                            @Override
+                            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                boolean error = false;
+                                for (String line : output) {
+                                    error = onLine(line);
+                                    if (error) {
+                                        break;
+                                    }
+                                }
+                                if (error) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                            builder.setTitle("System modification error")
+                                                    .setMessage("For some reason the modification failed. Please check logcat for further information.")
+                                                    .setPositiveButton("OK", null)
+                                                    .setNegativeButton("Reboot Later", null);
+                                            builder.show();
+                                        }});
+                                }
+                                else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                            builder.setTitle("System modified")
+                                                    .setMessage("System partition modified. You need to reboot for the changes to take effect")
+                                                    .setPositiveButton("Reboot Now", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            SUCommand.executeSu("sync;reboot");
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Reboot Later", null);
+                                            builder.show();
+                                        }});
+                                }
+                            }
 
-    private void saveValues() {
+                            private boolean onLine(String line) {
+                                if (line.length() > 1) {
+                                    StringTokenizer st = new StringTokenizer(line, ", ");
+                                    if (st.hasMoreTokens()) {
+                                        String token = st.nextToken();
+                                        if (token.equals("CMD_SET_CPU_CORE")) {
+                                            st.nextToken();
+                                            if (st.hasMoreTokens()) {
+                                                if (!st.nextToken().equals(getP("tCores"))) {
+                                                    return true;
+                                                }
+                                            }
+                                        } else if (token.equals("CMD_SET_CPU_FREQ")) {
+                                            st.nextToken();
+                                            if (st.hasMoreTokens()) {
+                                                if (!st.nextToken().equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))] + "000")) {
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                return false;
+                            }
+                        });
+                    }
+                });
+            }
+
+    public void saveValues() {
         curFrag.beforeSave();
         p.setProperty("onboot",""+onBoot);
         SharedPreferences sharedPreferences =getSharedPreferences("default", 0);

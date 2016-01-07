@@ -21,13 +21,21 @@ public class RNT2BootService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.w("boot_broadcast_poc", "Updating values...");
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {}
                 SUCommand.mountSD();
-                SUCommand.interTweak(RNT2BootService.this);
-                Log.w("boot_broadcast_poc", "Done...");
+                SharedPreferences sharedPreferences =RNT2BootService.this.getSharedPreferences("default", 0);
+                if ( Boolean.valueOf(sharedPreferences.getString("onboot","false"))) {
+                    Log.i("Boot Service-IT", "Updating values...");
+                    SUCommand.interTweak(RNT2BootService.this);
+                    Log.i("Boot Service-IT", "Done");
+                }
+                if ( Boolean.valueOf(sharedPreferences.getString("cbAutoMount","false"))) {
+                    Log.i("Boot Service-MT", "Mounting SD card...");
+                    SUCommand.mountSD();
+                    Log.i("Boot Service-MT", "Done");
+                }
             }
         }).start();
         return super.onStartCommand(pIntent, flags, startId);
