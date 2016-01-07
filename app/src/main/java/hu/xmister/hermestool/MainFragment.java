@@ -3,16 +3,14 @@ package hu.xmister.hermestool;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import eu.chainfire.libsuperuser.Shell;
+import android.widget.GridLayout;
 
 
 public class MainFragment extends MyFragment {
@@ -22,11 +20,11 @@ public class MainFragment extends MyFragment {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
-        private static String[] items, names;
         private static MainActivity a;
         private static Button   maxFreq,
                                 freq;
         private static EditText tCores;
+        private static CheckBox cbTouchBoost;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -47,9 +45,9 @@ public class MainFragment extends MyFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if ( items != null ) {
+                if ( Constants.frequencyItems != null ) {
                     a.setP("maxfreq",""+which);
-                    maxFreq.setText(names[which]);
+                    maxFreq.setText(Constants.frequencyNames[which]);
                 }
             }
         };
@@ -58,9 +56,9 @@ public class MainFragment extends MyFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if ( items != null ) {
+                if ( Constants.frequencyItems != null ) {
                     a.setP("tbFreq",""+which);
-                    freq.setText(names[which]);
+                    freq.setText(Constants.frequencyNames[which]);
                 }
             }
         };
@@ -82,23 +80,33 @@ public class MainFragment extends MyFragment {
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
-        items=new String[]  {"0",           "806",      "1183",     "1326",     "1469",     "1625",     "1781",     "1950"};
-        names=new String[]  {"Unlimited",   "806MHz",   "1183MHz",  "1326MHz",  "1469MHz",  "1625MHz",  "1781MHz",  "1950MHz"};
         maxFreq=(Button)getActivity().findViewById(R.id.maxFreq);
         freq=(Button)getActivity().findViewById(R.id.tFreq);
         tCores=(EditText)getActivity().findViewById(R.id.tCores);
+        cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
         maxFreq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChoiceDialog md = new ChoiceDialog("Maximum Frequency", names, di, null, null);
+                ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.frequencyNames, di, null, null);
                 md.show(getFragmentManager(), "maxfreq");
             }
         });
         freq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", names, tdi, null, null);
+                ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", Constants.frequencyNames, tdi, null, null);
                 md.show(getFragmentManager(), "tbfreq");
+            }
+        });
+        cbTouchBoost.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                a.setP("cbTouchBoost",""+isChecked);
+                GridLayout grTouch= (GridLayout)getActivity().findViewById(R.id.grTouch);
+                if (isChecked)
+                    grTouch.setVisibility(View.VISIBLE);
+                else
+                    grTouch.setVisibility(View.INVISIBLE);
             }
         });
         super.onViewStateRestored(savedInstanceState);
@@ -111,20 +119,23 @@ public class MainFragment extends MyFragment {
     }
 
     public void loadDefaults() {
-        a.setP("maxfreq","0");
+        a.setP("maxfreq", "0");
         maxFreq.setText("Unlimited");
-        a.setP("tbFreq","2");
+        a.setP("tbFreq", "2");
         freq.setText("806MHz");
-        a.setP("tCores","2");
+        a.setP("tCores", "2");
         tCores.setText("2");
+        a.setP("cbTouchBoost","true");
+        cbTouchBoost.setChecked(true);
     }
 
     @Override
     public void loadValues() {
         if (a.getP("maxfreq") != null) {
-            maxFreq.setText(names[Integer.valueOf(a.getP("maxfreq"))]);
-            freq.setText(names[Integer.valueOf(a.getP("tbFreq"))]);
+            maxFreq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("maxfreq"))]);
+            freq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("tbFreq"))]);
             tCores.setText(a.getP("tCores"));
+            cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
         } else super.loadValues();
     }
 }

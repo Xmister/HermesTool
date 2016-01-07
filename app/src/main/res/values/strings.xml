@@ -15,7 +15,7 @@
 
     <string name="main_section_label">Max Frequency</string>
     <string name="frequency">Unlimited</string>
-    <string name="touchboost">TouchBoost</string>
+    <string name="touchboost">Modify TouchBoost</string>
     <string name="cores">Cores</string>
     <string name="tbFrequency">Frequency</string>
 </resources>

@@ -3,12 +3,14 @@ package hu.xmister.hermestool;
 import android.app.Activity;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Property;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import eu.chainfire.libsuperuser.Shell;
 
@@ -44,6 +47,35 @@ public class MainActivity extends Activity
 
     private Properties p = new Properties();
     private boolean onBoot =false;
+
+    private Thread needReboot=null;
+
+    private Runnable needRebootRun = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(5000);
+            } catch (Exception e) {
+
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("System modified")
+                            .setMessage("System partition modified. You need to reboot for the changes to take effect")
+                            .setPositiveButton("Reboot Now", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    SUCommand.executeSu("sync;reboot");
+                                }
+                            })
+                            .setNegativeButton("Reboot Later",null);
+                    builder.show();
+                }
+            });
+        }
+    };
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -119,7 +151,7 @@ public class MainActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
+            // Only show frequencyItems in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.global, menu);
@@ -150,15 +182,66 @@ public class MainActivity extends Activity
             case R.id.action_setOnBoot:
                 item.setChecked(!item.isChecked());
                 onBoot=item.isChecked();
-                SUCommand.executeSu("true");
                 return true;
             case R.id.action_save:
                 saveValues();
+                SUCommand.interTweak(this);
+                if ( getP("cbTouchBoost").equals("true") ) {
+                    SUCommand.getTouchBoost(new Shell.OnCommandLineListener() {
+                        @Override
+                        public void onCommandResult(int commandCode, int exitCode) {
+
+                        }
+
+                        @Override
+                        public void onLine(String line) {
+                            if (line.length()>1) {
+                                StringTokenizer st = new StringTokenizer(line,", ");
+                                if (st.hasMoreTokens()) {
+                                    String token=st.nextToken();
+                                    if (token.equals("CMD_SET_CPU_CORE")) {
+                                        st.nextToken();
+                                        if (st.hasMoreTokens()) {
+                                            if (!st.nextToken().equals(getP("tCores"))) {
+                                                updateTB();
+                                            }
+                                        }
+                                    }
+                                    else if (token.equals("CMD_SET_CPU_FREQ")) {
+                                        st.nextToken();
+                                        if (st.hasMoreTokens()) {
+                                            if (!st.nextToken().equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))]+"000")) {
+                                                updateTB();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                return true;
+            case R.id.action_mount:
+                SUCommand.mountSD();
                 return true;
         }
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateTB() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, "Please wait...", Toast.LENGTH_LONG).show();
+            }
+        });
+        SUCommand.saveTouchBoost(getP("tCores"), getP("tbFreq"));
+        if (needReboot == null || !needReboot.isAlive()) {
+            needReboot = new Thread(needRebootRun);
+            needReboot.start();
+        }
     }
 
     private void saveValues() {
