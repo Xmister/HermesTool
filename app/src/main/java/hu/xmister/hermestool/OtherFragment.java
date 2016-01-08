@@ -14,6 +14,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -74,6 +76,21 @@ public class OtherFragment extends MyFragment {
     public void loadDefaults() {
         a.setP("cbAutoMount", "false");
         cbAutoMount.setChecked(false);
+        if (schedulers != null) {
+            List<String> al = Arrays.asList(schedulers);
+            String tmp;
+            if (al.contains("noop")) {
+                tmp="noop";
+            }
+            else if (al.contains("deadline")) {
+                tmp="deadline";
+            }
+            else {
+                tmp="cfq";
+            }
+            a.setP("sched",tmp);
+            sched.setText(tmp);
+        }
     }
 
     @Override
