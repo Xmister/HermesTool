@@ -259,80 +259,96 @@ public class MainActivity extends Activity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, "Please wait...", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("WARNING")
+                        .setMessage("You are about to modify the touchboost values. This means modifying a file on your system partition. If you do this, from now on the new values will be used until you update your ROM, or restore the values.")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        SUCommand.saveTouchBoost(getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
+                                            @Override
+                                            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                SUCommand.getTouchBoost(new Shell.OnCommandResultListener() {
+                                                    @Override
+                                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                        boolean error = false;
+                                                        for (String line : output) {
+                                                            error = onLine(line);
+                                                            if (error) {
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (error) {
+                                                            runOnUiThread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                    builder.setTitle("System modification error")
+                                                                            .setMessage("For some reason the modification failed. Please check logcat for further information.")
+                                                                            .setPositiveButton("OK", null);
+                                                                    builder.show();
+                                                                }
+                                                            });
+                                                        } else {
+                                                            runOnUiThread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                    builder.setTitle("System modified")
+                                                                            .setMessage("System partition modified. You need to reboot for the changes to take effect")
+                                                                            .setPositiveButton("Reboot Now", new DialogInterface.OnClickListener() {
+                                                                                @Override
+                                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                                    SUCommand.executeSu("sync;reboot", null);
+                                                                                }
+                                                                            })
+                                                                            .setNegativeButton("Reboot Later", null);
+                                                                    builder.show();
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+
+                                                    private boolean onLine(String line) {
+                                                        if (line.length() > 1) {
+                                                            StringTokenizer st = new StringTokenizer(line, ", ");
+                                                            if (st.hasMoreTokens()) {
+                                                                String token = st.nextToken();
+                                                                if (token.equals("CMD_SET_CPU_CORE")) {
+                                                                    st.nextToken();
+                                                                    if (st.hasMoreTokens()) {
+                                                                        if (!st.nextToken().equals(getP("tCores"))) {
+                                                                            return true;
+                                                                        }
+                                                                    }
+                                                                } else if (token.equals("CMD_SET_CPU_FREQ")) {
+                                                                    st.nextToken();
+                                                                    if (st.hasMoreTokens()) {
+                                                                        if (!st.nextToken().equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))] + "000")) {
+                                                                            return true;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        return false;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                }).start();
+                            }
+                        })
+                        .setNegativeButton("Cancel",null);
+                builder.show();
             }
         });
-        SUCommand.saveTouchBoost(getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
-            @Override
-            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                        SUCommand.getTouchBoost(new Shell.OnCommandResultListener() {
-                            @Override
-                            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                boolean error = false;
-                                for (String line : output) {
-                                    error = onLine(line);
-                                    if (error) {
-                                        break;
-                                    }
-                                }
-                                if (error) {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                            builder.setTitle("System modification error")
-                                                    .setMessage("For some reason the modification failed. Please check logcat for further information.")
-                                                    .setPositiveButton("OK", null);
-                                            builder.show();
-                                        }});
-                                }
-                                else {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                            builder.setTitle("System modified")
-                                                    .setMessage("System partition modified. You need to reboot for the changes to take effect")
-                                                    .setPositiveButton("Reboot Now", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                            SUCommand.executeSu("sync;reboot",null);
-                                                        }
-                                                    })
-                                                    .setNegativeButton("Reboot Later", null);
-                                            builder.show();
-                                        }});
-                                }
-                            }
 
-                            private boolean onLine(String line) {
-                                if (line.length() > 1) {
-                                    StringTokenizer st = new StringTokenizer(line, ", ");
-                                    if (st.hasMoreTokens()) {
-                                        String token = st.nextToken();
-                                        if (token.equals("CMD_SET_CPU_CORE")) {
-                                            st.nextToken();
-                                            if (st.hasMoreTokens()) {
-                                                if (!st.nextToken().equals(getP("tCores"))) {
-                                                    return true;
-                                                }
-                                            }
-                                        } else if (token.equals("CMD_SET_CPU_FREQ")) {
-                                            st.nextToken();
-                                            if (st.hasMoreTokens()) {
-                                                if (!st.nextToken().equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))] + "000")) {
-                                                    return true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                return false;
-                            }
-                        });
-                    }
-                });
-            }
+    }
 
     public void saveValues() {
         curFrag.beforeSave();
