@@ -142,109 +142,115 @@ public class OtherFragment extends MyFragment {
                 a.setP("cbAutoMount",""+isChecked);
             }
         });
-        btFormat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                builder.setTitle("WARNING")
-                        .setMessage("This will format your SD Card, and erase all data on it! Only continue if you made backup, and know what your are doing!\nMake sure you have busybox installed!\nMake sure you have disabled \"Mount namespace separation\" in SuperSU!")
-                        .setPositiveButton("Format card", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                SUCommand.executeSu("mke2fs", new Shell.OnCommandResultListener() {
-                                    @Override
-                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                        if (exitCode == 127) {
-                                            a.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                    builder.setTitle("Missing binaries")
-                                                            .setMessage("mke2fs not found! Do you have busybox installed?")
-                                                            .show();
-                                                }
-                                            });
-                                        } else {
-                                            SUCommand.executeSu("umount /storage/sdcard1", new Shell.OnCommandResultListener() {
-                                                @Override
-                                                public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                    if (exitCode == 0) {
-                                                        SUCommand.executeSu("umount /mnt/media_rw/sdcard1", new Shell.OnCommandResultListener() {
-                                                            @Override
-                                                            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                                if (exitCode == 0) {
-                                                                    SUCommand.formatSD(new Shell.OnCommandResultListener() {
-                                                                        @Override
-                                                                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                                            a.setP("cbAutoMount", "true");
-                                                                            cbAutoMount.setChecked(true);
-                                                                            a.saveValues();
-                                                                            SUCommand.mountSD();
-                                                                            a.runOnUiThread(new Runnable() {
-                                                                                @Override
-                                                                                public void run() {
-                                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                                    builder.setTitle("Format completed")
-                                                                                            .setMessage("SD card formatted, mounted, and set for auto-mount on each reboot. Please check if you have enabled autostart for this app!")
-                                                                                            .show();
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    });
-                                                                } else {
-                                                                    a.runOnUiThread(new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                            builder.setTitle("Unable to umount")
-                                                                                    .setMessage("Couldn't umount /mnt/media/rw/sdcard1. Please stop every other applications. If the problem persists, make a reboot.")
-                                                                                    .show();
-                                                                        }
-                                                                    });
-                                                                }
-                                                            }
-                                                        });
-                                                    } else {
-                                                        a.runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                builder.setTitle("Unable to umount")
-                                                                        .setMessage("Couldn't umount /storage/sdcard1. Please stop every other applications. If the problem persists, make a reboot.")
-                                                                        .show();
-                                                            }
-                                                        });
+        if ( a.isSuperSU ) {
+            btFormat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                    builder.setTitle(getString(R.string.warning))
+                            .setMessage(getString(R.string.format_sd_message))
+                            .setPositiveButton(getString(R.string.do_format), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    SUCommand.executeSu("mke2fs", new Shell.OnCommandResultListener() {
+                                        @Override
+                                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                            if (exitCode == 127) {
+                                                a.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                        builder.setTitle(getString(R.string.missing_binaries))
+                                                                .setMessage(getString(R.string.missing_binaries_message))
+                                                                .show();
                                                     }
-                                                }
-                                            });
+                                                });
+                                            } else {
+                                                SUCommand.executeSu("umount /storage/sdcard1", new Shell.OnCommandResultListener() {
+                                                    @Override
+                                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                        if (exitCode == 0) {
+                                                            SUCommand.executeSu("umount /mnt/media_rw/sdcard1", new Shell.OnCommandResultListener() {
+                                                                @Override
+                                                                public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                                    if (exitCode == 0) {
+                                                                        SUCommand.formatSD(new Shell.OnCommandResultListener() {
+                                                                            @Override
+                                                                            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                                                a.setP("cbAutoMount", "true");
+                                                                                cbAutoMount.setChecked(true);
+                                                                                a.saveValues();
+                                                                                SUCommand.mountSD();
+                                                                                a.runOnUiThread(new Runnable() {
+                                                                                    @Override
+                                                                                    public void run() {
+                                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                                        builder.setTitle(getString(R.string.format_complete))
+                                                                                                .setMessage(getString(R.string.format_complete_message))
+                                                                                                .show();
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        });
+                                                                    } else {
+                                                                        a.runOnUiThread(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+                                                                                AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                                builder.setTitle(getString(R.string.unable_umount))
+                                                                                        .setMessage(getString(R.string.unable_umount_message))
+                                                                                        .show();
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+                                                            });
+                                                        } else {
+                                                            a.runOnUiThread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                    builder.setTitle(getString(R.string.unable_umount))
+                                                                            .setMessage(getString(R.string.unable_umount_message2))
+                                                                            .show();
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                });
+                                            }
                                         }
-                                    }
-                                });
-                            }
-                        })
-                        .setNegativeButton("No, thanks", null);
-                builder.show();
-            }
-        });
-        btMount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SUCommand.mountSD(new Shell.OnCommandResultListener() {
-                    @Override
-                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                        a.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                builder.setTitle("Mount completed")
-                                        .setMessage("SD card mounted.")
-                                        .show();
-                            }
-                        });
-                    }
-                });
-            }
-        });
+                                    });
+                                }
+                            })
+                            .setNegativeButton(getString(R.string.nothanks), null);
+                    builder.show();
+                }
+            });
+            btMount.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SUCommand.mountSD(new Shell.OnCommandResultListener() {
+                        @Override
+                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                            a.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                    builder.setTitle("Mount completed")
+                                            .setMessage("SD card mounted.")
+                                            .show();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            btFormat.setEnabled(false);
+            btMount.setEnabled(false);
+        }
         sched.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

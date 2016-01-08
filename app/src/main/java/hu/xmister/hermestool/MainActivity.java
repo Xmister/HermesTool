@@ -48,6 +48,7 @@ public class MainActivity extends Activity
 
     private Properties p = new Properties();
     private boolean onBoot =false;
+    public boolean isSuperSU=false;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -88,11 +89,14 @@ public class MainActivity extends Activity
                             @Override
                             public void run() {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                builder.setTitle("WARNING")
-                                        .setMessage("You are not using SuperSU, that means some functions will not work (e.g. SD ext4 mount). Please consider using SuperSU.")
+                                builder.setTitle(getString(R.string.warning))
+                                        .setMessage(getString(R.string.no_supersu_message))
                                         .setPositiveButton("OK", null);
                                 builder.show();
                             }});
+                    }
+                    else {
+                        isSuperSU=true;
                     }
                 }
                 else {
@@ -100,8 +104,8 @@ public class MainActivity extends Activity
                         @Override
                         public void run() {
                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                            builder.setTitle("Root not available")
-                                    .setMessage("Your phone is not rooted, or you didn't give permission to this app. Without root permission, this app will not work.")
+                            builder.setTitle(getString(R.string.no_root))
+                                    .setMessage(getString(R.string.no_root_message))
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -260,8 +264,8 @@ public class MainActivity extends Activity
             @Override
             public void run() {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("WARNING")
-                        .setMessage("You are about to modify the touchboost values. This means modifying a file on your system partition. If you do this, from now on the new values will be used until you update your ROM, or restore the values.")
+                builder.setTitle(getString(R.string.warning))
+                        .setMessage(getString(R.string.modify_tb_warning_message))
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -286,8 +290,8 @@ public class MainActivity extends Activity
                                                                 @Override
                                                                 public void run() {
                                                                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                                    builder.setTitle("System modification error")
-                                                                            .setMessage("For some reason the modification failed. Please check logcat for further information.")
+                                                                    builder.setTitle(getString(R.string.sys_mod_error))
+                                                                            .setMessage(getString(R.string.sys_mod_error_message))
                                                                             .setPositiveButton("OK", null);
                                                                     builder.show();
                                                                 }
@@ -297,15 +301,15 @@ public class MainActivity extends Activity
                                                                 @Override
                                                                 public void run() {
                                                                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                                    builder.setTitle("System modified")
-                                                                            .setMessage("System partition modified. You need to reboot for the changes to take effect")
-                                                                            .setPositiveButton("Reboot Now", new DialogInterface.OnClickListener() {
+                                                                    builder.setTitle(getString(R.string.sys_mod_success))
+                                                                            .setMessage(getString(R.string.sys_mod_success_message))
+                                                                            .setPositiveButton(getString(R.string.reboot_now), new DialogInterface.OnClickListener() {
                                                                                 @Override
                                                                                 public void onClick(DialogInterface dialog, int which) {
                                                                                     SUCommand.executeSu("sync;reboot", null);
                                                                                 }
                                                                             })
-                                                                            .setNegativeButton("Reboot Later", null);
+                                                                            .setNegativeButton(getString(R.string.reboot_later), null);
                                                                     builder.show();
                                                                 }
                                                             });

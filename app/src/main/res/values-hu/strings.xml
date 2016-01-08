@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Redmi Note 2 Tool</string>
+    <string name="action_default">Ajánlott értékek</string>
+    <string name="action_save">Ment&amp;Alkalmaz</string>
+    <string name="action_setOnBoot">Beállítás Rendszerindításkor</string>
+    <string name="cbAutoMount">SD kártya felcsatolása rendszerindításkor(ext4)</string>
+    <string name="cores">Magok száma</string>
+    <string name="formatSD">SD kártya formázása ext4 fájlrendszerre</string>
+    <string name="main_section_label">Max frekvencia</string>
+    <string name="mountSD">SD kártya felcsatolása (ext4)</string>
+    <string name="mount_label">SD kártya ext4 használatával</string>
+    <string name="tbFrequency">Frekvencia</string>
+    <string name="title_section1">CPU</string>
+    <string name="title_section2">Többi</string>
+    <string name="touchboost">TouchBoost módosítása</string>
+    <string name="sched_label">I/O ütemező</string>
+    <string name="do_format">Kártya formázása</string>
+    <string name="format_complete">Formázás kész</string>
+    <string name="format_complete_message">A kártya formázva, csatolva, és beállítva, hogy rendszerindításkor is használható legyen. Kérlek ellenőrízd, hogy engedélyezve van-e az alkalmazás az Indítópultban!</string>
+    <string name="format_sd_message">Az SD kártya formázására készülsz, így minden adatod el fog veszni róla! Kérlek bizonyosodj meg, hogy van mentésed minden fontos fájlról, a busybox telepítve van, SuperSU-t használsz, és a "Mount namespace separation" ki van kapcsolva benne!</string>
+    <string name="missing_binaries">Hiányzó binárisok</string>
+    <string name="missing_binaries_message">Az mke2fs nem található a rendszereden! Feltetted a busybox-ot?</string>
+    <string name="modify_tb_warning_message">A touchboost módosítására készülsz. Ez azt jelenti, hogy a system partíción meg fog változni egy fájl. Innentől kezdve az új értékeket fogja használni a rendszer, amíg nem frissítesz ROM-ot, vagy állítod vissza azokat.</string>
+    <string name="no_root">Root nem elérhető</string>
+    <string name="no_root_message">A telefonod nincs rootolva, vagy nem engedélyezted ezt az alkalmazást. Root jogok nélkül az alkalmazás nem tud működni.</string>
+    <string name="no_supersu_message">Nem SuperSU-t használsz. Emiatt néhány funkció (pl. SD ext4) nem fog működni. Kérlek fontold meg a SuperSU használatát!</string>
+    <string name="reboot_later">Újraindítás később</string>
+    <string name="reboot_now">Újraindítás most</string>
+    <string name="sys_mod_error">Rendszer módosítás hiba</string>
+    <string name="sys_mod_error_message">A rendszer módosítás nem sikerült. További információt a logcat-ben találhatsz.</string>
+    <string name="sys_mod_success">Rendszer módosítva</string>
+    <string name="sys_mod_success_message">A rendszer módosítva. Újra kell indítanod a telefont, hogy a változások életbe lépjenek.</string>
+    <string name="unable_umount">Lecsatolás sikertelen</string>
+    <string name="unable_umount_message">Nem sikerült a /mnt/media/rw/sdcard1 lecsatolása. Zárj be minden egyéb alkalmazást, és próbáld újra. Ha továbbra is ebbe a hibába ütközöl, indítsd újra a telefont!</string>
+    <string name="unable_umount_message2">Nem sikerült a /storage/sdcard1 lecsatolása. Zárj be minden egyéb alkalmazást, és próbáld újra. Ha továbbra is ebbe a hibába ütközöl, indítsd újra a telefont!</string>
+    <string name="warning">FIGYELEM</string>
+    <string name="nothanks">Kösz, mégsem</string>
+</resources>
