@@ -95,6 +95,28 @@ public class MainActivity extends Activity
                             }});
                     }
                 }
+                else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                            builder.setTitle("Root not available")
+                                    .setMessage("Your phone is not rooted, or you didn't give permission to this app. Without root permission, this app will not work.")
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            finish();
+                                        }
+                                    })
+                                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            finish();
+                                        }
+                                    });
+                            builder.show();
+                        }});
+                }
             }
         }).start();
 
