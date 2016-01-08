@@ -81,7 +81,20 @@ public class MainActivity extends Activity
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Shell.SU.available();
+                if ( Shell.SU.available() ) {
+                    String ver=Shell.SU.version(false);
+                    if ( !ver.toLowerCase().contains("supersu") ) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                builder.setTitle("WARNING")
+                                        .setMessage("You are not using SuperSU, that means some functions will not work (e.g. SD ext4 mount). Please consider using SuperSU.")
+                                        .setPositiveButton("OK", null);
+                                builder.show();
+                            }});
+                    }
+                }
             }
         }).start();
 
@@ -207,6 +220,13 @@ public class MainActivity extends Activity
                     });
                 }
                 return true;
+            case R.id.action_debug:
+                SUCommand.executeSu(new String[]{"mke3fs","mke2fs"}, new Shell.OnCommandResultListener() {
+                    @Override
+                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                        return;
+                    }
+                });
         }
 
 
@@ -240,8 +260,7 @@ public class MainActivity extends Activity
                                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                             builder.setTitle("System modification error")
                                                     .setMessage("For some reason the modification failed. Please check logcat for further information.")
-                                                    .setPositiveButton("OK", null)
-                                                    .setNegativeButton("Reboot Later", null);
+                                                    .setPositiveButton("OK", null);
                                             builder.show();
                                         }});
                                 }
@@ -255,7 +274,7 @@ public class MainActivity extends Activity
                                                     .setPositiveButton("Reboot Now", new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
-                                                            SUCommand.executeSu("sync;reboot");
+                                                            SUCommand.executeSu("sync;reboot",null);
                                                         }
                                                     })
                                                     .setNegativeButton("Reboot Later", null);

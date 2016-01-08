@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="fill_parent" tools:context="hu.xmister.hermestool.OtherFragment"
     android:columnCount="2"
-    android:rowCount="5">
+    android:rowCount="7">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -34,5 +34,20 @@
         android:id="@+id/btMount"
         android:layout_column="0"
         android:layout_row="3" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sched_label"
+        android:layout_column="0"
+        android:layout_row="4"
+        android:id="@+id/textView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sched"
+        android:layout_row="5"
+        android:layout_column="0" />
 
 </GridLayout>

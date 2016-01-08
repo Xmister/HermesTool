@@ -21,7 +21,7 @@ public class SUCommand {
      * @param cmd the command to execute
      * @return the result of the execution
      */
-    public static List<String> executeSu(final String cmd) {
+    public static void executeSu(final String cmd, Shell.OnCommandResultListener ll) {
         /*try {
             Process p = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(p.getOutputStream());
@@ -35,16 +35,17 @@ public class SUCommand {
         catch (Exception e) {
             return -1;
         }*/
-        final List<String> ret = new ArrayList<String>(10);
-        new Thread(new Runnable() {
+        final Shell.Builder builder = new Shell.Builder();
+        builder.addCommand(cmd, 0, ll);
+        builder.useSU();
+        Thread abc = new Thread(new Runnable() {
             @Override
             public void run() {
-                for( String s : Shell.SU.run(cmd) ) {
-                    ret.add(s);
-                }
+                Shell.Interactive sh=builder.open();
+                sh.close();
             }
-        }).start();
-        return ret;
+        });
+        abc.start();
     }
 
 
@@ -66,14 +67,32 @@ public class SUCommand {
         String cmds[] = {
                 "e2fsck -fy /dev/block/mmcblk1p1",
                 "mount -o remount,rw /",
+                "mkdir /mnt/media_rw/sdcard1",
                 "chown media_rw:media_rw /mnt/media_rw/sdcard1",
+                "chmod 777 media_rw:media_rw /mnt/media_rw/sdcard1",
+                "mkdir /storage/sdcard1",
+                "chown media_rw:media_rw /storage/sdcard1",
+                "chmod 777 media_rw:media_rw /storage/sdcard1",
                 "mount -o remount,ro /",
                 "mount -rw -t ext4 -o noatime /dev/block/mmcblk1p1 /mnt/media_rw/sdcard1",
-                "setenforce 0",
                 "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
-                "/system/bin/vold &"
+                "/system/bin/vold &",
+                "supolicy --live \"allow sdcardd unlabeled dir { append create execute write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon rmdir audit_access remove_name add_name reparent execmod search open }\"",
+                "supolicy --live \"allow sdcardd unlabeled file { append create write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon audit_access open }\"",
+                "supolicy --live \"allow unlabeled unlabeled filesystem associate\"",
         };
-        executeSu(cmds, ll);
+        final Shell.Builder builder = new Shell.Builder();
+        builder.addCommand(cmds, 0, ll);
+        builder.useSU();
+        builder.setShell(Shell.SU.shellMountMaster());
+        Thread abc = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Shell.Interactive sh=builder.open();
+                sh.close();
+            }
+        });
+        abc.start();
     }
 
     public static void mountSD() {
@@ -104,10 +123,17 @@ public class SUCommand {
                 "echo \"800000\" > timer_slack",
                 "echo \"93 806000:95 1183000:95 1326000:96 1469000:98\" >  target_loads",
                 "echo \"99\" > go_hispeed_load",
-                "cd /sys/block/mmcblk0/queue",
-                "echo \"noop\" > scheduler"
         };
         executeSu(cmds,null);
+        if ( sharedPreferences.contains("sched") ) {
+            cmds=new String[]{
+                    "cd /sys/block/mmcblk0/queue",
+                    "echo "+sharedPreferences.getString("sched","cfq")+" > scheduler",
+                    "cd /sys/block/mmcblk1/queue",
+                    "echo "+sharedPreferences.getString("sched","cfq")+" > scheduler",
+            };
+            executeSu(cmds,null);
+        }
     }
     public static void saveTouchBoost(String cores, String freq, Shell.OnCommandResultListener ll) {
         String cmds[] = {

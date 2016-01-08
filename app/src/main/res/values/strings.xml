@@ -23,4 +23,5 @@
     <string name="cbAutoMount">Mount SD as ext4 on boot</string>
     <string name="formatSD">Format SD card to ext4</string>
     <string name="mountSD">Mount SD card as ext4</string>
+    <string name="sched_label">I/O Scheduler</string>
 </resources>
