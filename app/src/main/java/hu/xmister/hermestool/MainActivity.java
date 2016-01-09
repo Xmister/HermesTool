@@ -57,19 +57,8 @@ public class MainActivity extends Activity
 
     private MyFragment curFrag=null;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private void init() {
         setContentView(R.layout.activity_main);
-
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
 
         SharedPreferences sharedPreferences =getSharedPreferences("default", 0);
         Map<String, String> all;
@@ -79,51 +68,72 @@ public class MainActivity extends Activity
             p.setProperty(key,value);
         }
         onBoot=Boolean.valueOf(sharedPreferences.getString("onboot","false"));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if ( Shell.SU.available() ) {
-                    String ver=Shell.SU.version(false);
-                    if ( !ver.toLowerCase().contains("supersu") ) {
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mTitle = getTitle();
+
+        // Set up the drawer.
+        mNavigationDrawerFragment.setUp(
+                R.id.navigation_drawer,
+                (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        init();
+        findViewById(R.id.container).setVisibility(View.INVISIBLE);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (Shell.SU.available()) {
+                        String ver = Shell.SU.version(false);
+                        if (!ver.toLowerCase().contains("supersu")) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                    builder.setTitle(getString(R.string.warning))
+                                            .setMessage(getString(R.string.no_supersu_message))
+                                            .setPositiveButton("OK", null);
+                                    builder.show();
+                                }
+                            });
+                        } else {
+                            isSuperSU = true;
+                        }
+                    } else {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                builder.setTitle(getString(R.string.warning))
-                                        .setMessage(getString(R.string.no_supersu_message))
-                                        .setPositiveButton("OK", null);
+                                builder.setTitle(getString(R.string.no_root))
+                                        .setMessage(getString(R.string.no_root_message))
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                finish();
+                                            }
+                                        })
+                                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                            @Override
+                                            public void onDismiss(DialogInterface dialog) {
+                                                finish();
+                                            }
+                                        });
                                 builder.show();
-                            }});
+                            }
+                        });
                     }
-                    else {
-                        isSuperSU=true;
-                    }
-                }
-                else {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                            builder.setTitle(getString(R.string.no_root))
-                                    .setMessage(getString(R.string.no_root_message))
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            finish();
-                                        }
-                                    })
-                                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                        @Override
-                                        public void onDismiss(DialogInterface dialog) {
-                                            finish();
-                                        }
-                                    });
-                            builder.show();
-                        }});
+                            findViewById(R.id.container).setVisibility(View.VISIBLE);
+                        }
+                    });
                 }
-            }
-        }).start();
-
+            }).start();
     }
 
     @Override
@@ -207,41 +217,13 @@ public class MainActivity extends Activity
                 saveValues();
                 SUCommand.interTweak(this);
                 if ( getP("cbTouchBoost").equals("true") ) {
-                    SUCommand.getTouchBoost(new Shell.OnCommandResultListener() {
+                    SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                         @Override
-                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                            for (String line : output) {
-                                if ( onLine(line) ) {
-                                    updateTB();
-                                    break;
-                                }
+                        public void onGotTB(String freq, String cores) {
+                            if (freq == null || cores == null) return;
+                            if (!freq.equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))]+ "000") || !cores.equals(getP("tCores"))) {
+                                updateTB();
                             }
-                        }
-
-                        private boolean onLine(String line) {
-                            if (line.length()>1) {
-                                StringTokenizer st = new StringTokenizer(line,", ");
-                                if (st.hasMoreTokens()) {
-                                    String token=st.nextToken();
-                                    if (token.equals("CMD_SET_CPU_CORE")) {
-                                        st.nextToken();
-                                        if (st.hasMoreTokens()) {
-                                            if (!st.nextToken().equals(getP("tCores"))) {
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                    else if (token.equals("CMD_SET_CPU_FREQ")) {
-                                        st.nextToken();
-                                        if (st.hasMoreTokens()) {
-                                            if (!st.nextToken().equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))]+"000")) {
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            return false;
                         }
                     });
                 }
@@ -275,16 +257,14 @@ public class MainActivity extends Activity
                                         SUCommand.saveTouchBoost(getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
                                             @Override
                                             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                SUCommand.getTouchBoost(new Shell.OnCommandResultListener() {
+                                                SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                                                     @Override
-                                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                        boolean error = false;
-                                                        for (String line : output) {
-                                                            error = onLine(line);
-                                                            if (error) {
-                                                                break;
+                                                    public void onGotTB(String freq, String cores) {
+                                                        boolean error=false;
+                                                            if (freq == null || cores == null) error=true;
+                                                            else if (!freq.equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))]+"000") || !cores.equals(getP("tCores")) ) {
+                                                                error=true;
                                                             }
-                                                        }
                                                         if (error) {
                                                             runOnUiThread(new Runnable() {
                                                                 @Override
@@ -314,31 +294,6 @@ public class MainActivity extends Activity
                                                                 }
                                                             });
                                                         }
-                                                    }
-
-                                                    private boolean onLine(String line) {
-                                                        if (line.length() > 1) {
-                                                            StringTokenizer st = new StringTokenizer(line, ", ");
-                                                            if (st.hasMoreTokens()) {
-                                                                String token = st.nextToken();
-                                                                if (token.equals("CMD_SET_CPU_CORE")) {
-                                                                    st.nextToken();
-                                                                    if (st.hasMoreTokens()) {
-                                                                        if (!st.nextToken().equals(getP("tCores"))) {
-                                                                            return true;
-                                                                        }
-                                                                    }
-                                                                } else if (token.equals("CMD_SET_CPU_FREQ")) {
-                                                                    st.nextToken();
-                                                                    if (st.hasMoreTokens()) {
-                                                                        if (!st.nextToken().equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))] + "000")) {
-                                                                            return true;
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        return false;
                                                     }
                                                 });
                                             }

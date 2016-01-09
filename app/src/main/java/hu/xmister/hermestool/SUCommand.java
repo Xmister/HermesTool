@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -16,6 +17,9 @@ import eu.chainfire.libsuperuser.Shell;
 import eu.chainfire.libsuperuser.StreamGobbler;
 
 public class SUCommand {
+    public interface tbCallback {
+        public void onGotTB(String freq, String cores);
+    }
     /**
      * Executes command in SuperUser Shell
      * @param cmd the command to execute
@@ -107,7 +111,7 @@ public class SUCommand {
                 "umount /mnt/media_rw/sdcard1",
                 "mke2fs -t ext4 -m 0 /dev/block/mmcblk1p1",
         };
-        executeSu(cmds,ll);
+        executeSu(cmds, ll);
     }
 
     public static void interTweak(Context context) {
@@ -154,4 +158,41 @@ public class SUCommand {
         };
         executeSu(cmds,ll);
     }
+
+    public static void getTouchBoost(final tbCallback ll) {
+        getTouchBoost(new Shell.OnCommandResultListener() {
+            String fr=null, cr=null;
+            @Override
+            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                for (String line : output) {
+                    if ( onLine(line) ) {
+                    }
+                }
+                ll.onGotTB(fr,cr);
+            }
+
+            private boolean onLine(String line) {
+                if (line.length()>1) {
+                    StringTokenizer st = new StringTokenizer(line,", ");
+                    if (st.hasMoreTokens()) {
+                        String token=st.nextToken();
+                        if (token.equals("CMD_SET_CPU_CORE")) {
+                            st.nextToken();
+                            if (st.hasMoreTokens()) {
+                                cr=st.nextToken();
+                            }
+                        }
+                        else if (token.equals("CMD_SET_CPU_FREQ")) {
+                            st.nextToken();
+                            if (st.hasMoreTokens()) {
+                                fr=st.nextToken();
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
 }

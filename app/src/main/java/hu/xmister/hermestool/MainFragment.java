@@ -12,6 +12,8 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridLayout;
 
+import java.util.List;
+
 
 public class MainFragment extends MyFragment {
 
@@ -60,7 +62,7 @@ public class MainFragment extends MyFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if ( Constants.frequencyItems != null ) {
-                    a.setP("tbFreq",""+which+1);
+                    a.setP("tbFreq",""+(which+1));
                     freq.setText(Constants.frequencyNames[which+1]);
                 }
             }
@@ -99,7 +101,7 @@ public class MainFragment extends MyFragment {
             public void onClick(View v) {
                 String tmpNames[] = new String[Constants.frequencyNames.length - 1];
                 for (int i = 1; i < Constants.frequencyNames.length; i++) {
-                    tmpNames[i-1] = Constants.frequencyNames[i];
+                    tmpNames[i - 1] = Constants.frequencyNames[i];
                 }
                 ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
                 md.show(getFragmentManager(), "tbfreq");
@@ -122,7 +124,7 @@ public class MainFragment extends MyFragment {
     @Override
     public void beforeSave() {
         super.beforeSave();
-        a.setP("tCores",tCores.getText().toString());
+        a.setP("tCores", tCores.getText().toString());
     }
 
     public void loadDefaults() {
@@ -132,16 +134,50 @@ public class MainFragment extends MyFragment {
         freq.setText("806MHz");
         a.setP("tCores", "2");
         tCores.setText("2");
-        a.setP("cbTouchBoost","true");
+        a.setP("cbTouchBoost", "true");
         cbTouchBoost.setChecked(true);
+    }
+
+    private synchronized void setFreqText(final String text) {
+        a.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if ( freq != null ) freq.setText(text);
+            }
+        });
+    }
+    private synchronized void setCoresText(final String text) {
+        a.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if ( tCores != null ) tCores.setText(text);
+            }
+        });
     }
 
     @Override
     public void loadValues() {
+        SUCommand.getTouchBoost(new SUCommand.tbCallback() {
+            @Override
+            public void onGotTB(String freq, String cores) {
+                int i=0;
+                for (i=0; i<Constants.frequencyItems.length; i++) {
+                    if (Constants.frequencyItems[i].equals(freq.substring(0,freq.length()-3))) {
+                        break;
+                    }
+                }
+                if (i<Constants.frequencyItems.length) {
+                    setFreqText(Constants.frequencyNames[i]);
+                }
+                else i=0;
+                a.setP("tbFreq",""+i);
+                setCoresText(cores);
+            }
+        });
         if (a.getP("maxfreq") != null) {
             maxFreq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("maxfreq"))]);
-            freq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("tbFreq"))]);
-            tCores.setText(a.getP("tCores"));
+            //freq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("tbFreq"))]);
+            //tCores.setText(a.getP("tCores"));
             cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
         } else super.loadValues();
     }
