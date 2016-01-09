@@ -28,6 +28,7 @@ public class MainFragment extends MyFragment {
                                 freq;
         private static EditText tCores;
         private static CheckBox cbTouchBoost;
+        private static GridLayout grTouch;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -89,6 +90,7 @@ public class MainFragment extends MyFragment {
         freq=(Button)getActivity().findViewById(R.id.tFreq);
         tCores=(EditText)getActivity().findViewById(R.id.tCores);
         cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
+        grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
         maxFreq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,7 +113,6 @@ public class MainFragment extends MyFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 a.setP("cbTouchBoost", "" + isChecked);
-                GridLayout grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
                 if (isChecked)
                     grTouch.setVisibility(View.VISIBLE);
                 else
@@ -179,6 +180,12 @@ public class MainFragment extends MyFragment {
             //freq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("tbFreq"))]);
             //tCores.setText(a.getP("tCores"));
             cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
-        } else super.loadValues();
+        } else {
+            a.setP("maxfreq", "0");
+            maxFreq.setText("Unlimited");
+            a.setP("cbTouchBoost", "false");
+            cbTouchBoost.setChecked(false);
+            grTouch.setVisibility(View.INVISIBLE);
+        }
     }
 }

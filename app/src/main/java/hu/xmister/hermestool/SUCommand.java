@@ -82,7 +82,7 @@ public class SUCommand {
                 "mount -rw -t ext4 -o noatime /dev/block/mmcblk1p1 /mnt/media_rw/sdcard1",
                 "chmod 777 /mnt/media_rw/sdcard1",
                 "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
-                "/system/bin/vold &",
+                "/system/bin/vold",
                 //"supolicy --live \"allow sdcardd unlabeled dir { append create execute write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon rmdir audit_access remove_name add_name reparent execmod search open }\"",
                 //"supolicy --live \"allow sdcardd unlabeled file { append create write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon audit_access open }\"",
                 //"supolicy --live \"allow unlabeled unlabeled filesystem associate\"",
