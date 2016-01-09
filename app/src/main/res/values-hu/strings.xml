@@ -18,7 +18,7 @@
     <string name="do_format">Kártya formázása</string>
     <string name="format_complete">Formázás kész</string>
     <string name="format_complete_message">A kártya formázva, csatolva, és beállítva, hogy rendszerindításkor is használható legyen. Kérlek ellenőrízd, hogy engedélyezve van-e az alkalmazás az Indítópultban!</string>
-    <string name="format_sd_message">Az SD kártya formázására készülsz, így minden adatod el fog veszni róla! Kérlek bizonyosodj meg, hogy van mentésed minden fontos fájlról, a busybox telepítve van, SuperSU-t használsz, és a "Mount namespace separation" ki van kapcsolva benne!</string>
+    <string name="format_sd_message">Az SD kártya formázására készülsz, így minden adatod el fog veszni róla! Kérlek bizonyosodj meg, hogy van mentésed minden fontos fájlról. Ha SuperSU-t használsz, a "Mount namespace separation" legyen kikapcsolva a beállításaiban!</string>
     <string name="missing_binaries">Hiányzó binárisok</string>
     <string name="missing_binaries_message">Az mke2fs nem található a rendszereden! Feltetted a busybox-ot?</string>
     <string name="modify_tb_warning_message">A touchboost módosítására készülsz. Ez azt jelenti, hogy a system partíción meg fog változni egy fájl. Innentől kezdve az új értékeket fogja használni a rendszer, amíg nem frissítesz ROM-ot, vagy állítod vissza azokat.</string>

@@ -35,7 +35,7 @@
     <string name="no_root">Root not available</string>
     <string name="no_root_message">Your phone is not rooted, or you didn\'t give permission to this app. Without root permission, this app will not work.</string>
     <string name="no_supersu_message">You are not using SuperSU, that means some functions will not work (e.g. SD ext4 mount). Please consider using SuperSU.</string>
-    <string name="format_sd_message">This will format your SD Card, and erase all data on it! Only continue if you made backup, and know what your are doing!\nMake sure you have busybox installed!\nMake sure you have disabled \"Mount namespace separation\" in SuperSU!</string>
+    <string name="format_sd_message">This will format your SD Card, and erase all data on it! Only continue if you made backup, and know what your are doing!\nIf you are using SuperSU, make sure you have disabled \"Mount namespace separation\" in its settings!</string>
     <string name="do_format">Format card</string>
     <string name="missing_binaries">Missing binaries</string>
     <string name="missing_binaries_message">mke2fs not found! Do you have busybox installed?</string>

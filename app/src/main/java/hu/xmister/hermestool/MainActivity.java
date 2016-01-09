@@ -90,7 +90,7 @@ public class MainActivity extends Activity
                     if (Shell.SU.available()) {
                         String ver = Shell.SU.version(false);
                         if (!ver.toLowerCase().contains("supersu")) {
-                            runOnUiThread(new Runnable() {
+                            /*runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -99,7 +99,7 @@ public class MainActivity extends Activity
                                             .setPositiveButton("OK", null);
                                     builder.show();
                                 }
-                            });
+                            });*/
                         } else {
                             isSuperSU = true;
                         }

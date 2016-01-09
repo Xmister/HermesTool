@@ -143,7 +143,7 @@ public class OtherFragment extends MyFragment {
                 a.setP("cbAutoMount",""+isChecked);
             }
         });
-        if ( a.isSuperSU ) {
+        //if ( a.isSuperSU ) {
             btFormat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -247,11 +247,11 @@ public class OtherFragment extends MyFragment {
                     });
                 }
             });
-        }
+        /*}
         else {
             btFormat.setEnabled(false);
             btMount.setEnabled(false);
-        }
+        }*/
         sched.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
