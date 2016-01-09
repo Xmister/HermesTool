@@ -72,6 +72,7 @@ public class SUCommand {
                 "e2fsck -fy /dev/block/mmcblk1p1",
                 "mount -o remount,rw /",
                 "mkdir /mnt/media_rw/sdcard1",
+                //"chcon u:object_r:rootfs:s1 /mnt/media_rw/sdcard1",
                 "chown 1023:1023 /mnt/media_rw/sdcard1",
                 "chmod 777 /mnt/media_rw/sdcard1",
                 "mkdir /storage/sdcard1",
@@ -82,17 +83,16 @@ public class SUCommand {
                 "chmod 777 /mnt/media_rw/sdcard1",
                 "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
                 "/system/bin/vold &",
-                "supolicy --live \"allow sdcardd unlabeled dir { append create execute write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon rmdir audit_access remove_name add_name reparent execmod search open }\"",
-                "supolicy --live \"allow sdcardd unlabeled file { append create write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon audit_access open }\"",
-                "supolicy --live \"allow unlabeled unlabeled filesystem associate\"",
+                //"supolicy --live \"allow sdcardd unlabeled dir { append create execute write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon rmdir audit_access remove_name add_name reparent execmod search open }\"",
+                //"supolicy --live \"allow sdcardd unlabeled file { append create write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon audit_access open }\"",
+                //"supolicy --live \"allow unlabeled unlabeled filesystem associate\"",
         };
         final Shell.Builder builder = new Shell.Builder();
         builder.addCommand(cmds, 0, ll);
-        builder.useSU();
-        builder.setShell(Shell.SU.shellMountMaster());
         Thread abc = new Thread(new Runnable() {
             @Override
             public void run() {
+                builder.setShell("su -mm -c sh");
                 Shell.Interactive sh=builder.open();
                 sh.close();
             }
