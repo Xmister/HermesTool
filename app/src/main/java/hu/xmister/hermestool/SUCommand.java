@@ -114,7 +114,7 @@ public class SUCommand {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
         String cmds[] = {
                 "cd /proc/cpufreq",
-                "echo "+sharedPreferences.getString("maxfreq","0")+" > cpufreq_limited_max_freq_by_user",
+                "echo "+Constants.frequencyItems[Integer.valueOf(sharedPreferences.getString("maxfreq","0"))]+"000 > cpufreq_limited_max_freq_by_user",
                 "cd /sys/devices/system/cpu/cpufreq/interactive",
                 "echo \"5000\" > timer_rate",
                 "echo \"806000\" > hispeed_freq",
