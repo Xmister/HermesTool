@@ -45,4 +45,6 @@
     <string name="unable_umount_message">Couldn\'t umount /mnt/media/rw/sdcard1. Please stop every other applications. If the problem persists, make a reboot.</string>
     <string name="unable_umount_message2">Couldn\'t umount /storage/sdcard1. Please stop every other applications. If the problem persists, make a reboot.</string>
     <string name="nothanks">No, thanks</string>
+    <string name="tb_error">Error</string>
+    <string name="tb_error_message">Couldn\'t read touchboost values!</string>
 </resources>

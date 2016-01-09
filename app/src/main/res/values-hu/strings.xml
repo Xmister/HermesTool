@@ -36,4 +36,6 @@
     <string name="unable_umount_message2">Nem sikerült a /storage/sdcard1 lecsatolása. Zárj be minden egyéb alkalmazást, és próbáld újra. Ha továbbra is ebbe a hibába ütközöl, indítsd újra a telefont!</string>
     <string name="warning">FIGYELEM</string>
     <string name="nothanks">Kösz, mégsem</string>
+    <string name="tb_error">Hiba</string>
+    <string name="tb_error_message">Nem sikerült a touchboost értékek kiolvasása!</string>
 </resources>

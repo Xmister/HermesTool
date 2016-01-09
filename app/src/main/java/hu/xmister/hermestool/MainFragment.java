@@ -1,6 +1,7 @@
 package hu.xmister.hermestool;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,7 +26,7 @@ public class MainFragment extends MyFragment {
         private static MainFragment self=null;
         private static MainActivity a;
         private static Button   maxFreq,
-                                freq;
+                                freq=null;
         private static EditText tCores;
         private static CheckBox cbTouchBoost;
         private static GridLayout grTouch;
@@ -161,24 +162,47 @@ public class MainFragment extends MyFragment {
         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
             @Override
             public void onGotTB(String freq, String cores) {
-                int i=0;
-                for (i=0; i<Constants.frequencyItems.length; i++) {
-                    if (Constants.frequencyItems[i].equals(freq.substring(0,freq.length()-3))) {
-                        break;
+                if ( freq!= null && cores != null ) {
+                    int i = 0;
+                    for (i = 0; i < Constants.frequencyItems.length; i++) {
+                        if (Constants.frequencyItems[i].equals(freq.substring(0, freq.length() - 3))) {
+                            break;
+                        }
+                    }
+                    if (i < Constants.frequencyItems.length) {
+                        setFreqText(Constants.frequencyNames[i]);
+                    } else i = 0;
+                    a.setP("tbFreq", "" + i);
+                    setCoresText(cores);
+                } else {
+                    a.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                            builder.setTitle(getString(R.string.tb_error))
+                                    .setMessage(getString(R.string.tb_error_message))
+                                    .show();
+                        }
+                    });
+                    if ( a.getP("tbFreq")!=null) {
+                        setFreqText(Constants.frequencyNames[Integer.valueOf(a.getP("tbFreq"))]);
+                    }
+                    else {
+                        setFreqText("806MHz");
+                        a.setP("tbFreq", "1");
+                    }
+                    if ( a.getP("tCores")!=null) {
+                        setCoresText(a.getP("tCores"));
+                    }
+                    else {
+                        setCoresText("2");
+                        a.setP("tCores","2");
                     }
                 }
-                if (i<Constants.frequencyItems.length) {
-                    setFreqText(Constants.frequencyNames[i]);
-                }
-                else i=0;
-                a.setP("tbFreq",""+i);
-                setCoresText(cores);
             }
         });
         if (a.getP("maxfreq") != null) {
             maxFreq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("maxfreq"))]);
-            //freq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("tbFreq"))]);
-            //tCores.setText(a.getP("tCores"));
             cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
         } else {
             a.setP("maxfreq", "0");

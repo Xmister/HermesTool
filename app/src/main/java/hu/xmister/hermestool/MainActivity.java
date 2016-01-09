@@ -220,8 +220,8 @@ public class MainActivity extends Activity
                     SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                         @Override
                         public void onGotTB(String freq, String cores) {
-                            if (freq == null || cores == null) return;
-                            if (!freq.equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))]+ "000") || !cores.equals(getP("tCores"))) {
+                            if (freq == null || cores == null) updateTB();
+                            else if (!freq.equals(Constants.frequencyItems[Integer.valueOf(getP("tbFreq"))]+ "000") || !cores.equals(getP("tCores"))) {
                                 updateTB();
                             }
                         }
