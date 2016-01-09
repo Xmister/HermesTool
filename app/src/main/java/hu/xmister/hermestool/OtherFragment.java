@@ -42,11 +42,12 @@ public class OtherFragment extends MyFragment {
      */
     // TODO: Rename and change types and number of parameters
     public static OtherFragment newInstance(int sectionNumber) {
-        if ( self == null )
+        if ( self == null ) {
             self = new OtherFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-        self.setArguments(args);
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            self.setArguments(args);
+        }
         return self;
     }
 

@@ -32,11 +32,12 @@ public class MainFragment extends MyFragment {
          * number.
          */
         public static MainFragment newInstance(int sectionNumber) {
-            if ( self == null )
+            if ( self == null ) {
                 self = new MainFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            self.setArguments(args);
+                Bundle args = new Bundle();
+                args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+                self.setArguments(args);
+            }
             return self;
         }
 

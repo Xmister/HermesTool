@@ -48,7 +48,7 @@ public class MainActivity extends Activity
 
     private Properties p = new Properties();
     private boolean onBoot =false;
-    public boolean isSuperSU=false;
+    public static boolean isSuperSU=false;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
