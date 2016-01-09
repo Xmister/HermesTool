@@ -174,19 +174,19 @@ public class SUCommand {
 
             private boolean onLine(String line) {
                 if (line.length()>1) {
-                    StringTokenizer st = new StringTokenizer(line,", ");
+                    StringTokenizer st = new StringTokenizer(line,",");
                     if (st.hasMoreTokens()) {
-                        String token=st.nextToken();
+                        String token=st.nextToken().trim();
                         if (token.equals("CMD_SET_CPU_CORE")) {
                             st.nextToken();
                             if (st.hasMoreTokens()) {
-                                cr=st.nextToken();
+                                cr=st.nextToken().trim();
                             }
                         }
                         else if (token.equals("CMD_SET_CPU_FREQ")) {
                             st.nextToken();
                             if (st.hasMoreTokens()) {
-                                fr=st.nextToken();
+                                fr=st.nextToken().trim();
                             }
                         }
                     }
