@@ -41,7 +41,7 @@
     <string name="sys_inter_error">Interactive értékek nem menthetők</string>
     <string name="sys_inter_error_message">Valamilyen okból nem sikerült a megfelelő fájlok írása. Nem használsz másik kernel/CPU tweak appot?</string>
     <string name="sys_inter_suc">Siker</string>
-    <string name="sys_inter_suc_message">A módosítások életbe léptek</string>
+    <string name="sys_inter_suc_message">A módosítások életbe léptek. Ha bepipáltad az Alkalmazás rendszerindításkor opciót, akkor bizonyosdj meg róla, hogy a MIUI Biztonság alkalmazásban is beállítottad az automatikus indulás jogát az alkalmazáshoz!</string>
     <string name="no_inter">Nem interactive governor van használatban</string>
     <string name="no_inter_message">Az alkalmazás csak interactive governorral működik</string>
     <string name="no_scaling">Hiba</string>

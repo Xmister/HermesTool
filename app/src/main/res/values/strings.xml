@@ -29,7 +29,7 @@
     <string name="sys_inter_error">Interactive values not saved</string>
     <string name="sys_inter_error_message">For some reason the modification failed. Please check logcat for further information. Do you use any othet kernel/CPU tweak app?</string>
     <string name="sys_inter_suc">Success</string>
-    <string name="sys_inter_suc_message">The changes succesfully applied.</string>
+    <string name="sys_inter_suc_message">The changes succesfully applied. If you enabled Set On Boot, make sure that the app has right to Autostart in MIUI Security.</string>
     <string name="sys_mod_success">System modified</string>
     <string name="sys_mod_success_message">System partition modified. You need to reboot for the changes to take effect</string>
     <string name="reboot_now">Reboot Now</string>
