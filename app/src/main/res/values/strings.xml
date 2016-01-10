@@ -26,6 +26,10 @@
     <string name="sched_label">I/O Scheduler</string>
     <string name="sys_mod_error">System modification error</string>
     <string name="sys_mod_error_message">For some reason the modification failed. Please check logcat for further information.</string>
+    <string name="sys_inter_error">Interactive values not saved</string>
+    <string name="sys_inter_error_message">For some reason the modification failed. Please check logcat for further information. Do you use any othet kernel/CPU tweak app?</string>
+    <string name="sys_inter_suc">Success</string>
+    <string name="sys_inter_suc_message">The changes succesfully applied.</string>
     <string name="sys_mod_success">System modified</string>
     <string name="sys_mod_success_message">System partition modified. You need to reboot for the changes to take effect</string>
     <string name="reboot_now">Reboot Now</string>
@@ -47,4 +51,14 @@
     <string name="nothanks">No, thanks</string>
     <string name="tb_error">Error</string>
     <string name="tb_error_message">Couldn\'t read touchboost values!</string>
+    <string name="no_inter">You are not using interactive</string>
+    <string name="no_inter_message">You are not using interactive governor. This app can only work with interactive governor.</string>
+    <string name="no_scaling">Error</string>
+    <string name="no_scaling_message">Couldn\'t read CPU frequencies.</string>
+    <string name="change_inter">Change to interactive</string>
+    <string name="exit">Exit</string>
+    <string name="set_inter_fail">Setting to interactive failed</string>
+    <string name="set_inter_fail_message">You are probably using another tweak app that prevents me from changing governor.</string>
+    <string name="set_inter_suc">Success</string>
+    <string name="set_inter_suc_message">You are now using interactive.</string>
 </resources>

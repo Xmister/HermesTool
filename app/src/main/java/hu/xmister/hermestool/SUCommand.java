@@ -115,26 +115,29 @@ public class SUCommand {
         executeSu(cmds, ll);
     }
 
-    public static void interTweak(Context context) {
+    public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
         String cmds[] = {
                 "cd /proc/cpufreq",
-                "echo "+Constants.frequencyItems[Integer.valueOf(sharedPreferences.getString("maxfreq","0"))]+"000 > cpufreq_limited_max_freq_by_user",
-                "cd /sys/devices/system/cpu/cpufreq/interactive",
-                "echo \"5000\" > timer_rate",
-                "echo \"806000\" > hispeed_freq",
-                "echo \"10000 1183000:20000 1326000:25000 1469000:20000\" > above_hispeed_delay",
-                "echo \"5000\" > min_sample_time",
-                "echo \"800000\" > timer_slack",
-                "echo \"93 806000:95 1183000:95 1326000:96 1469000:98\" >  target_loads",
-                "echo \"99\" > go_hispeed_load",
+                "echo "+Constants.getFrequencyItems()[Integer.valueOf(sharedPreferences.getString("maxfreq","0"))]+" > cpufreq_limited_max_freq_by_user || exit 1",
+                "cd /sys/devices/system/cpu/cpufreq/interactive || exit 1",
+                "chmod 644 *",
+                "echo \"5000\" > timer_rate || exit 1",
+                "echo \"806000\" > hispeed_freq || exit 1",
+                "echo \"10000 1183000:20000 1326000:25000 1469000:20000\" > above_hispeed_delay || exit 1",
+                "echo \"5000\" > min_sample_time || exit 1",
+                "echo \"800000\" > timer_slack || exit 1",
+                "echo \"93 806000:95 1183000:95 1326000:96 1469000:98\" >  target_loads || exit 1",
+                "echo \"99\" > go_hispeed_load || exit 1",
         };
-        executeSu(cmds,null);
+        executeSu(cmds,ll);
         if ( sharedPreferences.contains("sched") ) {
             cmds=new String[]{
                     "cd /sys/block/mmcblk0/queue",
+                    "chmod 644 *",
                     "echo "+sharedPreferences.getString("sched","cfq")+" > scheduler",
                     "cd /sys/block/mmcblk1/queue",
+                    "chmod 644 *",
                     "echo "+sharedPreferences.getString("sched","cfq")+" > scheduler",
             };
             executeSu(cmds,null);
@@ -145,7 +148,7 @@ public class SUCommand {
                 "mount -o remount,rw /system",
                 "cd /system/etc",
                 "cat perfservscntbl.bak || cp -i perfservscntbl.txt perfservscntbl.bak",
-                "echo \"CMD_SET_CPU_CORE, SCN_APP_TOUCH, "+cores+"\nCMD_SET_CPU_FREQ, SCN_APP_TOUCH, "+Constants.frequencyItems[Integer.valueOf(freq)]+"000\n\" > perfservscntbl.txt",
+                "echo \"CMD_SET_CPU_CORE, SCN_APP_TOUCH, "+cores+"\nCMD_SET_CPU_FREQ, SCN_APP_TOUCH, "+Constants.getFrequencyItems()[Integer.valueOf(freq)]+"\n\" > perfservscntbl.txt || exit 1",
                 "chmod 644 perfservscntbl.txt",
                 "mount -o remount,ro /system",
         };

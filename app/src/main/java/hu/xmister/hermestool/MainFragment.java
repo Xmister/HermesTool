@@ -52,9 +52,9 @@ public class MainFragment extends MyFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if ( Constants.frequencyItems != null ) {
+                if ( Constants.getFrequencyItems() != null ) {
                     a.setP("maxfreq",""+which);
-                    maxFreq.setText(Constants.frequencyNames[which]);
+                    maxFreq.setText(Constants.getFrequencyNames()[which]);
                 }
             }
         };
@@ -63,9 +63,9 @@ public class MainFragment extends MyFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if ( Constants.frequencyItems != null ) {
+                if ( Constants.getFrequencyItems() != null ) {
                     a.setP("tbFreq",""+(which+1));
-                    freq.setText(Constants.frequencyNames[which+1]);
+                    freq.setText(Constants.getFrequencyNames()[which+1]);
                 }
             }
         };
@@ -95,16 +95,16 @@ public class MainFragment extends MyFragment {
         maxFreq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.frequencyNames, di, null, null);
+                ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(), di, null, null);
                 md.show(getFragmentManager(), "maxfreq");
             }
         });
         freq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String tmpNames[] = new String[Constants.frequencyNames.length - 1];
-                for (int i = 1; i < Constants.frequencyNames.length; i++) {
-                    tmpNames[i - 1] = Constants.frequencyNames[i];
+                String tmpNames[] = new String[Constants.getFrequencyNames().length - 1];
+                for (int i = 1; i < Constants.getFrequencyNames().length; i++) {
+                    tmpNames[i - 1] = Constants.getFrequencyNames()[i];
                 }
                 ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
                 md.show(getFragmentManager(), "tbfreq");
@@ -132,7 +132,7 @@ public class MainFragment extends MyFragment {
     public void loadDefaults() {
         a.setP("maxfreq", "0");
         maxFreq.setText("Unlimited");
-        a.setP("tbFreq", "1");
+        a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
         freq.setText("806MHz");
         a.setP("tCores", "2");
         tCores.setText("2");
@@ -164,13 +164,13 @@ public class MainFragment extends MyFragment {
             public void onGotTB(String freq, String cores) {
                 if ( freq!= null && cores != null ) {
                     int i = 0;
-                    for (i = 0; i < Constants.frequencyItems.length; i++) {
-                        if (Constants.frequencyItems[i].equals(freq.substring(0, freq.length() - 3))) {
+                    for (i = 0; i < Constants.getFrequencyItems().length; i++) {
+                        if (Constants.getFrequencyItems()[i].equals(freq)) {
                             break;
                         }
                     }
-                    if (i < Constants.frequencyItems.length) {
-                        setFreqText(Constants.frequencyNames[i]);
+                    if (i < Constants.getFrequencyItems().length) {
+                        setFreqText(Constants.getFrequencyNames()[i]);
                     } else i = 0;
                     a.setP("tbFreq", "" + i);
                     setCoresText(cores);
@@ -185,11 +185,11 @@ public class MainFragment extends MyFragment {
                         }
                     });
                     if ( a.getP("tbFreq")!=null) {
-                        setFreqText(Constants.frequencyNames[Integer.valueOf(a.getP("tbFreq"))]);
+                        setFreqText(Constants.getFrequencyNames()[Integer.valueOf(a.getP("tbFreq"))]);
                     }
                     else {
                         setFreqText("806MHz");
-                        a.setP("tbFreq", "1");
+                        a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
                     }
                     if ( a.getP("tCores")!=null) {
                         setCoresText(a.getP("tCores"));
@@ -202,7 +202,7 @@ public class MainFragment extends MyFragment {
             }
         });
         if (a.getP("maxfreq") != null) {
-            maxFreq.setText(Constants.frequencyNames[Integer.valueOf(a.getP("maxfreq"))]);
+            maxFreq.setText(Constants.getFrequencyNames()[Integer.valueOf(a.getP("maxfreq"))]);
             cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
         } else {
             a.setP("maxfreq", "0");
