@@ -56,7 +56,7 @@ public class RNT2BootService extends Service {
                     Thread.sleep(5000);
                 } catch (Exception e) {}
                 SharedPreferences sharedPreferences =RNT2BootService.this.getSharedPreferences("default", 0);
-                if ( Boolean.valueOf(sharedPreferences.getString("cbAutoMount","false"))) {
+                if ( Boolean.valueOf(sharedPreferences.getString("cbautomount","false"))) {
                     Log.i("Boot Service-MT", "Mounting SD card...");
                     SUCommand.mountSD(new Shell.OnCommandResultListener() {
                         @Override
