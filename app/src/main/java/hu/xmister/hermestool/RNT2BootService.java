@@ -24,17 +24,24 @@ public class RNT2BootService extends Service {
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {}
-                SUCommand.mountSD();
                 SharedPreferences sharedPreferences =RNT2BootService.this.getSharedPreferences("default", 0);
-                if ( Boolean.valueOf(sharedPreferences.getString("onboot","false"))) {
-                    Log.i("Boot Service-IT", "Updating values...");
-                    SUCommand.interTweak(RNT2BootService.this,null);
-                    Log.i("Boot Service-IT", "Done");
-                }
                 if ( Boolean.valueOf(sharedPreferences.getString("cbAutoMount","false"))) {
                     Log.i("Boot Service-MT", "Mounting SD card...");
                     SUCommand.mountSD();
                     Log.i("Boot Service-MT", "Done");
+                }
+                try {
+                    Thread.sleep(10000);
+                } catch (Exception e) {}
+                if ( Boolean.valueOf(sharedPreferences.getString("onboot","false"))) {
+                    Log.i("Boot Service-IT", "Updating values...");
+                    if (Constants.getFrequencyNames() == null)  {
+                        Log.e("Boot Service-IT", "Couldn't load frequency values...");
+                    }
+                    else {
+                        SUCommand.interTweak(RNT2BootService.this, null);
+                    }
+                    Log.i("Boot Service-IT", "Done");
                 }
             }
         }).start();

@@ -125,9 +125,9 @@ public class SUCommand {
                 "echo \"5000\" > timer_rate || exit 1",
                 "echo \"806000\" > hispeed_freq || exit 1",
                 "echo \"10000 1183000:20000 1326000:25000 1469000:20000\" > above_hispeed_delay || exit 1",
-                "echo \"5000\" > min_sample_time || exit 1",
+                "echo \"10000\" > min_sample_time || exit 1",
                 "echo \"800000\" > timer_slack || exit 1",
-                "echo \"93 806000:95 1183000:95 1326000:96 1469000:98\" >  target_loads || exit 1",
+                "echo \"80 806000:92 1183000:94 1326000:95 1469000:90\" >  target_loads || exit 1",
                 "echo \"99\" > go_hispeed_load || exit 1",
         };
         executeSu(cmds,ll);

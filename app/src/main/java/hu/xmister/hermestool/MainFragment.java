@@ -132,7 +132,8 @@ public class MainFragment extends MyFragment {
     public void loadDefaults() {
         a.setP("maxfreq", "0");
         maxFreq.setText("Unlimited");
-        a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
+        if ( Constants.getNamesPos("806MHz") > -1 )
+            a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
         freq.setText("806MHz");
         a.setP("tCores", "2");
         tCores.setText("2");
@@ -189,7 +190,8 @@ public class MainFragment extends MyFragment {
                     }
                     else {
                         setFreqText("806MHz");
-                        a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
+                        if ( Constants.getNamesPos("806MHz") > -1)
+                            a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
                     }
                     if ( a.getP("tCores")!=null) {
                         setCoresText(a.getP("tCores"));

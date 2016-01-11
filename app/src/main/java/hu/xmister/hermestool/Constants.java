@@ -56,6 +56,7 @@ public class Constants {
         if (frequencyNames == null) fillArrays();
         int i=0;
         while (frequencyNames == null && i<20) {
+            i++;
             try {
                 Thread.sleep(500);
             } catch (Exception e) {}
@@ -67,6 +68,7 @@ public class Constants {
         if (frequencyItems == null) fillArrays();
         int i=0;
         while (frequencyItems == null  && i<20) {
+            i++;
             try {
                 Thread.sleep(500);
             } catch (Exception e) {}
@@ -75,6 +77,7 @@ public class Constants {
     }
 
     public static int getNamesPos(String f) {
+        if ( getFrequencyNames() == null ) return -1;
         for (int i=0; i<getFrequencyNames().length; i++) {
             if (getFrequencyNames()[i].toLowerCase().equals(f.toLowerCase())) return i;
         }
@@ -82,6 +85,7 @@ public class Constants {
     }
 
     public static int getItemsPos(String f) {
+        if ( getFrequencyItems() == null ) return -1;
         for (int i=0; i<getFrequencyItems().length; i++) {
             if (getFrequencyItems()[i].toLowerCase().equals(f.toLowerCase())) return i;
         }
