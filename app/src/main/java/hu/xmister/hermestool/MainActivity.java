@@ -104,29 +104,29 @@ public class MainActivity extends Activity
                         } else {
                             isSuperSU = true;
                         }
-                        if (Constants.getFrequencyName(0) == null) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                    builder.setTitle(getString(R.string.no_scaling))
-                                            .setMessage(getString(R.string.no_scaling_message))
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    finish();
-                                                }
-                                            })
-                                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                                @Override
-                                                public void onDismiss(DialogInterface dialog) {
-                                                    finish();
-                                                }
-                                            });
-                                    builder.show();
+                                    if (Constants.getFrequencyName(0) == null) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                        builder.setTitle(getString(R.string.no_scaling))
+                                                .setMessage(getString(R.string.no_scaling_message))
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        finish();
+                                                    }
+                                                })
+                                                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                    @Override
+                                                    public void onDismiss(DialogInterface dialog) {
+                                                        finish();
+                                                    }
+                                                });
+                                        builder.show();
+                                    }
                                 }
                             });
-                        }
                         if (!noCPU) {
                             SUCommand.executeSu("cd /sys/devices/system/cpu/cpufreq/interactive", new Shell.OnCommandResultListener() {
                                 @Override

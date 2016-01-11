@@ -25,7 +25,7 @@ public class SUCommand {
      * @param cmd the command to execute
      * @return the result of the execution
      */
-    public static void executeSu(final String cmd, Shell.OnCommandResultListener ll) {
+    public static void executeSu(final String cmd, Shell.OnCommandResultListener ll, int wait) {
         /*try {
             Process p = Runtime.getRuntime().exec("su");
             DataOutputStream os = new DataOutputStream(p.getOutputStream());
@@ -50,10 +50,21 @@ public class SUCommand {
             }
         });
         abc.start();
+        if (wait > 0) try {
+            abc.join(wait);
+        } catch (Exception e) {}
+    }
+
+    public static void executeSu(final String cmd, Shell.OnCommandResultListener ll) {
+        executeSu(cmd,ll,0);
     }
 
 
     public static void executeSu(final String[] cmds, Shell.OnCommandResultListener ll) {
+        executeSu(cmds,ll,0);
+    }
+
+    public static void executeSu(final String[] cmds, Shell.OnCommandResultListener ll, int wait) {
         final Shell.Builder builder = new Shell.Builder();
         builder.addCommand(cmds, 0, ll);
         builder.useSU();
@@ -65,6 +76,9 @@ public class SUCommand {
             }
         });
         abc.start();
+        if (wait > 0) try {
+            abc.join(wait);
+        } catch (Exception e) {}
     }
 
     public static void mountSD(final Shell.OnCommandResultListener ll) {
@@ -145,16 +159,17 @@ public class SUCommand {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
         String cmds[] = {
                 "cd /proc/cpufreq",
-                "echo "+Constants.getFrequencyItems()[Integer.valueOf(sharedPreferences.getString("maxfreq","0"))]+" > cpufreq_limited_max_freq_by_user || exit 1",
-                "cd /sys/devices/system/cpu/cpufreq/interactive || exit 1",
+                "chmod 644 cpufreq_limited_max_freq_by_user",
+                "echo "+Constants.getFrequencyItems()[Integer.valueOf(sharedPreferences.getString("maxfreq","0"))]+" > cpufreq_limited_max_freq_by_user",
+                "cd /sys/devices/system/cpu/cpufreq/interactive",
                 "chmod 644 *",
-                "echo \"5000\" > timer_rate || exit 1",
-                "echo \"806000\" > hispeed_freq || exit 1",
-                "echo \"10000 1183000:20000 1326000:25000 1469000:20000\" > above_hispeed_delay || exit 1",
-                "echo \"10000\" > min_sample_time || exit 1",
-                "echo \"800000\" > timer_slack || exit 1",
-                "echo \"80 806000:92 1183000:94 1326000:95 1469000:90\" >  target_loads || exit 1",
-                "echo \"99\" > go_hispeed_load || exit 1",
+                "echo \"5000\" > timer_rate",
+                "echo \"806000\" > hispeed_freq",
+                "echo \"10000 1183000:20000 1326000:25000 1469000:20000\" > above_hispeed_delay",
+                "echo \"10000\" > min_sample_time",
+                "echo \"800000\" > timer_slack",
+                "echo \"80 806000:92 1183000:94 1326000:95 1469000:90\" >  target_loads",
+                "echo \"99\" > go_hispeed_load",
         };
         executeSu(cmds,ll);
         if ( sharedPreferences.contains("sched") ) {
