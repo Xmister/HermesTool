@@ -103,7 +103,7 @@ public class MainActivity extends Activity
                         } else {
                             isSuperSU = true;
                         }
-                        if (Constants.getFrequencyNames() == null) {
+                        if (Constants.getFrequencyName(0) == null) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -369,7 +369,7 @@ public class MainActivity extends Activity
                         @Override
                         public void onGotTB(String freq, String cores) {
                             if (freq == null || cores == null) updateTB();
-                            else if (!freq.equals(Constants.getFrequencyItems()[Integer.valueOf(getP("tbFreq"))]) || !cores.equals(getP("tCores"))) {
+                            else if (!freq.equals(Constants.getFrequencyItem(Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores"))) {
                                 updateTB();
                             }
                         }
@@ -410,7 +410,7 @@ public class MainActivity extends Activity
                                                     public void onGotTB(String freq, String cores) {
                                                         boolean error=false;
                                                             if (freq == null || cores == null) error=true;
-                                                            else if (!freq.equals(Constants.getFrequencyItems()[Integer.valueOf(getP("tbFreq"))]) || !cores.equals(getP("tCores")) ) {
+                                                            else if (!freq.equals(Constants.getFrequencyItem(Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores")) ) {
                                                                 error=true;
                                                             }
                                                         if (error) {

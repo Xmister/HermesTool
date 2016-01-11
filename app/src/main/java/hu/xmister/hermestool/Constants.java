@@ -64,6 +64,18 @@ public class Constants {
         return frequencyNames;
     }
 
+    public static String getFrequencyName(int index) {
+        if ( getFrequencyNames() != null )
+            return getFrequencyNames()[index];
+        else return null;
+    }
+
+    public static String getFrequencyItem(int index) {
+        if ( getFrequencyItems() != null )
+            return getFrequencyItems()[index];
+        else return null;
+    }
+
     public static String[] getFrequencyItems() {
         if (frequencyItems == null) fillArrays();
         int i=0;
