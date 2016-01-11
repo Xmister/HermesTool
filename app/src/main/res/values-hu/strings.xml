@@ -52,4 +52,9 @@
     <string name="set_inter_fail_message">Valószínűleg egy másik tweak alkalmazás megakadályozza a váltást.</string>
     <string name="set_inter_suc">Siker</string>
     <string name="set_inter_suc_message">A váltás sikerült</string>
+    <string name="apply_error">Nem sikerült az értékek beállítása</string>
+    <string name="apply_success">Mentett értékek sikeresen alkalmazva</string>
+    <string name="freq_error">Frekvencia tábla betöltése nem sikerült</string>
+    <string name="mount_error">SD kártya csatolása nem sikerült</string>
+    <string name="mount_success">SD kártya csatolása sikeres</string>
 </resources>

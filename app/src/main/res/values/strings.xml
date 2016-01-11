@@ -61,4 +61,9 @@
     <string name="set_inter_fail_message">You are probably using another tweak app that prevents me from changing governor.</string>
     <string name="set_inter_suc">Success</string>
     <string name="set_inter_suc_message">You are now using interactive.</string>
+    <string name="mount_error">Error mounting SD card</string>
+    <string name="mount_success">SD card mounted successfully</string>
+    <string name="freq_error">Couldn\'t load frequency table</string>
+    <string name="apply_error">Error applying values</string>
+    <string name="apply_success">Values successfully applied</string>
 </resources>
