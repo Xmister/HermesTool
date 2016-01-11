@@ -67,8 +67,8 @@ public class SUCommand {
         abc.start();
     }
 
-    public static void mountSD(Shell.OnCommandResultListener ll) {
-        String cmds[] = {
+    public static void mountSD(final Shell.OnCommandResultListener ll) {
+        final String cmds1[] = {
                 "e2fsck -fy /dev/block/mmcblk1p1",
                 "mount -o remount,rw /",
                 "mkdir /mnt/media_rw/sdcard1",
@@ -80,15 +80,40 @@ public class SUCommand {
                 "chmod 777 /storage/sdcard1",
                 "mount -o remount,ro /",
                 "mount -rw -t ext4 -o noatime /dev/block/mmcblk1p1 /mnt/media_rw/sdcard1",
-                "chmod 777 /mnt/media_rw/sdcard1",
-                "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
-                "/system/bin/vold",
                 //"supolicy --live \"allow sdcardd unlabeled dir { append create execute write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon rmdir audit_access remove_name add_name reparent execmod search open }\"",
                 //"supolicy --live \"allow sdcardd unlabeled file { append create write relabelfrom link unlink ioctl getattr setattr read rename lock mounton quotaon swapon audit_access open }\"",
                 //"supolicy --live \"allow unlabeled unlabeled filesystem associate\"",
         };
+        final String cmds2[] = {
+                "chmod 777 /mnt/media_rw/sdcard1",
+                "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
+                "/system/bin/vold",
+                "ture",
+        };
         final Shell.Builder builder = new Shell.Builder();
-        builder.addCommand(cmds, 0, ll);
+        builder.addCommand(cmds1, 0, new Shell.OnCommandResultListener() {
+            @Override
+            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                if ( exitCode > 0 ) ll.onCommandResult(commandCode,exitCode,output);
+                else {
+                    final Shell.Builder builder2 = new Shell.Builder();
+                    builder2.addCommand(cmds2, 0, new Shell.OnCommandResultListener() {
+                        @Override
+                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                            ll.onCommandResult(commandCode,0,output);
+                        }
+                    });
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            builder2.setShell("su -mm -c sh");
+                            Shell.Interactive sh=builder2.open();
+                            sh.close();
+                        }
+                    }).start();
+                }
+            }
+        });
         Thread abc = new Thread(new Runnable() {
             @Override
             public void run() {

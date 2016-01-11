@@ -233,14 +233,22 @@ public class OtherFragment extends MyFragment {
                 public void onClick(View v) {
                     SUCommand.mountSD(new Shell.OnCommandResultListener() {
                         @Override
-                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                        public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
                             a.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                    builder.setTitle("Mount completed")
-                                            .setMessage("SD card mounted.")
-                                            .show();
+                                    if (exitCode > 0) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                        builder.setTitle(getString(R.string.mount_label))
+                                                .setMessage(getString(R.string.mount_error))
+                                                .show();
+                                    }
+                                    else {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                        builder.setTitle(getString(R.string.mount_label))
+                                                .setMessage(getString(R.string.mount_success))
+                                                .show();
+                                    }
                                 }
                             });
                         }
