@@ -21,7 +21,7 @@ public class RNT2BootService extends Service {
         return null;
     }
 
-    private void sendNotify(String text) {
+    private void sendNotify(int id,String text) {
         // prepare intent which is triggered if the
 // notification is selected
 
@@ -42,7 +42,7 @@ public class RNT2BootService extends Service {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0, n);
+        notificationManager.notify(id, n);
     }
 
     @Override
@@ -62,10 +62,10 @@ public class RNT2BootService extends Service {
                         @Override
                         public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                             if ( exitCode > 0 ) {
-                                sendNotify(getString(R.string.mount_error));
+                                sendNotify(0,getString(R.string.mount_error));
                             }
                             else {
-                                sendNotify(getString(R.string.mount_success));
+                                sendNotify(0,getString(R.string.mount_success));
                             }
                         }
                     });
@@ -78,17 +78,17 @@ public class RNT2BootService extends Service {
                     Log.i("Boot Service-IT", "Updating values...");
                     if (Constants.getFrequencyNames() == null)  {
                         Log.e("Boot Service-IT", "Couldn't load frequency values...");
-                        sendNotify(getString(R.string.freq_error));
+                        sendNotify(1,getString(R.string.freq_error));
                     }
                     else {
                         SUCommand.interTweak(RNT2BootService.this, new Shell.OnCommandResultListener() {
                             @Override
                             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                                 if ( exitCode > 0 ) {
-                                    sendNotify(getString(R.string.apply_error));
+                                    sendNotify(2,getString(R.string.apply_error));
                                 }
                                 else {
-                                    sendNotify(getString(R.string.apply_success));
+                                    sendNotify(2,getString(R.string.apply_success));
                                 }
                             }
                         });
