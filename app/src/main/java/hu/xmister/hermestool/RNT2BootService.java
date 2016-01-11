@@ -95,6 +95,10 @@ public class RNT2BootService extends Service {
                     }
                     Log.i("Boot Service-IT", "Done");
                 }
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception e) {}
+                System.exit(0);
             }
         }).start();
         return super.onStartCommand(pIntent, flags, startId);

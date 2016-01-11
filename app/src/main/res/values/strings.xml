@@ -66,4 +66,5 @@
     <string name="freq_error">Couldn\'t load frequency table</string>
     <string name="apply_error">Error applying values</string>
     <string name="apply_success">Values successfully applied</string>
+    <string name="disable_cpu">Continue</string>
 </resources>

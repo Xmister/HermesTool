@@ -131,6 +131,7 @@ public class OtherFragment extends MyFragment {
         } else super.loadValues();
     }
 
+
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         cbAutoMount=(CheckBox)a.findViewById(R.id.cbAutoMount);
@@ -167,7 +168,7 @@ public class OtherFragment extends MyFragment {
                                                     }
                                                 });
                                             } else {
-                                                SUCommand.executeSu("umount /storage/sdcard1", new Shell.OnCommandResultListener() {
+                                                SUCommand.executeSu("umount /storage/sdcard1 || umount /storage/sdcard2", new Shell.OnCommandResultListener() {
                                                     @Override
                                                     public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                                                         if (exitCode == 0) {
