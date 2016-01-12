@@ -163,12 +163,12 @@ public class SUCommand {
                 "echo "+Constants.getFrequencyItems()[Integer.valueOf(sharedPreferences.getString("maxfreq","0"))]+" > cpufreq_limited_max_freq_by_user",
                 "cd /sys/devices/system/cpu/cpufreq/interactive",
                 "chmod 644 *",
-                "echo \"5000\" > timer_rate",
+                "echo \"10000\" > timer_rate",
                 "echo \"806000\" > hispeed_freq",
-                "echo \"10000 1183000:20000 1326000:25000 1469000:20000\" > above_hispeed_delay",
+                "echo \"10000 1183000:20000 1326000:30000 1469000:40000\" > above_hispeed_delay",
                 "echo \"10000\" > min_sample_time",
                 "echo \"800000\" > timer_slack",
-                "echo \"80 806000:92 1183000:94 1326000:95 1469000:90\" >  target_loads",
+                "echo \"85 806000:92 1183000:94 1326000:95 1469000:97\" >  target_loads",
                 "echo \"99\" > go_hispeed_load",
         };
         executeSu(cmds,ll);
