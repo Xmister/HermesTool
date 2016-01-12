@@ -41,7 +41,7 @@
     <string name="sys_inter_error">Interactive értékek nem menthetők</string>
     <string name="sys_inter_error_message">Valamilyen okból nem sikerült a megfelelő fájlok írása. Nem használsz másik kernel/CPU tweak appot?</string>
     <string name="sys_inter_suc">Siker</string>
-    <string name="sys_inter_suc_message">A módosítások életbe léptek. Ha bepipáltad az Alkalmazás rendszerindításkor opciót, akkor bizonyosdj meg róla, hogy a MIUI Biztonság alkalmazásban is beállítottad az automatikus indulás jogát az alkalmazáshoz!</string>
+    <string name="sys_inter_suc_message">Az interactive módosítások életbe léptek. Ha bepipáltad az Alkalmazás rendszerindításkor opciót, akkor bizonyosdj meg róla, hogy a MIUI Biztonság alkalmazásban is beállítottad az automatikus indulás jogát az alkalmazáshoz!</string>
     <string name="no_inter">Nem interactive governor van használatban</string>
     <string name="no_inter_message">Az alkalmazás csak interactive governorral működik</string>
     <string name="no_scaling">Hiba</string>
@@ -58,4 +58,6 @@
     <string name="mount_error">SD kártya csatolása nem sikerült</string>
     <string name="mount_success">SD kártya csatolása sikeres</string>
     <string name="disable_cpu">Tovább</string>
+    <string name="tb_different">Touchboost értékek mások, mint amit beállítottál! Kérlek nyisd meg az alkalmazást, és nyomj a mentésre!</string>
+    <string name="on_system">Rendszerben</string>
 </resources>

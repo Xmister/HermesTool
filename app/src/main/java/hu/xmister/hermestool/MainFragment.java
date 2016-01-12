@@ -3,6 +3,7 @@ package hu.xmister.hermestool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -30,6 +34,8 @@ public class MainFragment extends MyFragment {
         private static EditText tCores;
         private static CheckBox cbTouchBoost;
         private static GridLayout grTouch;
+        private static TextView textCore,
+                                textFreq;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -90,6 +96,8 @@ public class MainFragment extends MyFragment {
         maxFreq=(Button)getActivity().findViewById(R.id.maxFreq);
         freq=(Button)getActivity().findViewById(R.id.tFreq);
         tCores=(EditText)getActivity().findViewById(R.id.tCores);
+        textFreq=(TextView)getActivity().findViewById(R.id.textFreq);
+        textCore=(TextView)getActivity().findViewById(R.id.textCore);
         cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
         grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
         maxFreq.setOnClickListener(new View.OnClickListener() {
@@ -142,8 +150,21 @@ public class MainFragment extends MyFragment {
     public void loadDefaults() {
         a.setP("maxfreq", "0");
         maxFreq.setText("Unlimited");
-        if ( Constants.getNamesPos("806MHz") > -1 )
-            a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
+        try {
+            Constants.getNamesPos("806MHz");
+            a.setP("tbFreq", "" + Constants.getNamesPos("806MHz"));
+        } catch ( Resources.NotFoundException e ) {
+            a.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                    builder.setTitle(getString(R.string.freq_error))
+                            .setMessage("This is probably not a Redmi Note 2 device!")
+                            .show();
+                    a.finish();
+                }
+            });
+        }
         freq.setText("806MHz");
         a.setP("tCores", "2");
         tCores.setText("2");
@@ -155,7 +176,7 @@ public class MainFragment extends MyFragment {
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if ( freq != null ) freq.setText(text);
+                if (freq != null) freq.setText(text);
             }
         });
     }
@@ -163,7 +184,23 @@ public class MainFragment extends MyFragment {
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if ( tCores != null ) tCores.setText(text);
+                if (tCores != null) tCores.setText(text);
+            }
+        });
+    }
+    private synchronized void setReadFreqText(final String text) {
+        a.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if ( freq != null ) textFreq.setText(text);
+            }
+        });
+    }
+    private synchronized void setReadCoresText(final String text) {
+        a.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if ( tCores != null ) textCore.setText(text);
             }
         });
     }
@@ -175,16 +212,17 @@ public class MainFragment extends MyFragment {
             public void onGotTB(String freq, String cores) {
                 if ( freq!= null && cores != null ) {
                     if (Constants.getFrequencyItems() != null) {
-                        int i = Constants.getItemsPos(freq);
-                        if (i > -1 && i < Constants.getFrequencyItems().length) {
-                            setFreqText(Constants.getFrequencyName(i));
-                        } else i = 0;
-                        a.setP("tbFreq", "" + i);
-                        setCoresText(cores);
+                        try {
+                            int i = Constants.getItemsPos(freq);
+                            setReadFreqText(Constants.getFrequencyName(i));
+                        } catch (Resources.NotFoundException e) {
+                            //TODO
+                        }
                     }
                     else {
                         //TODO
                     }
+                    setReadCoresText(cores);
                 } else {
                     a.runOnUiThread(new Runnable() {
                         @Override
@@ -195,24 +233,37 @@ public class MainFragment extends MyFragment {
                                     .show();
                         }
                     });
-                    if ( a.getP("tbFreq") != null) {
-                        setFreqText(Constants.getFrequencyName(Integer.valueOf(a.getP("tbFreq"))));
-                    }
-                    else {
-                        setFreqText("806MHz");
-                        if ( Constants.getNamesPos("806MHz") > -1)
-                            a.setP("tbFreq", ""+Constants.getNamesPos("806MHz"));
-                    }
-                    if ( a.getP("tCores")!=null) {
-                        setCoresText(a.getP("tCores"));
-                    }
-                    else {
-                        setCoresText("2");
-                        a.setP("tCores","2");
-                    }
                 }
             }
         });
+        if ( a.getP("tbFreq") != null) {
+            setFreqText(Constants.getFrequencyName(Integer.valueOf(a.getP("tbFreq"))));
+        }
+        else {
+            try {
+                Constants.getNamesPos("806MHz");
+                setFreqText("806MHz");
+                a.setP("tbFreq", "" + Constants.getNamesPos("806MHz"));
+            } catch (Exception e ) {
+                a.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                        builder.setTitle(getString(R.string.freq_error))
+                                .setMessage("This is probably not a Redmi Note 2 device!")
+                                .show();
+                        a.finish();
+                    }
+                });
+            }
+        }
+        if ( a.getP("tCores")!=null) {
+            setCoresText(a.getP("tCores"));
+        }
+        else {
+            setCoresText("2");
+            a.setP("tCores","2");
+        }
         if (a.getP("maxfreq") != null) {
             maxFreq.setText(Constants.getFrequencyName(Integer.valueOf(a.getP("maxfreq"))));
             cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));

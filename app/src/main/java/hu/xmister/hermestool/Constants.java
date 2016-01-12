@@ -1,6 +1,7 @@
 package hu.xmister.hermestool;
 
 
+import android.content.res.Resources;
 import android.util.Property;
 
 import java.util.List;
@@ -47,16 +48,20 @@ public class Constants {
         return frequencyNames;
     }
 
-    public static String getFrequencyName(int index) {
+    public static String getFrequencyName(int index) throws IndexOutOfBoundsException {
         if ( getFrequencyNames() != null )
-            return getFrequencyNames()[index];
-        else return null;
+            if (index >= 0 && index < getFrequencyNames().length)
+                return getFrequencyNames()[index];
+            else throw new IndexOutOfBoundsException();
+        else throw new IndexOutOfBoundsException();
     }
 
-    public static String getFrequencyItem(int index) {
+    public static String getFrequencyItem(int index) throws IndexOutOfBoundsException {
         if ( getFrequencyItems() != null )
-            return getFrequencyItems()[index];
-        else return null;
+            if (index >= 0 && index < getFrequencyItems().length)
+                return getFrequencyItems()[index];
+            else throw new IndexOutOfBoundsException();
+        else throw new IndexOutOfBoundsException();
     }
 
     public static String[] getFrequencyItems() {
@@ -64,19 +69,19 @@ public class Constants {
         return frequencyItems;
     }
 
-    public static int getNamesPos(String f) {
-        if ( getFrequencyNames() == null ) return -1;
+    public static int getNamesPos(String f) throws Resources.NotFoundException {
+        if ( getFrequencyNames() == null ) throw new Resources.NotFoundException(null);
         for (int i=0; i<getFrequencyNames().length; i++) {
             if (getFrequencyNames()[i].toLowerCase().equals(f.toLowerCase())) return i;
         }
-        return -1;
+        throw new Resources.NotFoundException(null);
     }
 
-    public static int getItemsPos(String f) {
-        if ( getFrequencyItems() == null ) return -1;
+    public static int getItemsPos(String f) throws Resources.NotFoundException {
+        if ( getFrequencyItems() == null ) throw new Resources.NotFoundException(null);
         for (int i=0; i<getFrequencyItems().length; i++) {
             if (getFrequencyItems()[i].toLowerCase().equals(f.toLowerCase())) return i;
         }
-        return -1;
+        throw new Resources.NotFoundException(null);
     }
 }

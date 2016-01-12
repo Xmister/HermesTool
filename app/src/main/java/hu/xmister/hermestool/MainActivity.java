@@ -357,7 +357,7 @@ public class MainActivity extends Activity
             case R.id.action_save:
                 saveValues();
                 if (!noCPU) {
-                    SUCommand.interTweak(this, new Shell.OnCommandResultListener() {
+                    final Shell.OnCommandResultListener interCB=new Shell.OnCommandResultListener() {
                         @Override
                         public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                             if (exitCode > 0) {
@@ -384,17 +384,24 @@ public class MainActivity extends Activity
                                 });
                             }
                         }
-                    });
+                    };
                     if (getP("cbTouchBoost").equals("true")) {
                         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                             @Override
                             public void onGotTB(String freq, String cores) {
-                                if (freq == null || cores == null) updateTB();
-                                else if (!freq.equals(Constants.getFrequencyItem(Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores"))) {
-                                    updateTB();
+                                if (freq == null || cores == null || !freq.equals(Constants.getFrequencyItem(Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores"))) {
+                                    updateTB(new SUCommand.tbCallback() {
+                                        @Override
+                                        public void onGotTB(String freq, String cores) {
+                                            SUCommand.interTweak(MainActivity.this, interCB);
+                                        }
+                                    });
                                 }
                             }
                         });
+                    }
+                    else {
+                        SUCommand.interTweak(MainActivity.this, interCB);
                     }
                 }
                 return true;
@@ -411,7 +418,7 @@ public class MainActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateTB() {
+    private void updateTB(final SUCommand.tbCallback tb) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -429,7 +436,7 @@ public class MainActivity extends Activity
                                             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                                                 SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                                                     @Override
-                                                    public void onGotTB(String freq, String cores) {
+                                                    public void onGotTB(final String freq, final String cores) {
                                                         boolean error=false;
                                                             if (freq == null || cores == null) error=true;
                                                             else if (!freq.equals(Constants.getFrequencyItem(Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores")) ) {
@@ -442,7 +449,13 @@ public class MainActivity extends Activity
                                                                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                                                     builder.setTitle(getString(R.string.sys_mod_error))
                                                                             .setMessage(getString(R.string.sys_mod_error_message))
-                                                                            .setPositiveButton("OK", null);
+                                                                            .setPositiveButton("OK", null)
+                                                                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                                                @Override
+                                                                                public void onDismiss(DialogInterface dialog) {
+                                                                                    tb.onGotTB("0","0");
+                                                                                }
+                                                                            });
                                                                     builder.show();
                                                                 }
                                                             });
@@ -450,6 +463,7 @@ public class MainActivity extends Activity
                                                             runOnUiThread(new Runnable() {
                                                                 @Override
                                                                 public void run() {
+                                                                    curFrag.loadValues();
                                                                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                                                     builder.setTitle(getString(R.string.sys_mod_success))
                                                                             .setMessage(getString(R.string.sys_mod_success_message))
@@ -459,7 +473,13 @@ public class MainActivity extends Activity
                                                                                     SUCommand.executeSu("sync;reboot", null);
                                                                                 }
                                                                             })
-                                                                            .setNegativeButton(getString(R.string.reboot_later), null);
+                                                                            .setNegativeButton(getString(R.string.reboot_later), null)
+                                                                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                                                @Override
+                                                                                public void onDismiss(DialogInterface dialog) {
+                                                                                    tb.onGotTB(freq, cores);
+                                                                                }
+                                                                            });
                                                                     builder.show();
                                                                 }
                                                             });
@@ -472,11 +492,21 @@ public class MainActivity extends Activity
                                 }).start();
                             }
                         })
-                        .setNegativeButton("Cancel",null);
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                tb.onGotTB("0","0");
+                            }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                tb.onGotTB("0","0");
+                            }
+                        });
                 builder.show();
             }
         });
-
     }
 
     public void saveValues() {

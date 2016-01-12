@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -55,7 +56,7 @@ public class RNT2BootService extends Service {
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {}
-                SharedPreferences sharedPreferences =RNT2BootService.this.getSharedPreferences("default", 0);
+                final SharedPreferences sharedPreferences =RNT2BootService.this.getSharedPreferences("default", 0);
                 if ( Boolean.valueOf(sharedPreferences.getString("cbautomount","false"))) {
                     Log.i("Boot Service-MT", "Mounting SD card...");
                     SUCommand.mountSD(new Shell.OnCommandResultListener() {
@@ -92,6 +93,18 @@ public class RNT2BootService extends Service {
                                 }
                             }
                         });
+                        if (Boolean.valueOf(sharedPreferences.getString("cbtouchboost","false"))) {
+                            SUCommand.getTouchBoost(new SUCommand.tbCallback() {
+                                @Override
+                                public void onGotTB(String freq, String cores) {
+                                    try {
+                                        if (!freq.equals(Constants.getFrequencyItem(Integer.valueOf(sharedPreferences.getString("tbfreq", "" + Constants.getNamesPos("806MHz"))))) || !cores.equals(sharedPreferences.getString("tcores", "2"))) {
+                                            sendNotify(3, getString(R.string.tb_different));
+                                        }
+                                    } catch (Resources.NotFoundException e) {}
+                                }
+                            });
+                        }
                     }
                     Log.i("Boot Service-IT", "Done");
                 }
