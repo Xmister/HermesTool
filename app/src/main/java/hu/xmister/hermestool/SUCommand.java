@@ -215,23 +215,27 @@ public class SUCommand {
 
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
-        String cmds[] = {
-                "cd /proc/cpufreq",
-                "chmod 644 cpufreq_limited_max_freq_by_user",
-                "echo "+Constants.getFrequencyItems()[Integer.valueOf(sharedPreferences.getString("maxfreq","0"))]+" > cpufreq_limited_max_freq_by_user",
-                "cd /sys/devices/system/cpu/cpufreq/interactive",
-                "chmod 644 *",
-                "echo \"10000\" > timer_rate",
-                "echo \"806000\" > hispeed_freq",
-                "echo \"10000 1183000:20000 1326000:30000 1469000:40000\" > above_hispeed_delay",
-                "echo \"10000\" > min_sample_time",
-                "echo \"800000\" > timer_slack",
-                "echo \"85 806000:92 1183000:94 1326000:95 1469000:97\" >  target_loads",
-                "echo \"99\" > go_hispeed_load",
-        };
-        executeSu(cmds,ll);
+        try {
+            String cmds[] = {
+                    "cd /proc/cpufreq",
+                    "chmod 644 cpufreq_limited_max_freq_by_user",
+                    "echo " + Constants.getFrequencyItem(Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                    "cd /sys/devices/system/cpu/cpufreq/interactive",
+                    "chmod 644 *",
+                    "echo \"10000\" > timer_rate",
+                    "echo \"806000\" > hispeed_freq",
+                    "echo \"10000 1183000:20000 1326000:20000 1469000:40000\" > above_hispeed_delay",
+                    "echo \"10000\" > min_sample_time",
+                    "echo \"800000\" > timer_slack",
+                    "echo \"85 806000:92 1183000:93 1326000:94 1469000:95\" >  target_loads",
+                    "echo \"99\" > go_hispeed_load",
+            };
+            executeSu(cmds, ll);
+        } catch (IndexOutOfBoundsException e) {
+            if (ll != null) ll.onCommandResult(0,120,null);
+        }
         if ( sharedPreferences.contains("sched") ) {
-            cmds=new String[]{
+            String cmds[]=new String[]{
                     "cd /sys/block/mmcblk0/queue",
                     "chmod 644 *",
                     "echo "+sharedPreferences.getString("sched","cfq")+" > scheduler",
