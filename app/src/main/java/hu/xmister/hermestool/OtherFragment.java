@@ -216,6 +216,8 @@ public class OtherFragment extends MyFragment {
                                                                         builder.setTitle(getString(R.string.unable_umount))
                                                                                 .setMessage(getString(R.string.unable_umount_message))
                                                                                 .show();
+                                                                a.findViewById(R.id.prog).setVisibility(View.GONE);
+                                                                a.findViewById(R.id.container).setVisibility(View.VISIBLE);
                                                             }
                                                     }});
 
