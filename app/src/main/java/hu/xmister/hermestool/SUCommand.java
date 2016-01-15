@@ -95,7 +95,6 @@ public class SUCommand {
         };
         final String cmds2[] = {
                 "chmod 777 /mnt/media_rw/sdcard1",
-                bb+" killall -9 sdcard",
                 "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
                 "/system/bin/vold",
                 "ture",
