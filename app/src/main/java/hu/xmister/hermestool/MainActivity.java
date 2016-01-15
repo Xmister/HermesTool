@@ -10,6 +10,7 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Property;
 import android.view.LayoutInflater;
@@ -406,12 +407,8 @@ public class MainActivity extends Activity
                 }
                 return true;
             case R.id.action_debug:
-                SUCommand.executeSu(new String[]{"mke3fs", "mke2fs"}, new Shell.OnCommandResultListener() {
-                    @Override
-                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                        return;
-                    }
-                });
+
+
         }
 
 

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -168,14 +171,25 @@ public class OtherFragment extends MyFragment {
                                                     }
                                                 });
                                             } else {
-                                                SUCommand.executeSu("umount /storage/sdcard1 || umount /storage/sdcard2", new Shell.OnCommandResultListener() {
-                                                    @Override
-                                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                        if (exitCode == 0) {
-                                                            SUCommand.executeSu("umount /mnt/media_rw/sdcard1", new Shell.OnCommandResultListener() {
-                                                                @Override
-                                                                public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                                    if (exitCode == 0) {
+                                                if (SUCommand.linkBusybox(a) == false ) {
+                                                    a.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                            builder.setTitle(getString(R.string.busybox_install_failed))
+                                                                    .setMessage(getString(R.string.busybox_install_failed_message))
+                                                                    .show();
+                                                        }
+                                                    });
+                                                }else {
+                                                    a.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Toast.makeText(a, "Please wait...", Toast.LENGTH_LONG).show();
+                                                            a.findViewById(R.id.container).setVisibility(View.GONE);
+                                                            ((TextView)a.findViewById(R.id.tStatus)).setText(getString(R.string.take_a_minute));
+                                                            a.findViewById(R.id.prog).setVisibility(View.VISIBLE);
+                                                            if (SUCommand.uMountSD()) {
                                                                         SUCommand.formatSD(new Shell.OnCommandResultListener() {
                                                                             @Override
                                                                             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
@@ -190,36 +204,22 @@ public class OtherFragment extends MyFragment {
                                                                                         builder.setTitle(getString(R.string.format_complete))
                                                                                                 .setMessage(getString(R.string.format_complete_message))
                                                                                                 .show();
+                                                                                        a.findViewById(R.id.prog).setVisibility(View.GONE);
+                                                                                        a.findViewById(R.id.container).setVisibility(View.VISIBLE);
                                                                                     }
                                                                                 });
                                                                             }
                                                                         });
-                                                                    } else {
-                                                                        a.runOnUiThread(new Runnable() {
-                                                                            @Override
-                                                                            public void run() {
-                                                                                AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                                builder.setTitle(getString(R.string.unable_umount))
-                                                                                        .setMessage(getString(R.string.unable_umount_message))
-                                                                                        .show();
-                                                                            }
-                                                                        });
-                                                                    }
                                                                 }
-                                                            });
-                                                        } else {
-                                                            a.runOnUiThread(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                    builder.setTitle(getString(R.string.unable_umount))
-                                                                            .setMessage(getString(R.string.unable_umount_message2))
-                                                                            .show();
-                                                                }
-                                                            });
-                                                        }
-                                                    }
-                                                });
+                                                            else {
+                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                        builder.setTitle(getString(R.string.unable_umount))
+                                                                                .setMessage(getString(R.string.unable_umount_message))
+                                                                                .show();
+                                                            }
+                                                    }});
+
+                                                }
                                             }
                                         }
                                     });
@@ -234,14 +234,18 @@ public class OtherFragment extends MyFragment {
                 public void onClick(View v) {
                     SUCommand.mountSD(new Shell.OnCommandResultListener() {
                         @Override
-                        public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
+                        public void onCommandResult(int commandCode, final int exitCode, final List<String> output) {
                             a.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (exitCode > 0) {
+                                        StringBuilder sb = new StringBuilder();
+                                        for (String line: output) {
+                                            sb.append(line+"\n");
+                                        }
                                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
                                         builder.setTitle(getString(R.string.mount_label))
-                                                .setMessage(getString(R.string.mount_error))
+                                                .setMessage(getString(R.string.mount_error) + "\n"+sb.toString())
                                                 .show();
                                     }
                                     else {
@@ -267,9 +271,9 @@ public class OtherFragment extends MyFragment {
                 ChoiceDialog md = new ChoiceDialog("Scheduler", schedulers, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        selectSched=which;
+                        selectSched = which;
                         sched.setText(schedulers[selectSched]);
-                        a.setP("sched",schedulers[selectSched]);
+                        a.setP("sched", schedulers[selectSched]);
                     }
                 }, null, null);
                 md.show(getFragmentManager(), "scheduler");

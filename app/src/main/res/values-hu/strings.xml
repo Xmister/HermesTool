@@ -60,4 +60,7 @@
     <string name="disable_cpu">Tovább</string>
     <string name="tb_different">Touchboost értékek mások, mint amit beállítottál! Kérlek nyisd meg az alkalmazást, és nyomj a mentésre!</string>
     <string name="on_system">Rendszerben</string>
+    <string name="busybox_install_failed_message">Nem sikerült feltelepíteni a BusyBox-ot</string>
+    <string name="busybox_install_failed">Busybox telepítési hiba</string>
+    <string name="take_a_minute">Ez tényleg percekig is tarthat...</string>
 </resources>

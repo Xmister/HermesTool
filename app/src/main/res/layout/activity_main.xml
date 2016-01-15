@@ -4,10 +4,43 @@
     android:layout_width="fill_parent" android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- As the main content view, the view below consumes the entire
-         space available using match_parent in both dimensions. -->
-    <FrameLayout android:id="@+id/container" android:layout_width="fill_parent"
-        android:layout_height="match_parent" />
+    <FrameLayout android:layout_width="fill_parent"
+        android:layout_height="match_parent" >
+
+        <!-- As the main content view, the view below consumes the entire
+             space available using match_parent in both dimensions. -->
+        <FrameLayout android:id="@+id/container" android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal|top">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/prog"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateOnly="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/tStatus"
+                android:layout_gravity="center_horizontal|top" />
+
+        </FrameLayout>
+
+    </FrameLayout>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat
          this as a sliding drawer on the left side for left-to-right

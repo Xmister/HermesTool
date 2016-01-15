@@ -69,4 +69,7 @@
     <string name="disable_cpu">Continue</string>
     <string name="tb_different">Touchboost values are different then your settings! Please open the app, and press Save!</string>
     <string name="on_system">On System</string>
+    <string name="busybox_install_failed">Busybox install failed</string>
+    <string name="busybox_install_failed_message">There was an error installing busybox binary.</string>
+    <string name="take_a_minute">This can really take a minute...</string>
 </resources>

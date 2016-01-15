@@ -2,21 +2,16 @@ package hu.xmister.hermestool;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import java.io.DataOutputStream;
-import java.util.ArrayList;
+import java.io.File;
 import java.util.List;
-import java.util.Objects;
 import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import eu.chainfire.libsuperuser.Shell;
-import eu.chainfire.libsuperuser.StreamGobbler;
 
 public class SUCommand {
+    private static String bb=null;
+    private static boolean umountOk =false;
     public interface tbCallback {
         public void onGotTB(String freq, String cores);
     }
@@ -56,12 +51,12 @@ public class SUCommand {
     }
 
     public static void executeSu(final String cmd, Shell.OnCommandResultListener ll) {
-        executeSu(cmd,ll,0);
+        executeSu(cmd, ll, 0);
     }
 
 
     public static void executeSu(final String[] cmds, Shell.OnCommandResultListener ll) {
-        executeSu(cmds,ll,0);
+        executeSu(cmds, ll, 0);
     }
 
     public static void executeSu(final String[] cmds, Shell.OnCommandResultListener ll, int wait) {
@@ -108,20 +103,22 @@ public class SUCommand {
         builder.addCommand(cmds1, 0, new Shell.OnCommandResultListener() {
             @Override
             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                if ( exitCode > 0 ) ll.onCommandResult(commandCode,exitCode,output);
+                if (exitCode > 0) {
+                    if ( ll != null ) ll.onCommandResult(commandCode, exitCode, output);
+                }
                 else {
                     final Shell.Builder builder2 = new Shell.Builder();
                     builder2.addCommand(cmds2, 0, new Shell.OnCommandResultListener() {
                         @Override
                         public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                            ll.onCommandResult(commandCode,0,output);
+                            if ( ll != null ) ll.onCommandResult(commandCode, 0, output);
                         }
                     });
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             builder2.setShell("su -mm -c sh");
-                            Shell.Interactive sh=builder2.open();
+                            Shell.Interactive sh = builder2.open();
                             sh.close();
                         }
                     }).start();
@@ -139,20 +136,81 @@ public class SUCommand {
         abc.start();
     }
 
+    public static boolean linkBusybox(Context c) {
+        final String oldF=c.getApplicationInfo().dataDir+"/lib/lib_busybox_.so";
+        final String newF=c.getApplicationInfo().dataDir+"/lib/busybox";
+        SUCommand.executeSu("ln -sf " + oldF + " " + newF, null, 10000);
+        File f = new File(newF);
+        if (f.exists()) {
+            bb=newF;
+            return true;
+        }
+        return false;
+    }
+
+    public static void boxExec(final String cmd, Shell.OnCommandResultListener ll) {
+        executeSu(bb + " " + cmd, ll);
+    }
+
+    public static boolean uMountSD() {
+        umountOk =true;
+        Thread abc=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<String> out = Shell.run("su -mm -c sh", new String[]{bb + " umount /storage/sdcard1"},null,true);
+                if (out.size() > 0) {
+                    if (out.get(0).contains("busy")) {
+                        umountOk = false;
+                    } else if (out.get(0).contains("Invalid")) {
+                        List<String> out2 = Shell.run("su -mm -c sh", new String[]{bb + " umount /storage/sdcard2"},null,true);
+                        if (out2.size() > 0) {
+                            if (out2.get(0).contains("busy")) {
+                                umountOk = false;
+                            }
+                        }
+                    }
+                }
+                if ( umountOk ) {
+                    List<String> out2 = Shell.run("su -mm -c sh", new String[]{bb + " umount /mnt/media_rw/sdcard1"},null,true);
+                    if (out2.size() > 0) {
+                        if (out2.get(0).contains("busy")) {
+                            umountOk = false;
+                        } else if (out2.get(0).contains("Invalid")) {
+                            out2 = Shell.run("su -mm -c sh", new String[]{bb + " umount /mnt/media_rw/sdcard2"},null,true);
+                            if (out2.size() > 0 && out2.get(0).contains("busy")) {
+                                umountOk = false;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        abc.start();
+        try {
+            abc.join(20000);
+        } catch (Exception e) { umountOk =false; }
+        return umountOk;
+    }
 
     public static void mountSD() {
         mountSD(null);
     }
 
     public static void formatSD(Shell.OnCommandResultListener ll) {
-        String cmds[] = {
-                "umount /storage/sdcard1",
-                "umount /storage/sdcard2",
-                "killall sdcard",
-                "umount /mnt/media_rw/sdcard1",
-                "mke2fs -t ext4 -m 0 /dev/block/mmcblk1p1",
-        };
-        executeSu(cmds, ll);
+        Thread abc = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<String> out2 = Shell.run("su -c sh", new String[]{"(echo o; echo n; echo p; echo 1; echo ; echo; echo w) | "+bb+" fdisk /dev/block/mmcblk1"},null,true);
+            }
+        });
+        abc.start();
+        try {
+            abc.join(60000);
+            String cmds[] = {
+                    bb+" mke2fs -T ext4 -m 0 /dev/block/mmcblk1p1",
+            };
+            executeSu(cmds, ll);
+        } catch (Exception e) { ll.onCommandResult(0,1,null);}
     }
 
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
