@@ -16,10 +16,17 @@ import java.util.List;
 import eu.chainfire.libsuperuser.Shell;
 
 public class RNT2BootService extends Service {
+
+    private static int stopV=3;
     @Override
     public IBinder onBind(Intent arg0) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    private void canStop() {
+        if ( --stopV < 1 ) stopSelf();
+
     }
 
     private void sendNotify(int id,String text) {
@@ -68,9 +75,13 @@ public class RNT2BootService extends Service {
                             else {
                                 sendNotify(0,getString(R.string.mount_success));
                             }
+                            canStop();
                         }
                     });
                     Log.i("Boot Service-MT", "Done");
+                }
+                else {
+                    canStop();
                 }
                 try {
                     Thread.sleep(10000);
@@ -79,7 +90,8 @@ public class RNT2BootService extends Service {
                     Log.i("Boot Service-IT", "Updating values...");
                     if (Constants.getFrequencyNames() == null)  {
                         Log.e("Boot Service-IT", "Couldn't load frequency values...");
-                        sendNotify(1,getString(R.string.freq_error));
+                        sendNotify(1, getString(R.string.freq_error));
+                        canStop();
                     }
                     else {
                         SUCommand.interTweak(RNT2BootService.this, new Shell.OnCommandResultListener() {
@@ -91,6 +103,7 @@ public class RNT2BootService extends Service {
                                 else {
                                     sendNotify(2,getString(R.string.apply_success));
                                 }
+                                canStop();
                             }
                         });
                         if (Boolean.valueOf(sharedPreferences.getString("cbtouchboost","false"))) {
@@ -102,16 +115,19 @@ public class RNT2BootService extends Service {
                                             sendNotify(3, getString(R.string.tb_different));
                                         }
                                     } catch (Resources.NotFoundException e) {}
+                                    canStop();
                                 }
                             });
+                        }
+                        else {
+                            canStop();
                         }
                     }
                     Log.i("Boot Service-IT", "Done");
                 }
-                try {
-                    Thread.sleep(5000);
-                } catch (Exception e) {}
-                RNT2BootService.this.stopSelf();
+                else {
+                    canStop();
+                }
             }
         }).start();
         return super.onStartCommand(pIntent, flags, startId);

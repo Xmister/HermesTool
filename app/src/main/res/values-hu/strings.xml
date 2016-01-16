@@ -63,4 +63,5 @@
     <string name="busybox_install_failed_message">Nem sikerült feltelepíteni a BusyBox-ot</string>
     <string name="busybox_install_failed">Busybox telepítési hiba</string>
     <string name="take_a_minute">Ez tényleg percekig is tarthat...</string>
+    <string name="error">HIBA</string>
 </resources>

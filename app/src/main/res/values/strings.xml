@@ -72,4 +72,5 @@
     <string name="busybox_install_failed">Busybox install failed</string>
     <string name="busybox_install_failed_message">There was an error installing busybox binary.</string>
     <string name="take_a_minute">This can really take a minute...</string>
+    <string name="error">ERROR</string>
 </resources>

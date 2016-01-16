@@ -78,7 +78,6 @@ public class SUCommand {
 
     public static void mountSD(final Shell.OnCommandResultListener ll) {
         final String cmds1[] = {
-                "e2fsck -fy /dev/block/mmcblk1p1",
                 "mount -o remount,rw /",
                 "mkdir /mnt/media_rw/sdcard1",
                 //"chcon u:object_r:rootfs:s1 /mnt/media_rw/sdcard1",
@@ -97,40 +96,35 @@ public class SUCommand {
                 "chmod 777 /mnt/media_rw/sdcard1",
                 "/system/bin/sdcard -u 1023 -g 1023 -d /mnt/media_rw/sdcard1 /storage/sdcard1 &",
                 "/system/bin/vold",
-                "ture",
+                "true",
         };
         final Shell.Builder builder = new Shell.Builder();
         builder.addCommand(cmds1, 0, new Shell.OnCommandResultListener() {
             @Override
             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                if (exitCode > 0) {
+                /*if (exitCode > 0) {
                     if ( ll != null ) ll.onCommandResult(commandCode, exitCode, output);
                 }
-                else {
-                    final Shell.Builder builder2 = new Shell.Builder();
-                    builder2.addCommand(cmds2, 0, new Shell.OnCommandResultListener() {
-                        @Override
-                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                            if ( ll != null ) ll.onCommandResult(commandCode, 0, output);
-                        }
-                    });
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            builder2.setShell("su -mm -c sh");
-                            Shell.Interactive sh = builder2.open();
-                            sh.close();
-                        }
-                    }).start();
-                }
+                else {*/
+                final Shell.Builder builder2 = new Shell.Builder();
+                builder2.addCommand(cmds2, 0, ll);
+                builder2.setShell("su -mm -c sh");
+                Shell.Interactive sh = builder2.open();
+                sh.close();
+                //}
             }
         });
         Thread abc = new Thread(new Runnable() {
             @Override
             public void run() {
-                builder.setShell("su -mm -c sh");
-                Shell.Interactive sh=builder.open();
-                sh.close();
+                executeSu("e2fsck -fy /dev/block/mmcblk1p1", new Shell.OnCommandResultListener() {
+                    @Override
+                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                        builder.setShell("su -mm -c sh");
+                        Shell.Interactive sh = builder.open();
+                        sh.close();
+                    }
+                });
             }
         });
         abc.start();
@@ -196,21 +190,21 @@ public class SUCommand {
         mountSD(null);
     }
 
-    public static void formatSD(Shell.OnCommandResultListener ll) {
-        Thread abc = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<String> out2 = Shell.run("su -c sh", new String[]{"(echo o; echo n; echo p; echo 1; echo ; echo; echo w) | "+bb+" fdisk /dev/block/mmcblk1"},null,true);
-            }
-        });
-        abc.start();
-        try {
-            abc.join(60000);
-            String cmds[] = {
-                    bb+" mke2fs -T ext4 -m 0 /dev/block/mmcblk1p1",
-            };
-            executeSu(cmds, ll);
-        } catch (Exception e) { ll.onCommandResult(0,1,null);}
+    public static void formatSD(final Shell.OnCommandResultListener ll) {
+                executeSu("(echo o; echo n; echo p; echo 1; echo ; echo; echo w) | " + bb + " fdisk /dev/block/mmcblk1", new Shell.OnCommandResultListener() {
+                    @Override
+                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                        if ( exitCode == 0 ) {
+                            String cmds[] = {
+                                    "mke2fs -t ext4 -m 0 /dev/block/mmcblk1p1",
+                            };
+                            executeSu(cmds, ll);
+                        }
+                        else {
+                            if (ll != null) ll.onCommandResult(commandCode,exitCode,output);
+                        }
+                    }
+                });
     }
 
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {

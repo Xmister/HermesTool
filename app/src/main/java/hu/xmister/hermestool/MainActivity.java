@@ -398,6 +398,9 @@ public class MainActivity extends Activity
                                         }
                                     });
                                 }
+                                else {
+                                    SUCommand.interTweak(MainActivity.this, interCB);
+                                }
                             }
                         });
                     }
@@ -464,12 +467,6 @@ public class MainActivity extends Activity
                                                                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                                                     builder.setTitle(getString(R.string.sys_mod_success))
                                                                             .setMessage(getString(R.string.sys_mod_success_message))
-                                                                            .setPositiveButton(getString(R.string.reboot_now), new DialogInterface.OnClickListener() {
-                                                                                @Override
-                                                                                public void onClick(DialogInterface dialog, int which) {
-                                                                                    SUCommand.executeSu("sync;reboot", null);
-                                                                                }
-                                                                            })
                                                                             .setNegativeButton(getString(R.string.reboot_later), null)
                                                                             .setOnDismissListener(new DialogInterface.OnDismissListener() {
                                                                                 @Override
