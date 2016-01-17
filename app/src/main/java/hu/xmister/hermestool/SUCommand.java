@@ -5,12 +5,13 @@ import android.content.SharedPreferences;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import eu.chainfire.libsuperuser.Shell;
 
 public class SUCommand {
-    private static String bb=null;
+    private static String dir;
     private static boolean umountOk =false;
     public interface tbCallback {
         public void onGotTB(String freq, String cores);
@@ -117,7 +118,7 @@ public class SUCommand {
         Thread abc = new Thread(new Runnable() {
             @Override
             public void run() {
-                executeSu("e2fsck -fy /dev/block/mmcblk1p1", new Shell.OnCommandResultListener() {
+                executeSu(dir+"e2fsck -fy /dev/block/mmcblk1p1", new Shell.OnCommandResultListener() {
                     @Override
                     public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                         builder.setShell("su -mm -c sh");
@@ -130,20 +131,24 @@ public class SUCommand {
         abc.start();
     }
 
-    public static boolean linkBusybox(Context c) {
-        final String oldF=c.getApplicationInfo().dataDir+"/lib/lib_busybox_.so";
-        final String newF=c.getApplicationInfo().dataDir+"/lib/busybox";
-        SUCommand.executeSu("ln -sf " + oldF + " " + newF, null, 10000);
-        File f = new File(newF);
-        if (f.exists()) {
-            bb=newF;
-            return true;
+    public static boolean linkBinaries(Context c) {
+        dir=c.getApplicationInfo().dataDir+"/lib/";
+        final Properties files=new Properties();
+        files.setProperty("lib_busybox_.so","busybox");
+        files.setProperty("lib_mke2fs_.so","mke2fs");
+        files.setProperty("lib_e2fsck_.so","e2fsck");
+        for (String key:files.stringPropertyNames()) {
+            SUCommand.executeSu("ln -sf " + dir + key + " " + dir + files.getProperty(key), null, 10000);
+            File f = new File(dir + files.getProperty(key));
+            if (!f.exists()) {
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     public static void boxExec(final String cmd, Shell.OnCommandResultListener ll) {
-        executeSu(bb + " " + cmd, ll);
+        executeSu(dir+"busybox" + " " + cmd, ll);
     }
 
     public static boolean uMountSD() {
@@ -151,12 +156,12 @@ public class SUCommand {
         Thread abc=new Thread(new Runnable() {
             @Override
             public void run() {
-                List<String> out = Shell.run("su -mm -c sh", new String[]{bb + " umount /storage/sdcard1"},null,true);
+                List<String> out = Shell.run("su -mm -c sh", new String[]{dir+"busybox" + " umount /storage/sdcard1"},null,true);
                 if (out.size() > 0) {
                     if (out.get(0).contains("busy")) {
                         umountOk = false;
                     } else if (out.get(0).contains("Invalid")) {
-                        List<String> out2 = Shell.run("su -mm -c sh", new String[]{bb + " umount /storage/sdcard2"},null,true);
+                        List<String> out2 = Shell.run("su -mm -c sh", new String[]{dir+"busybox" + " umount /storage/sdcard2"},null,true);
                         if (out2.size() > 0) {
                             if (out2.get(0).contains("busy")) {
                                 umountOk = false;
@@ -165,12 +170,12 @@ public class SUCommand {
                     }
                 }
                 if ( umountOk ) {
-                    List<String> out2 = Shell.run("su -mm -c sh", new String[]{bb + " umount /mnt/media_rw/sdcard1"},null,true);
+                    List<String> out2 = Shell.run("su -mm -c sh", new String[]{dir+"busybox" + " umount /mnt/media_rw/sdcard1"},null,true);
                     if (out2.size() > 0) {
                         if (out2.get(0).contains("busy")) {
                             umountOk = false;
                         } else if (out2.get(0).contains("Invalid")) {
-                            out2 = Shell.run("su -mm -c sh", new String[]{bb + " umount /mnt/media_rw/sdcard2"},null,true);
+                            out2 = Shell.run("su -mm -c sh", new String[]{dir+"busybox" + " umount /mnt/media_rw/sdcard2"},null,true);
                             if (out2.size() > 0 && out2.get(0).contains("busy")) {
                                 umountOk = false;
                             }
@@ -191,20 +196,20 @@ public class SUCommand {
     }
 
     public static void formatSD(final Shell.OnCommandResultListener ll) {
-                executeSu("(echo o; echo n; echo p; echo 1; echo ; echo; echo w) | " + bb + " fdisk /dev/block/mmcblk1", new Shell.OnCommandResultListener() {
-                    @Override
-                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                        if ( exitCode == 0 ) {
-                            String cmds[] = {
-                                    "mke2fs -t ext4 -m 0 /dev/block/mmcblk1p1",
-                            };
-                            executeSu(cmds, ll);
-                        }
-                        else {
-                            if (ll != null) ll.onCommandResult(commandCode,exitCode,output);
-                        }
-                    }
-                });
+        executeSu("(echo o; echo n; echo p; echo 1; echo ; echo; echo w) | " + dir+"busybox" + " fdisk /dev/block/mmcblk1", new Shell.OnCommandResultListener() {
+            @Override
+            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                if ( exitCode == 0 ) {
+                    String cmds[] = {
+                            dir+"mke2fs -t ext4 -b 4096 -O ^huge_file,^dir_nlink,^ext_attr,^resize_inode,^extra_isize -m 0 /dev/block/mmcblk1p1",
+                    };
+                    executeSu(cmds, ll);
+                }
+                else {
+                    if (ll != null) ll.onCommandResult(commandCode,exitCode,output);
+                }
+            }
+        });
     }
 
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {

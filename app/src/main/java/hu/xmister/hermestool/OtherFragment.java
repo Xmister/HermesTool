@@ -173,7 +173,7 @@ public class OtherFragment extends MyFragment {
                                                     }
                                                 });
                                             } else {
-                                                if (SUCommand.linkBusybox(a) == false ) {
+                                                if (SUCommand.linkBinaries(a) == false ) {
                                                     a.runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
