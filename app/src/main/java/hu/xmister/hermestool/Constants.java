@@ -1,11 +1,10 @@
 package hu.xmister.hermestool;
 
 
+import android.content.Context;
 import android.content.res.Resources;
-import android.util.Property;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.StringTokenizer;
 
 import eu.chainfire.libsuperuser.Shell;
@@ -15,7 +14,7 @@ public class Constants {
     private static String[] fn,frequencyNames = null; /*new String[]  {"Unlimited",   "806MHz",   "1183MHz",  "1326MHz",  "1469MHz",  "1625MHz",  "1781MHz",  "1950MHz"};*/
     private static boolean filling=false;
 
-    private synchronized static void fillArrays() {
+    private synchronized static void fillArrays(final Context c) {
         if (filling) return;
         filling=true;
         SUCommand.executeSu("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies", new Shell.OnCommandResultListener() {
@@ -28,7 +27,7 @@ public class Constants {
                         fn=new String[st.countTokens() + 1];
                         int i = 0;
                         fi[i] = "0";
-                        fn[i++] = "Unlimited";
+                        fn[i++] = c.getString(R.string.unlimited);
                         while (st.hasMoreTokens()) {
                             String cur = st.nextToken().trim();
                             fi[i] = cur;
@@ -43,44 +42,44 @@ public class Constants {
         filling=false;
     }
 
-    public static String[] getFrequencyNames() {
-        if (frequencyNames == null) fillArrays();
+    public static String[] getFrequencyNames(final Context c) {
+        if (frequencyNames == null) fillArrays(c);
         return frequencyNames;
     }
 
-    public static String getFrequencyName(int index) throws IndexOutOfBoundsException {
-        if ( getFrequencyNames() != null )
-            if (index >= 0 && index < getFrequencyNames().length)
-                return getFrequencyNames()[index];
+    public static String getFrequencyName(final Context c,int index) throws IndexOutOfBoundsException {
+        if ( getFrequencyNames(c) != null )
+            if (index >= 0 && index < getFrequencyNames(c).length)
+                return getFrequencyNames(c)[index];
             else throw new IndexOutOfBoundsException();
         else throw new IndexOutOfBoundsException();
     }
 
-    public static String getFrequencyItem(int index) throws IndexOutOfBoundsException {
-        if ( getFrequencyItems() != null )
-            if (index >= 0 && index < getFrequencyItems().length)
-                return getFrequencyItems()[index];
+    public static String getFrequencyItem(final Context c,int index) throws IndexOutOfBoundsException {
+        if ( getFrequencyItems(c) != null )
+            if (index >= 0 && index < getFrequencyItems(c).length)
+                return getFrequencyItems(c)[index];
             else throw new IndexOutOfBoundsException();
         else throw new IndexOutOfBoundsException();
     }
 
-    public static String[] getFrequencyItems() {
-        if (frequencyItems == null) fillArrays();
+    public static String[] getFrequencyItems(final Context c) {
+        if (frequencyItems == null) fillArrays(c);
         return frequencyItems;
     }
 
-    public static int getNamesPos(String f) throws Resources.NotFoundException {
-        if ( getFrequencyNames() == null ) throw new Resources.NotFoundException(null);
-        for (int i=0; i<getFrequencyNames().length; i++) {
-            if (getFrequencyNames()[i].toLowerCase().equals(f.toLowerCase())) return i;
+    public static int getNamesPos(final Context c,String f) throws Resources.NotFoundException {
+        if ( getFrequencyNames(c) == null ) throw new Resources.NotFoundException(null);
+        for (int i=0; i<getFrequencyNames(c).length; i++) {
+            if (getFrequencyNames(c)[i].toLowerCase().equals(f.toLowerCase())) return i;
         }
         throw new Resources.NotFoundException(null);
     }
 
-    public static int getItemsPos(String f) throws Resources.NotFoundException {
-        if ( getFrequencyItems() == null ) throw new Resources.NotFoundException(null);
-        for (int i=0; i<getFrequencyItems().length; i++) {
-            if (getFrequencyItems()[i].toLowerCase().equals(f.toLowerCase())) return i;
+    public static int getItemsPos(final Context c,String f) throws Resources.NotFoundException {
+        if ( getFrequencyItems(c) == null ) throw new Resources.NotFoundException(null);
+        for (int i=0; i<getFrequencyItems(c).length; i++) {
+            if (getFrequencyItems(c)[i].toLowerCase().equals(f.toLowerCase())) return i;
         }
         throw new Resources.NotFoundException(null);
     }

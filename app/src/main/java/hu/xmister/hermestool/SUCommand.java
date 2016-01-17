@@ -218,13 +218,13 @@ public class SUCommand {
             String cmds[] = {
                     "cd /proc/cpufreq",
                     "chmod 644 cpufreq_limited_max_freq_by_user",
-                    "echo " + Constants.getFrequencyItem(Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                    "echo " + Constants.getFrequencyItem(context,Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
                     "cd /sys/devices/system/cpu/cpufreq/interactive",
                     "chmod 644 *",
-                    "echo \"10000\" > timer_rate",
+                    (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_game)) == R.id.rb_game ? "echo \"10000\" > timer_rate" : "echo \"500\" > timer_rate"),
                     "echo \"806000\" > hispeed_freq",
                     "echo \"10000 1183000:20000 1326000:20000 1469000:40000\" > above_hispeed_delay",
-                    "echo \"10000\" > min_sample_time",
+                    (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_game)) == R.id.rb_game ? "echo \"10000\" > min_sample_time" : "echo \"500\" > min_sample_time"),
                     "echo \"800000\" > timer_slack",
                     "echo \"85 806000:92 1183000:93 1326000:94 1469000:95\" >  target_loads",
                     "echo \"99\" > go_hispeed_load",
@@ -245,12 +245,12 @@ public class SUCommand {
             executeSu(cmds,null);
         }
     }
-    public static void saveTouchBoost(String cores, String freq, Shell.OnCommandResultListener ll) {
+    public static void saveTouchBoost(Context c,String cores, String freq, Shell.OnCommandResultListener ll) {
         String cmds[] = {
                 "mount -o remount,rw /system",
                 "cd /system/etc",
                 "cat perfservscntbl.bak || cp -i perfservscntbl.txt perfservscntbl.bak",
-                "echo \"CMD_SET_CPU_CORE, SCN_APP_TOUCH, "+cores+"\nCMD_SET_CPU_FREQ, SCN_APP_TOUCH, "+Constants.getFrequencyItems()[Integer.valueOf(freq)]+"\n\" > perfservscntbl.txt || exit 1",
+                "echo \"CMD_SET_CPU_CORE, SCN_APP_TOUCH, "+cores+"\nCMD_SET_CPU_FREQ, SCN_APP_TOUCH, "+Constants.getFrequencyItems(c)[Integer.valueOf(freq)]+"\n\" > perfservscntbl.txt || exit 1",
                 "chmod 644 perfservscntbl.txt",
                 "mount -o remount,ro /system",
         };

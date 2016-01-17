@@ -37,7 +37,7 @@
     <string name="warning">FIGYELEM</string>
     <string name="nothanks">Kösz, mégsem</string>
     <string name="tb_error">Hiba</string>
-    <string name="tb_error_message">Nem sikerült a touchboost értékek kiolvasása!</string>
+    <string name="tb_error_message">Nem sikerült a touchboost értékek kiolvasása!\nHa NEM MIUI-t használsz, ne törődj ezzel.</string>
     <string name="sys_inter_error">Interactive értékek nem menthetők</string>
     <string name="sys_inter_error_message">Valamilyen okból nem sikerült a megfelelő fájlok írása. Nem használsz másik kernel/CPU tweak appot?</string>
     <string name="sys_inter_suc">Siker</string>
@@ -64,4 +64,9 @@
     <string name="busybox_install_failed">Busybox telepítési hiba</string>
     <string name="take_a_minute">Ez tényleg percekig is tarthat...</string>
     <string name="error">HIBA</string>
+    <string name="rb_game">Gaming</string>
+    <string name="rb_quick">QuickRamp - Jobb AOSP/CyanogenMod típusú ROM-okhoz, és akkubarátabb</string>
+    <string name="def">Alapért.</string>
+    <string name="profile">Profil</string>
+    <string name="unlimited">Nincs limit</string>
 </resources>

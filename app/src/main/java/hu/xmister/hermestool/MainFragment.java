@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -36,6 +37,7 @@ public class MainFragment extends MyFragment {
         private static GridLayout grTouch;
         private static TextView textCore,
                                 textFreq;
+        private static RadioGroup rg_profile;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -58,9 +60,9 @@ public class MainFragment extends MyFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if ( Constants.getFrequencyName(which) != null ) {
+                if ( Constants.getFrequencyName(a,which) != null ) {
                     a.setP("maxfreq",""+which);
-                    maxFreq.setText(Constants.getFrequencyName(which));
+                    maxFreq.setText(Constants.getFrequencyName(a,which));
                 }
             }
         };
@@ -69,9 +71,9 @@ public class MainFragment extends MyFragment {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if ( Constants.getFrequencyName(which) != null ) {
+                if ( Constants.getFrequencyName(a,which) != null ) {
                     a.setP("tbFreq",""+(which+1));
-                    freq.setText(Constants.getFrequencyName(which+1));
+                    freq.setText(Constants.getFrequencyName(a,which+1));
                 }
             }
         };
@@ -100,11 +102,18 @@ public class MainFragment extends MyFragment {
         textCore=(TextView)getActivity().findViewById(R.id.textCore);
         cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
         grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
+        rg_profile = (RadioGroup) getActivity().findViewById(R.id.rg_profile);
+        rg_profile.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                a.setP("rg_profile",""+checkedId);
+            }
+        });
         maxFreq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Constants.getFrequencyNames() != null) {
-                    ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(), di, null, null);
+                if (Constants.getFrequencyNames(a) != null) {
+                    ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(a), di, null, null);
                     md.show(getFragmentManager(), "maxfreq");
                 }
                 else {
@@ -115,10 +124,10 @@ public class MainFragment extends MyFragment {
         freq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Constants.getFrequencyNames() != null) {
-                    String tmpNames[] = new String[Constants.getFrequencyNames().length - 1];
-                    for (int i = 1; i < Constants.getFrequencyNames().length; i++) {
-                        tmpNames[i - 1] = Constants.getFrequencyNames()[i];
+                if (Constants.getFrequencyNames(a) != null) {
+                    String tmpNames[] = new String[Constants.getFrequencyNames(a).length - 1];
+                    for (int i = 1; i < Constants.getFrequencyNames(a).length; i++) {
+                        tmpNames[i - 1] = Constants.getFrequencyNames(a)[i];
                     }
                     ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
                     md.show(getFragmentManager(), "tbfreq");
@@ -151,8 +160,8 @@ public class MainFragment extends MyFragment {
         a.setP("maxfreq", "0");
         maxFreq.setText("Unlimited");
         try {
-            Constants.getNamesPos("806MHz");
-            a.setP("tbFreq", "" + Constants.getNamesPos("806MHz"));
+            Constants.getNamesPos(a,"806MHz");
+            a.setP("tbFreq", "" + Constants.getNamesPos(a,"806MHz"));
         } catch ( Resources.NotFoundException e ) {
             a.runOnUiThread(new Runnable() {
                 @Override
@@ -169,6 +178,8 @@ public class MainFragment extends MyFragment {
         a.setP("tCores", "2");
         tCores.setText("2");
         a.setP("cbTouchBoost", "true");
+        rg_profile.check(R.id.rb_game);
+        a.setP("rg_profile", "" + R.id.rb_game);
         cbTouchBoost.setChecked(true);
     }
 
@@ -211,10 +222,10 @@ public class MainFragment extends MyFragment {
             @Override
             public void onGotTB(String freq, String cores) {
                 if ( freq!= null && cores != null ) {
-                    if (Constants.getFrequencyItems() != null) {
+                    if (Constants.getFrequencyItems(a) != null) {
                         try {
-                            int i = Constants.getItemsPos(freq);
-                            setReadFreqText(Constants.getFrequencyName(i));
+                            int i = Constants.getItemsPos(a,freq);
+                            setReadFreqText(Constants.getFrequencyName(a,i));
                         } catch (Resources.NotFoundException e) {
                             //TODO
                         }
@@ -237,13 +248,13 @@ public class MainFragment extends MyFragment {
             }
         });
         if ( a.getP("tbFreq") != null) {
-            setFreqText(Constants.getFrequencyName(Integer.valueOf(a.getP("tbFreq"))));
+            setFreqText(Constants.getFrequencyName(a,Integer.valueOf(a.getP("tbFreq"))));
         }
         else {
             try {
-                Constants.getNamesPos("806MHz");
+                Constants.getNamesPos(a,"806MHz");
                 setFreqText("806MHz");
-                a.setP("tbFreq", "" + Constants.getNamesPos("806MHz"));
+                a.setP("tbFreq", "" + Constants.getNamesPos(a,"806MHz"));
             } catch (Exception e ) {
                 a.runOnUiThread(new Runnable() {
                     @Override
@@ -265,14 +276,32 @@ public class MainFragment extends MyFragment {
             a.setP("tCores","2");
         }
         if (a.getP("maxfreq") != null) {
-            maxFreq.setText(Constants.getFrequencyName(Integer.valueOf(a.getP("maxfreq"))));
-            cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
+            a.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    maxFreq.setText(Constants.getFrequencyName(a,Integer.valueOf(a.getP("maxfreq"))));
+                    cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
+                }
+            });
         } else {
-            a.setP("maxfreq", "0");
-            maxFreq.setText("Unlimited");
-            a.setP("cbTouchBoost", "false");
-            cbTouchBoost.setChecked(false);
-            grTouch.setVisibility(View.INVISIBLE);
+            a.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    a.setP("maxfreq", "0");
+                    maxFreq.setText("Unlimited");
+                    a.setP("cbTouchBoost", "false");
+                    cbTouchBoost.setChecked(false);
+                    grTouch.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+        if (a.getP("rg_profile") != null) {
+            a.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    rg_profile.check(Integer.valueOf(a.getP("rg_profile")));
+                }
+            });
         }
     }
 }

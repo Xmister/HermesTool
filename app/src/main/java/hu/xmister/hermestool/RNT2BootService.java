@@ -88,7 +88,7 @@ public class RNT2BootService extends Service {
                 } catch (Exception e) {}
                 if ( Boolean.valueOf(sharedPreferences.getString("onboot","false"))) {
                     Log.i("Boot Service-IT", "Updating values...");
-                    if (Constants.getFrequencyNames() == null)  {
+                    if (Constants.getFrequencyNames(RNT2BootService.this) == null)  {
                         Log.e("Boot Service-IT", "Couldn't load frequency values...");
                         sendNotify(1, getString(R.string.freq_error));
                         canStop();
@@ -111,7 +111,7 @@ public class RNT2BootService extends Service {
                                 @Override
                                 public void onGotTB(String freq, String cores) {
                                     try {
-                                        if (!freq.equals(Constants.getFrequencyItem(Integer.valueOf(sharedPreferences.getString("tbfreq", "" + Constants.getNamesPos("806MHz"))))) || !cores.equals(sharedPreferences.getString("tcores", "2"))) {
+                                        if (!freq.equals(Constants.getFrequencyItem(RNT2BootService.this,Integer.valueOf(sharedPreferences.getString("tbfreq", "" + Constants.getNamesPos(RNT2BootService.this,"806MHz"))))) || !cores.equals(sharedPreferences.getString("tcores", "2"))) {
                                             sendNotify(3, getString(R.string.tb_different));
                                         }
                                     } catch (Resources.NotFoundException e) {}

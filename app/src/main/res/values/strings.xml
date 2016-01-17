@@ -14,7 +14,7 @@
     <string name="action_default">Load suggested values</string>
 
     <string name="main_section_label">Max Frequency</string>
-    <string name="frequency" translatable="false">Unlimited</string>
+    <string name="unlimited">Unlimited</string>
     <string name="touchboost">Modify TouchBoost</string>
     <string name="cores">Cores</string>
     <string name="tbFrequency">Frequency</string>
@@ -50,7 +50,7 @@
     <string name="unable_umount_message2">Couldn\'t umount /storage/sdcard1. Please stop every other applications. If the problem persists, make a reboot.</string>
     <string name="nothanks">No, thanks</string>
     <string name="tb_error">Error</string>
-    <string name="tb_error_message">Couldn\'t read touchboost values!</string>
+    <string name="tb_error_message">Couldn\'t read touchboost values!\nIf you are NOT using MIUI, don\'t worry about this.</string>
     <string name="no_inter">You are not using interactive</string>
     <string name="no_inter_message">You are not using interactive governor. This app can only work with interactive governor.</string>
     <string name="no_scaling">Error</string>
@@ -73,4 +73,8 @@
     <string name="busybox_install_failed_message">There was an error installing busybox binary.</string>
     <string name="take_a_minute">This can really take a minute...</string>
     <string name="error">ERROR</string>
+    <string name="def">Default</string>
+    <string name="profile">Profile</string>
+    <string name="rb_game">Gaming</string>
+    <string name="rb_quick">QuickRamp - Better for AOSP/CyanogenMod and battery overall</string>
 </resources>

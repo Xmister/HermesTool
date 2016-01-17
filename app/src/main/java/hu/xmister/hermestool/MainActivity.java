@@ -108,7 +108,7 @@ public class MainActivity extends Activity
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (Constants.getFrequencyName(0) == null) {
+                                    if (Constants.getFrequencyName(MainActivity.this,0) == null) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                         builder.setTitle(getString(R.string.no_scaling))
                                                 .setMessage(getString(R.string.no_scaling_message))
@@ -390,7 +390,7 @@ public class MainActivity extends Activity
                         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                             @Override
                             public void onGotTB(String freq, String cores) {
-                                if (freq == null || cores == null || !freq.equals(Constants.getFrequencyItem(Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores"))) {
+                                if (freq == null || cores == null || !freq.equals(Constants.getFrequencyItem(MainActivity.this,Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores"))) {
                                     updateTB(new SUCommand.tbCallback() {
                                         @Override
                                         public void onGotTB(String freq, String cores) {
@@ -431,7 +431,7 @@ public class MainActivity extends Activity
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        SUCommand.saveTouchBoost(getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
+                                        SUCommand.saveTouchBoost(MainActivity.this,getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
                                             @Override
                                             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                                                 SUCommand.getTouchBoost(new SUCommand.tbCallback() {
@@ -439,7 +439,7 @@ public class MainActivity extends Activity
                                                     public void onGotTB(final String freq, final String cores) {
                                                         boolean error=false;
                                                             if (freq == null || cores == null) error=true;
-                                                            else if (!freq.equals(Constants.getFrequencyItem(Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores")) ) {
+                                                            else if (!freq.equals(Constants.getFrequencyItem(MainActivity.this,Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores")) ) {
                                                                 error=true;
                                                             }
                                                         if (error) {
