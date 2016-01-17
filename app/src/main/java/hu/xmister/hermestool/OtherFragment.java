@@ -196,19 +196,23 @@ public class OtherFragment extends MyFragment {
                                                                             @Override
                                                                             public void onCommandResult(int commandCode, int exitCode, final List<String> output) {
                                                                                 if (exitCode == 0) {
-                                                                                    a.setP("cbAutoMount", "true");
-                                                                                    cbAutoMount.setChecked(true);
-                                                                                    a.saveValues();
-                                                                                    SUCommand.mountSD();
-                                                                                    a.runOnUiThread(new Runnable() {
+                                                                                    SUCommand.mountSD(new Shell.OnCommandResultListener() {
                                                                                         @Override
-                                                                                        public void run() {
-                                                                                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                                            builder.setTitle(getString(R.string.format_complete))
-                                                                                                    .setMessage(getString(R.string.format_complete_message))
-                                                                                                    .show();
-                                                                                            a.findViewById(R.id.prog).setVisibility(View.GONE);
-                                                                                            a.findViewById(R.id.container).setVisibility(View.VISIBLE);
+                                                                                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                                                            a.runOnUiThread(new Runnable() {
+                                                                                                @Override
+                                                                                                public void run() {
+                                                                                                    a.setP("cbAutoMount", "true");
+                                                                                                    cbAutoMount.setChecked(true);
+                                                                                                    a.saveValues();
+                                                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                                                    builder.setTitle(getString(R.string.format_complete))
+                                                                                                            .setMessage(getString(R.string.format_complete_message))
+                                                                                                            .show();
+                                                                                                    a.findViewById(R.id.prog).setVisibility(View.GONE);
+                                                                                                    a.findViewById(R.id.container).setVisibility(View.VISIBLE);
+                                                                                                }
+                                                                                            });
                                                                                         }
                                                                                     });
                                                                                 }
