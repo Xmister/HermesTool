@@ -215,20 +215,41 @@ public class SUCommand {
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
         try {
-            String cmds[] = {
-                    "cd /proc/cpufreq",
-                    "chmod 644 cpufreq_limited_max_freq_by_user",
-                    "echo " + Constants.getFrequencyItem(context,Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
-                    "cd /sys/devices/system/cpu/cpufreq/interactive",
-                    "chmod 644 *",
-                    (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_game)) == R.id.rb_game ? "echo \"10000\" > timer_rate" : "echo \"500\" > timer_rate"),
-                    "echo \"806000\" > hispeed_freq",
-                    "echo \"10000 1183000:20000 1326000:20000 1469000:40000\" > above_hispeed_delay",
-                    (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_game)) == R.id.rb_game ? "echo \"10000\" > min_sample_time" : "echo \"500\" > min_sample_time"),
-                    "echo \"800000\" > timer_slack",
-                    "echo \"85 806000:92 1183000:93 1326000:94 1469000:95\" >  target_loads",
-                    "echo \"99\" > go_hispeed_load",
-            };
+            String cmds[] = null;
+            switch (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_game))) {
+                case R.id.rb_game:
+                    cmds = new String[]{
+                        "cd /proc/cpufreq",
+                        "chmod 644 cpufreq_limited_max_freq_by_user",
+                        "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                        "cd /sys/devices/system/cpu/cpufreq/interactive",
+                        "chmod 644 *",
+                        "echo \"10000\" > timer_rate",
+                        "echo \"806000\" > hispeed_freq",
+                        "echo \"10000 1183000:20000 1326000:20000 1469000:40000\" > above_hispeed_delay",
+                        "echo \"10000\" > min_sample_time",
+                        "echo \"800000\" > timer_slack",
+                        "echo \"85 806000:92 1183000:93 1326000:94 1469000:95\" >  target_loads",
+                        "echo \"99\" > go_hispeed_load",
+                     };
+                    break;
+                case R.id.rb_quick:
+                    cmds = new String[]{
+                            "cd /proc/cpufreq",
+                            "chmod 644 cpufreq_limited_max_freq_by_user",
+                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                            "cd /sys/devices/system/cpu/cpufreq/interactive",
+                            "chmod 644 *",
+                            "echo \"500\" > timer_rate",
+                            "echo \"806000\" > hispeed_freq",
+                            "echo \"5000 1183000:15000 1326000:20000 1469000:25000\" > above_hispeed_delay",
+                            "echo \"500\" > min_sample_time",
+                            "echo \"800000\" > timer_slack",
+                            "echo \"85 806000:94 1183000:95 1326000:96 1469000:97\" >  target_loads",
+                            "echo \"99\" > go_hispeed_load",
+                    };
+                    break;
+            }
             executeSu(cmds, ll);
         } catch (IndexOutOfBoundsException e) {
             if (ll != null) ll.onCommandResult(0,120,null);
