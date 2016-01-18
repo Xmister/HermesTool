@@ -249,6 +249,22 @@ public class SUCommand {
                             "echo \"99\" > go_hispeed_load",
                     };
                     break;
+                case R.id.rb_default:
+                    cmds = new String[]{
+                            "cd /proc/cpufreq",
+                            "chmod 644 cpufreq_limited_max_freq_by_user",
+                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                            "cd /sys/devices/system/cpu/cpufreq/interactive",
+                            "chmod 644 *",
+                            "echo \"20000\" > timer_rate",
+                            "echo \"1183000\" > hispeed_freq",
+                            "echo \"20000\" > above_hispeed_delay",
+                            "echo \"20000\" > min_sample_time",
+                            "echo \"80000\" > timer_slack",
+                            "echo \"90\" >  target_loads",
+                            "echo \"99\" > go_hispeed_load",
+                    };
+                    break;
             }
             executeSu(cmds, ll);
         } catch (IndexOutOfBoundsException e) {

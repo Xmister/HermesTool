@@ -177,6 +177,12 @@
             android:layout_height="wrap_content"
             android:text="@string/rb_quick"
             android:id="@+id/rb_quick" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rb_default"
+            android:id="@+id/rb_default" />
     </RadioGroup>
 
 </GridLayout>

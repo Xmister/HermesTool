@@ -8,6 +8,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -86,6 +88,7 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         init();
         findViewById(R.id.container).setVisibility(View.INVISIBLE);
+        registerReceiver(new PhoneUnlockedReceiver(), new IntentFilter(Intent.ACTION_SCREEN_ON));
             new Thread(new Runnable() {
                 @Override
                 public void run() {

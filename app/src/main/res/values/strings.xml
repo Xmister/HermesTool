@@ -77,4 +77,5 @@
     <string name="profile">Profile</string>
     <string name="rb_game">Gaming</string>
     <string name="rb_quick">QuickRamp - Better for AOSP/CyanogenMod and battery overall</string>
+    <string name="rb_default">MIUI default</string>
 </resources>
