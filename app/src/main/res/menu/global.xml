@@ -7,5 +7,5 @@
     <item android:id="@+id/action_save" android:title="@string/action_save"
         android:orderInCategory="101" android:showAsAction="ifRoom|withText" />
     <item android:id="@+id/action_debug" android:title="Debug"
-        android:orderInCategory="101" android:showAsAction="never" android:visible="true" />
+        android:orderInCategory="101" android:showAsAction="never" android:visible="false" />
 </menu>
