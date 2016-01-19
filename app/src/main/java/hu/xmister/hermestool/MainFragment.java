@@ -160,7 +160,6 @@ public class MainFragment extends MyFragment {
         a.setP("maxfreq", "0");
         maxFreq.setText("Unlimited");
         try {
-            Constants.getNamesPos(a,"806MHz");
             a.setP("tbFreq", "" + Constants.getNamesPos(a,"806MHz"));
         } catch ( Resources.NotFoundException e ) {
             a.runOnUiThread(new Runnable() {
@@ -248,7 +247,11 @@ public class MainFragment extends MyFragment {
             }
         });
         if ( a.getP("tbFreq") != null) {
-            setFreqText(Constants.getFrequencyName(a,Integer.valueOf(a.getP("tbFreq"))));
+            try {
+                setFreqText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("tbFreq"))));
+            } catch (Exception e) {
+                setFreqText("806MHz");
+            }
         }
         else {
             try {
@@ -279,8 +282,13 @@ public class MainFragment extends MyFragment {
             a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    maxFreq.setText(Constants.getFrequencyName(a,Integer.valueOf(a.getP("maxfreq"))));
-                    cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
+                    try {
+                        maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
+                        cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
+                    } catch (Exception e) {
+                        a.setP("maxfreq", "0");
+                        maxFreq.setText("Unlimited");
+                    }
                 }
             });
         } else {
