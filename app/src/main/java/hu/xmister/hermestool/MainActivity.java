@@ -279,7 +279,7 @@ public class MainActivity extends Activity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         if (position==2) {
-            String url="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=xmisterhu@gmail.com&item_name=Donation&currency_code=EUR&amount=2";
+            String url="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=xmisterhu@gmail.com&item_name=Donation&currency_code=EUR";
             Intent i=new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
