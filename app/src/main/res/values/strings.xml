@@ -78,4 +78,5 @@
     <string name="rb_game">SlowRamp - Default, might be better for gaming</string>
     <string name="rb_quick">QuickRamp - Experimental, better for AOSP/CyanogenMod and battery overall</string>
     <string name="rb_default">MIUI default</string>
+    <string name="donate">Support the app - Donate</string>
 </resources>

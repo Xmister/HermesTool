@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -277,21 +278,29 @@ public class MainActivity extends Activity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fT=fragmentManager.beginTransaction();
-        switch (position) {
-            case 0:
-                if (!noCPU)
-                    curFrag = MainFragment.newInstance(position + 1);
-                else
-                    curFrag = OtherFragment.newInstance(position + 1);
-                break;
-            case 1:
-                curFrag = OtherFragment.newInstance(position + 1);
-                break;
+        if (position==2) {
+            String url="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=xmisterhu@gmail.com&item_name=Donation&currency_code=EUR&amount=2";
+            Intent i=new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
         }
-        fT.replace(R.id.container, curFrag);
-        fT.commit();
+        else {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fT = fragmentManager.beginTransaction();
+            switch (position) {
+                case 0:
+                    if (!noCPU)
+                        curFrag = MainFragment.newInstance(position + 1);
+                    else
+                        curFrag = OtherFragment.newInstance(position + 1);
+                    break;
+                case 1:
+                    curFrag = OtherFragment.newInstance(position + 1);
+                    break;
+            }
+            fT.replace(R.id.container, curFrag);
+            fT.commit();
+        }
     }
 
     public void onSectionAttached(int number) {
