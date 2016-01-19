@@ -229,7 +229,7 @@ public class SUCommand {
                         "echo \"10000 1183000:20000 1326000:20000 1469000:40000\" > above_hispeed_delay",
                         "echo \"10000\" > min_sample_time",
                         "echo \"800000\" > timer_slack",
-                        "echo \"85 806000:92 1183000:93 1326000:94 1469000:95\" >  target_loads",
+                        "echo \"90 806000:92 1183000:95 1326000:96 1469000:98\" >  target_loads",
                         "echo \"99\" > go_hispeed_load",
                      };
                     break;
@@ -242,10 +242,10 @@ public class SUCommand {
                             "chmod 644 *",
                             "echo \"500\" > timer_rate",
                             "echo \"806000\" > hispeed_freq",
-                            "echo \"5000 1183000:10000 1326000:15000 1469000:20000\" > above_hispeed_delay",
+                            "echo \"5000 1183000:15000 1326000:20000 1469000:25000\" > above_hispeed_delay",
                             "echo \"500\" > min_sample_time",
                             "echo \"800000\" > timer_slack",
-                            "echo \"92 806000:97 1183000:97 1326000:98 1469000:99\" >  target_loads",
+                            "echo \"92 806000:96 1183000:97 1326000:98 1469000:99\" >  target_loads",
                             "echo \"99\" > go_hispeed_load",
                     };
                     break;
