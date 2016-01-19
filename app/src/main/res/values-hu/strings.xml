@@ -64,8 +64,8 @@
     <string name="busybox_install_failed">Busybox telepítési hiba</string>
     <string name="take_a_minute">Ez tényleg percekig is tarthat...</string>
     <string name="error">HIBA</string>
-    <string name="rb_game">Gaming</string>
-    <string name="rb_quick">QuickRamp - Jobb AOSP/CyanogenMod típusú ROM-okhoz, és akkubarátabb</string>
+    <string name="rb_game">SlowRamp - Alapértelmezett, jobb lehet játékokhoz</string>
+    <string name="rb_quick">QuickRamp - Kísérleti. Jobb AOSP/CyanogenMod típusú ROM-okhoz, és akkubarátabb</string>
     <string name="rb_default">MIUI alapértelmezett</string>
     <string name="def">Alapért.</string>
     <string name="profile">Profil</string>
