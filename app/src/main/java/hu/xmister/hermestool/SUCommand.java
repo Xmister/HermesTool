@@ -228,7 +228,7 @@ public class SUCommand {
                         "echo \"806000\" > hispeed_freq",
                         "echo \"10000 1183000:20000 1326000:20000 1469000:40000\" > above_hispeed_delay",
                         "echo \"10000\" > min_sample_time",
-                        "echo \"800000\" > timer_slack",
+                        "echo \"20000\" > timer_slack",
                         "echo \"90 806000:92 1183000:95 1326000:96 1469000:98\" >  target_loads",
                         "echo \"99\" > go_hispeed_load",
                      };
@@ -244,7 +244,7 @@ public class SUCommand {
                             "echo \"806000\" > hispeed_freq",
                             "echo \"5000 1183000:3000 1326000:3000 1469000:5000\" > above_hispeed_delay",
                             "echo \"500\" > min_sample_time",
-                            "echo \"800000\" > timer_slack",
+                            "echo \"5000\" > timer_slack",
                             "echo \"90 806000:99 1183000:98 1326000:98 1469000:150\" >  target_loads",
                             "echo \"99\" > go_hispeed_load",
                     };
