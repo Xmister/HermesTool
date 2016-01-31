@@ -221,6 +221,7 @@ public class SUCommand {
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
         String cmds[] = new String[]{
+                "chmod 644 /proc/hps/*",
                 "echo 2 > /proc/hps/input_boost_cpu_num",
                 "echo 0 > /proc/hps/input_boost_enable",
                 "echo 5 > /proc/hps/num_limit_low_battery",
@@ -228,6 +229,7 @@ public class SUCommand {
                 "echo 5 > /proc/hps/num_limit_thermal",
                 "echo 5 > /proc/hps/num_limit_ultra_power_saving",
                 "echo 0 > /proc/hps/rush_boost_enable",
+                "chmod 444 /proc/hps/*",
                 "cd /proc/cpufreq",
                 "chmod 644 cpufreq_limited_max_freq_by_user",
                 "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+Constants.defFRPos))) + " > cpufreq_limited_max_freq_by_user",
@@ -244,7 +246,6 @@ public class SUCommand {
                             "echo \"40000\" > min_sample_time",
                             "echo \"40000\" > timer_slack",
                             "echo \"90 "+Constants.getFrequencyItem(context,Constants.defTBPos)+":90 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":90 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":92 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":95\" >  target_loads",
-                            "echo \"99\" > go_hispeed_load",
                     });
                     break;
                 case R.id.rb_slow:
@@ -255,7 +256,6 @@ public class SUCommand {
                         "echo \"10000\" > min_sample_time",
                         "echo \"400000\" > timer_slack",
                         "echo \"90 "+Constants.getFrequencyItem(context,Constants.defTBPos)+":92 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":95 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":96 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":98\" >  target_loads",
-                        "echo \"99\" > go_hispeed_load",
                      });
                     break;
                 case R.id.rb_quick:
@@ -266,7 +266,6 @@ public class SUCommand {
                             "echo \"1000\" > min_sample_time",
                             "echo \"200000\" > timer_slack",
                             "echo \"90 "+Constants.getFrequencyItem(context,Constants.defTBPos)+":99 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":98 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":98 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":99\" >  target_loads",
-                            "echo \"99\" > go_hispeed_load",
                     });
                     break;
                 case R.id.rb_default:
@@ -277,10 +276,13 @@ public class SUCommand {
                             "echo \"20000\" > min_sample_time",
                             "echo \"80000\" > timer_slack",
                             "echo \"90\" >  target_loads",
-                            "echo \"99\" > go_hispeed_load",
                     });
                     break;
             }
+            cmds = concat(cmds,new String[]{
+                    "echo \"99\" > go_hispeed_load",
+                    "chmod 444 *",
+            });
             executeSu(cmds, ll);
         } catch (IndexOutOfBoundsException e) {
             if (ll != null) ll.onCommandResult(0,120,null);
