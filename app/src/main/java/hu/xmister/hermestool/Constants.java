@@ -13,6 +13,8 @@ public class Constants {
     private static String[] fi,frequencyItems = null; /*new String[]  {"0",           "806",      "1183",     "1326",     "1469",     "1625",     "1781",     "1950"};*/
     private static String[] fn,frequencyNames = null; /*new String[]  {"Unlimited",   "806MHz",   "1183MHz",  "1326MHz",  "1469MHz",  "1625MHz",  "1781MHz",  "1950MHz"};*/
     private static boolean filling=false;
+    public static int defFRPos=2;
+    public static int defTBPos=5;
 
     private synchronized static void fillArrays(final Context c) {
         if (filling) return;
@@ -37,8 +39,10 @@ public class Constants {
                 }
                 frequencyItems = fi;
                 frequencyNames = fn;
+                defFRPos=(Constants.getFrequencyItem(c,1).equals("1950000") ? 2 : 3);
+                defTBPos=Constants.getFrequencyItems(c).length-2;
             }
-        },10000);
+        },30000);
         filling=false;
     }
 

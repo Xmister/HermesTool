@@ -153,11 +153,10 @@ public class MainFragment extends MyFragment {
     }
 
     public void loadDefaults() {
-        a.setP("maxfreq", "3");
-        maxFreq.setText(Constants.getFrequencyName(getActivity(),3));
-        int defPos=Constants.getFrequencyItems(getActivity()).length-2;
+        a.setP("maxfreq", ""+Constants.defFRPos);
+        maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
         try {
-            a.setP("tbFreq", "" + defPos);
+            a.setP("tbFreq", "" + Constants.defTBPos);
         } catch ( Resources.NotFoundException e ) {
             a.runOnUiThread(new Runnable() {
                 @Override
@@ -170,7 +169,7 @@ public class MainFragment extends MyFragment {
                 }
             });
         }
-        freq.setText(Constants.getFrequencyName(getActivity(),defPos));
+        freq.setText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
         a.setP("tCores", "2");
         tCores.setText("2");
         a.setP("cbTouchBoost", "true");
@@ -214,8 +213,6 @@ public class MainFragment extends MyFragment {
 
     @Override
     public void loadValues() {
-        final int defTBPos=Constants.getFrequencyItems(getActivity()).length-2;
-        final int defFRPos=3;
         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
             @Override
             public void onGotTB(String freq, String cores) {
@@ -249,12 +246,12 @@ public class MainFragment extends MyFragment {
             try {
                 setFreqText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("tbFreq"))));
             } catch (Exception e) {
-                setFreqText(Constants.getFrequencyName(getActivity(),defTBPos));
+                setFreqText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
             }
         }
         else {
             try {
-                a.setP("tbFreq", "" + defTBPos);
+                a.setP("tbFreq", "" + Constants.defTBPos);
             } catch (Exception e ) {
                 a.runOnUiThread(new Runnable() {
                     @Override
@@ -283,8 +280,8 @@ public class MainFragment extends MyFragment {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
                     } catch (Exception e) {
-                        a.setP("maxfreq", ""+defFRPos);
-                        maxFreq.setText(Constants.getFrequencyName(getActivity(),defFRPos));
+                        a.setP("maxfreq", ""+Constants.defFRPos);
+                        maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
                     }
                 }
             });
@@ -292,8 +289,8 @@ public class MainFragment extends MyFragment {
             a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    a.setP("maxfreq", ""+defFRPos);
-                    maxFreq.setText(Constants.getFrequencyName(getActivity(),defFRPos));
+                    a.setP("maxfreq", ""+Constants.defFRPos);
+                    maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
                     a.setP("cbTouchBoost", "false");
                     cbTouchBoost.setChecked(false);
                     grTouch.setVisibility(View.INVISIBLE);

@@ -111,8 +111,7 @@ public class RNT2BootService extends Service {
                                 @Override
                                 public void onGotTB(String freq, String cores) {
                                     try {
-                                        final int defPos=Constants.getFrequencyItems(RNT2BootService.this).length-2;
-                                        if (!freq.equals(Constants.getFrequencyItem(RNT2BootService.this,Integer.valueOf(sharedPreferences.getString("tbfreq", "" + defPos)))) || !cores.equals(sharedPreferences.getString("tcores", "2"))) {
+                                        if (!freq.equals(Constants.getFrequencyItem(RNT2BootService.this,Integer.valueOf(sharedPreferences.getString("tbfreq", "" + Constants.defTBPos)))) || !cores.equals(sharedPreferences.getString("tcores", "2"))) {
                                             sendNotify(3, getString(R.string.tb_different));
                                         }
                                     } catch (Resources.NotFoundException e) {}

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -118,7 +119,7 @@ public class SUCommand {
         Thread abc = new Thread(new Runnable() {
             @Override
             public void run() {
-                executeSu(dir+"e2fsck -fy /dev/block/mmcblk1p1", new Shell.OnCommandResultListener() {
+                executeSu(dir + "e2fsck -fy /dev/block/mmcblk1p1", new Shell.OnCommandResultListener() {
                     @Override
                     public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                         builder.setShell("su -mm -c sh");
@@ -136,7 +137,7 @@ public class SUCommand {
         final Properties files=new Properties();
         files.setProperty("lib_busybox_.so","busybox");
         files.setProperty("lib_mke2fs_.so","mke2fs");
-        files.setProperty("lib_e2fsck_.so","e2fsck");
+        files.setProperty("lib_e2fsck_.so", "e2fsck");
         for (String key:files.stringPropertyNames()) {
             SUCommand.executeSu("ln -sf " + dir + key + " " + dir + files.getProperty(key), null, 10000);
             File f = new File(dir + files.getProperty(key));
@@ -196,92 +197,88 @@ public class SUCommand {
     }
 
     public static void formatSD(final Shell.OnCommandResultListener ll) {
-        executeSu("(echo o; echo n; echo p; echo 1; echo ; echo; echo w) | " + dir+"busybox" + " fdisk /dev/block/mmcblk1", new Shell.OnCommandResultListener() {
+        executeSu("(echo o; echo n; echo p; echo 1; echo ; echo; echo w) | " + dir + "busybox" + " fdisk /dev/block/mmcblk1", new Shell.OnCommandResultListener() {
             @Override
             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                if ( exitCode == 0 ) {
+                if (exitCode == 0) {
                     String cmds[] = {
-                            dir+"mke2fs -t ext4 -b 4096 -O ^huge_file,^dir_nlink,^ext_attr,^resize_inode,^extra_isize -m 0 /dev/block/mmcblk1p1",
+                            dir + "mke2fs -t ext4 -b 4096 -O ^huge_file,^dir_nlink,^ext_attr,^resize_inode,^extra_isize -m 0 /dev/block/mmcblk1p1",
                     };
                     executeSu(cmds, ll);
-                }
-                else {
-                    if (ll != null) ll.onCommandResult(commandCode,exitCode,output);
+                } else {
+                    if (ll != null) ll.onCommandResult(commandCode, exitCode, output);
                 }
             }
         });
     }
 
+    public static <T> T[] concat(T[] first, T[] second) {
+        T[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
+    }
+
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
-        final int defFRPos=3;
-        final int defTBPos=Constants.getFrequencyItems(context).length-2;
+        String cmds[] = new String[]{
+                "echo 2 > /proc/hps/input_boost_cpu_num",
+                "echo 0 > /proc/hps/input_boost_enable",
+                "echo 5 > /proc/hps/num_limit_low_battery",
+                "echo 5 > /proc/hps/num_limit_power_serv",
+                "echo 5 > /proc/hps/num_limit_thermal",
+                "echo 5 > /proc/hps/num_limit_ultra_power_saving",
+                "echo 0 > /proc/hps/rush_boost_enable",
+                "cd /proc/cpufreq",
+                "chmod 644 cpufreq_limited_max_freq_by_user",
+                "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+Constants.defFRPos))) + " > cpufreq_limited_max_freq_by_user",
+                "cd /sys/devices/system/cpu/cpufreq/interactive",
+                "chmod 644 *",
+        };
         try {
-            String cmds[] = null;
             switch (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_slow))) {
                 case R.id.rb_gaming:
-                    cmds = new String[]{
-                            "cd /proc/cpufreq",
-                            "chmod 644 cpufreq_limited_max_freq_by_user",
-                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
-                            "cd /sys/devices/system/cpu/cpufreq/interactive",
-                            "chmod 644 *",
-                            "echo \"30000\" > timer_rate",
-                            "echo \""+Constants.getFrequencyItem(context,defTBPos)+"\" > hispeed_freq",
-                            "echo \"30000 "+Constants.getFrequencyItem(context,defTBPos-3)+":60000\" > above_hispeed_delay",
-                            "echo \"30000\" > min_sample_time",
-                            "echo \"30000\" > timer_slack",
-                            "echo \"85 "+Constants.getFrequencyItem(context,defTBPos)+":87 "+Constants.getFrequencyItem(context,defTBPos-1)+":90 "+Constants.getFrequencyItem(context,defTBPos-2)+":92 "+Constants.getFrequencyItem(context,defTBPos-3)+":95\" >  target_loads",
+                    cmds = concat(cmds,new String[]{
+                            "echo \"40000\" > timer_rate",
+                            "echo \""+Constants.getFrequencyItem(context,Constants.defTBPos)+"\" > hispeed_freq",
+                            "echo \"40000\" > above_hispeed_delay",
+                            "echo \"40000\" > min_sample_time",
+                            "echo \"40000\" > timer_slack",
+                            "echo \"90 "+Constants.getFrequencyItem(context,Constants.defTBPos)+":90 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":90 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":92 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":95\" >  target_loads",
                             "echo \"99\" > go_hispeed_load",
-                    };
+                    });
                     break;
                 case R.id.rb_slow:
-                    cmds = new String[]{
-                        "cd /proc/cpufreq",
-                        "chmod 644 cpufreq_limited_max_freq_by_user",
-                        "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
-                        "cd /sys/devices/system/cpu/cpufreq/interactive",
-                        "chmod 644 *",
+                    cmds = concat(cmds,new String[]{
                         "echo \"10000\" > timer_rate",
-                        "echo \""+Constants.getFrequencyItem(context,defTBPos)+"\" > hispeed_freq",
-                        "echo \"10000 "+Constants.getFrequencyItem(context,defTBPos-1)+":10000 "+Constants.getFrequencyItem(context,defTBPos-2)+":30000 "+Constants.getFrequencyItem(context,defTBPos-3)+":20000\" > above_hispeed_delay",
+                        "echo \""+Constants.getFrequencyItem(context,Constants.defTBPos)+"\" > hispeed_freq",
+                        "echo \"10000 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":10000 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":30000 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":20000\" > above_hispeed_delay",
                         "echo \"10000\" > min_sample_time",
                         "echo \"400000\" > timer_slack",
-                        "echo \"90 "+Constants.getFrequencyItem(context,defTBPos)+":92 "+Constants.getFrequencyItem(context,defTBPos-1)+":95 "+Constants.getFrequencyItem(context,defTBPos-2)+":96 "+Constants.getFrequencyItem(context,defTBPos-3)+":98\" >  target_loads",
+                        "echo \"90 "+Constants.getFrequencyItem(context,Constants.defTBPos)+":92 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":95 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":96 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":98\" >  target_loads",
                         "echo \"99\" > go_hispeed_load",
-                     };
+                     });
                     break;
                 case R.id.rb_quick:
-                    cmds = new String[]{
-                            "cd /proc/cpufreq",
-                            "chmod 644 cpufreq_limited_max_freq_by_user",
-                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
-                            "cd /sys/devices/system/cpu/cpufreq/interactive",
-                            "chmod 644 *",
+                    cmds = concat(cmds,new String[]{
                             "echo \"1000\" > timer_rate",
-                            "echo \""+Constants.getFrequencyItem(context,defTBPos)+"\" > hispeed_freq",
-                            "echo \"5000 "+Constants.getFrequencyItem(context,defTBPos-1)+":3000 "+Constants.getFrequencyItem(context,defTBPos-2)+":4000 "+Constants.getFrequencyItem(context,defTBPos-3)+":5000\" > above_hispeed_delay",
+                            "echo \""+Constants.getFrequencyItem(context,Constants.defTBPos)+"\" > hispeed_freq",
+                            "echo \"5000 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":3000 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":4000 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":5000\" > above_hispeed_delay",
                             "echo \"1000\" > min_sample_time",
                             "echo \"200000\" > timer_slack",
-                            "echo \"90 "+Constants.getFrequencyItem(context,defTBPos)+":99 "+Constants.getFrequencyItem(context,defTBPos-1)+":98 "+Constants.getFrequencyItem(context,defTBPos-2)+":98 "+Constants.getFrequencyItem(context,defTBPos-3)+":99\" >  target_loads",
+                            "echo \"90 "+Constants.getFrequencyItem(context,Constants.defTBPos)+":99 "+Constants.getFrequencyItem(context,Constants.defTBPos-1)+":98 "+Constants.getFrequencyItem(context,Constants.defTBPos-2)+":98 "+Constants.getFrequencyItem(context,Constants.defTBPos-3)+":99\" >  target_loads",
                             "echo \"99\" > go_hispeed_load",
-                    };
+                    });
                     break;
                 case R.id.rb_default:
-                    cmds = new String[]{
-                            "cd /proc/cpufreq",
-                            "chmod 644 cpufreq_limited_max_freq_by_user",
-                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
-                            "cd /sys/devices/system/cpu/cpufreq/interactive",
-                            "chmod 644 *",
+                    cmds = concat(cmds,new String[]{
                             "echo \"20000\" > timer_rate",
-                            "echo \""+Constants.getFrequencyItem(context,defTBPos-1)+"\" > hispeed_freq",
+                            "echo \""+Constants.getFrequencyItem(context,Constants.defTBPos-1)+"\" > hispeed_freq",
                             "echo \"20000\" > above_hispeed_delay",
                             "echo \"20000\" > min_sample_time",
                             "echo \"80000\" > timer_slack",
                             "echo \"90\" >  target_loads",
                             "echo \"99\" > go_hispeed_load",
-                    };
+                    });
                     break;
             }
             executeSu(cmds, ll);
@@ -289,7 +286,7 @@ public class SUCommand {
             if (ll != null) ll.onCommandResult(0,120,null);
         }
         if ( sharedPreferences.contains("sched") ) {
-            String cmds[]=new String[]{
+            cmds=new String[]{
                     "cd /sys/block/mmcblk0/queue",
                     "chmod 644 *",
                     "echo "+sharedPreferences.getString("sched","cfq")+" > scheduler",
