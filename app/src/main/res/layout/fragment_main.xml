@@ -155,7 +155,7 @@
         android:layout_row="6"
         android:layout_column="0"
         android:layout_columnSpan="2"
-        android:checkedButton="@+id/rb_game"
+        android:checkedButton="@+id/rb_slow"
         android:id="@+id/rg_profile"
         android:layout_gravity="top"
         android:layout_marginTop="20dp">
@@ -169,8 +169,20 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/rb_game"
-            android:id="@+id/rb_game" />
+            android:text="@string/rb_gaming"
+            android:id="@+id/rb_gaming" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rb_default"
+            android:id="@+id/rb_default" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rb_slow"
+            android:id="@+id/rb_slow" />
 
         <RadioButton
             android:layout_width="wrap_content"
@@ -178,11 +190,6 @@
             android:text="@string/rb_quick"
             android:id="@+id/rb_quick" />
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/rb_default"
-            android:id="@+id/rb_default" />
     </RadioGroup>
 
 </GridLayout>

@@ -74,9 +74,10 @@
     <string name="take_a_minute">This can really take a minute...</string>
     <string name="error">ERROR</string>
     <string name="def">Default</string>
-    <string name="profile">Profile</string>
-    <string name="rb_game">SlowRamp - Default, might be better for gaming</string>
+    <string name="profile">Profile (From the slowest response to the fastest)</string>
+    <string name="rb_slow">SlowRamp - Default, might be better for gaming</string>
     <string name="rb_quick">QuickRamp - Experimental, better for AOSP/CyanogenMod and battery overall</string>
     <string name="rb_default">MIUI default</string>
     <string name="donate">Support the app - Donate</string>
+    <string name="rb_gaming">Gaming</string>
 </resources>

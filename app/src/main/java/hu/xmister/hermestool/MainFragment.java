@@ -16,10 +16,6 @@ import android.widget.GridLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.util.List;
-
 
 public class MainFragment extends MyFragment {
 
@@ -157,10 +153,11 @@ public class MainFragment extends MyFragment {
     }
 
     public void loadDefaults() {
-        a.setP("maxfreq", "0");
-        maxFreq.setText("Unlimited");
+        a.setP("maxfreq", "3");
+        maxFreq.setText(Constants.getFrequencyName(getActivity(),3));
+        int defPos=Constants.getFrequencyItems(getActivity()).length-2;
         try {
-            a.setP("tbFreq", "" + Constants.getNamesPos(a,"806MHz"));
+            a.setP("tbFreq", "" + defPos);
         } catch ( Resources.NotFoundException e ) {
             a.runOnUiThread(new Runnable() {
                 @Override
@@ -173,12 +170,12 @@ public class MainFragment extends MyFragment {
                 }
             });
         }
-        freq.setText("806MHz");
+        freq.setText(Constants.getFrequencyName(getActivity(),defPos));
         a.setP("tCores", "2");
         tCores.setText("2");
         a.setP("cbTouchBoost", "true");
-        rg_profile.check(R.id.rb_game);
-        a.setP("rg_profile", "" + R.id.rb_game);
+        rg_profile.check(R.id.rb_slow);
+        a.setP("rg_profile", "" + R.id.rb_slow);
         cbTouchBoost.setChecked(true);
     }
 
@@ -217,6 +214,8 @@ public class MainFragment extends MyFragment {
 
     @Override
     public void loadValues() {
+        final int defTBPos=Constants.getFrequencyItems(getActivity()).length-2;
+        final int defFRPos=3;
         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
             @Override
             public void onGotTB(String freq, String cores) {
@@ -250,14 +249,12 @@ public class MainFragment extends MyFragment {
             try {
                 setFreqText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("tbFreq"))));
             } catch (Exception e) {
-                setFreqText("806MHz");
+                setFreqText(Constants.getFrequencyName(getActivity(),defTBPos));
             }
         }
         else {
             try {
-                Constants.getNamesPos(a,"806MHz");
-                setFreqText("806MHz");
-                a.setP("tbFreq", "" + Constants.getNamesPos(a,"806MHz"));
+                a.setP("tbFreq", "" + defTBPos);
             } catch (Exception e ) {
                 a.runOnUiThread(new Runnable() {
                     @Override
@@ -286,8 +283,8 @@ public class MainFragment extends MyFragment {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
                     } catch (Exception e) {
-                        a.setP("maxfreq", "0");
-                        maxFreq.setText("Unlimited");
+                        a.setP("maxfreq", ""+defFRPos);
+                        maxFreq.setText(Constants.getFrequencyName(getActivity(),defFRPos));
                     }
                 }
             });
@@ -295,8 +292,8 @@ public class MainFragment extends MyFragment {
             a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    a.setP("maxfreq", "0");
-                    maxFreq.setText("Unlimited");
+                    a.setP("maxfreq", ""+defFRPos);
+                    maxFreq.setText(Constants.getFrequencyName(getActivity(),defFRPos));
                     a.setP("cbTouchBoost", "false");
                     cbTouchBoost.setChecked(false);
                     grTouch.setVisibility(View.INVISIBLE);

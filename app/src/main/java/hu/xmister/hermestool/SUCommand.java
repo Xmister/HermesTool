@@ -214,22 +214,40 @@ public class SUCommand {
 
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
+        final int defFRPos=3;
+        final int defTBPos=Constants.getFrequencyItems(context).length-2;
         try {
             String cmds[] = null;
-            switch (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_game))) {
-                case R.id.rb_game:
+            switch (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_slow))) {
+                case R.id.rb_gaming:
+                    cmds = new String[]{
+                            "cd /proc/cpufreq",
+                            "chmod 644 cpufreq_limited_max_freq_by_user",
+                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
+                            "cd /sys/devices/system/cpu/cpufreq/interactive",
+                            "chmod 644 *",
+                            "echo \"30000\" > timer_rate",
+                            "echo \""+Constants.getFrequencyItem(context,defTBPos)+"\" > hispeed_freq",
+                            "echo \"30000 "+Constants.getFrequencyItem(context,defTBPos-3)+":60000\" > above_hispeed_delay",
+                            "echo \"30000\" > min_sample_time",
+                            "echo \"30000\" > timer_slack",
+                            "echo \"85 "+Constants.getFrequencyItem(context,defTBPos)+":87 "+Constants.getFrequencyItem(context,defTBPos-1)+":90 "+Constants.getFrequencyItem(context,defTBPos-2)+":92 "+Constants.getFrequencyItem(context,defTBPos-3)+":95\" >  target_loads",
+                            "echo \"99\" > go_hispeed_load",
+                    };
+                    break;
+                case R.id.rb_slow:
                     cmds = new String[]{
                         "cd /proc/cpufreq",
                         "chmod 644 cpufreq_limited_max_freq_by_user",
-                        "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                        "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
                         "cd /sys/devices/system/cpu/cpufreq/interactive",
                         "chmod 644 *",
                         "echo \"10000\" > timer_rate",
-                        "echo \"806000\" > hispeed_freq",
-                        "echo \"10000 1183000:20000 1326000:20000 1469000:40000\" > above_hispeed_delay",
+                        "echo \""+Constants.getFrequencyItem(context,defTBPos)+"\" > hispeed_freq",
+                        "echo \"10000 "+Constants.getFrequencyItem(context,defTBPos-1)+":10000 "+Constants.getFrequencyItem(context,defTBPos-2)+":30000 "+Constants.getFrequencyItem(context,defTBPos-3)+":20000\" > above_hispeed_delay",
                         "echo \"10000\" > min_sample_time",
-                        "echo \"20000\" > timer_slack",
-                        "echo \"90 806000:92 1183000:95 1326000:96 1469000:98\" >  target_loads",
+                        "echo \"400000\" > timer_slack",
+                        "echo \"90 "+Constants.getFrequencyItem(context,defTBPos)+":92 "+Constants.getFrequencyItem(context,defTBPos-1)+":95 "+Constants.getFrequencyItem(context,defTBPos-2)+":96 "+Constants.getFrequencyItem(context,defTBPos-3)+":98\" >  target_loads",
                         "echo \"99\" > go_hispeed_load",
                      };
                     break;
@@ -237,15 +255,15 @@ public class SUCommand {
                     cmds = new String[]{
                             "cd /proc/cpufreq",
                             "chmod 644 cpufreq_limited_max_freq_by_user",
-                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
                             "cd /sys/devices/system/cpu/cpufreq/interactive",
                             "chmod 644 *",
-                            "echo \"500\" > timer_rate",
-                            "echo \"806000\" > hispeed_freq",
-                            "echo \"5000 1183000:3000 1326000:3000 1469000:5000\" > above_hispeed_delay",
-                            "echo \"500\" > min_sample_time",
-                            "echo \"5000\" > timer_slack",
-                            "echo \"90 806000:99 1183000:98 1326000:98 1469000:150\" >  target_loads",
+                            "echo \"1000\" > timer_rate",
+                            "echo \""+Constants.getFrequencyItem(context,defTBPos)+"\" > hispeed_freq",
+                            "echo \"5000 "+Constants.getFrequencyItem(context,defTBPos-1)+":3000 "+Constants.getFrequencyItem(context,defTBPos-2)+":4000 "+Constants.getFrequencyItem(context,defTBPos-3)+":5000\" > above_hispeed_delay",
+                            "echo \"1000\" > min_sample_time",
+                            "echo \"200000\" > timer_slack",
+                            "echo \"90 "+Constants.getFrequencyItem(context,defTBPos)+":99 "+Constants.getFrequencyItem(context,defTBPos-1)+":98 "+Constants.getFrequencyItem(context,defTBPos-2)+":98 "+Constants.getFrequencyItem(context,defTBPos-3)+":99\" >  target_loads",
                             "echo \"99\" > go_hispeed_load",
                     };
                     break;
@@ -253,11 +271,11 @@ public class SUCommand {
                     cmds = new String[]{
                             "cd /proc/cpufreq",
                             "chmod 644 cpufreq_limited_max_freq_by_user",
-                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", "0"))) + " > cpufreq_limited_max_freq_by_user",
+                            "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+defFRPos))) + " > cpufreq_limited_max_freq_by_user",
                             "cd /sys/devices/system/cpu/cpufreq/interactive",
                             "chmod 644 *",
                             "echo \"20000\" > timer_rate",
-                            "echo \"1183000\" > hispeed_freq",
+                            "echo \""+Constants.getFrequencyItem(context,defTBPos-1)+"\" > hispeed_freq",
                             "echo \"20000\" > above_hispeed_delay",
                             "echo \"20000\" > min_sample_time",
                             "echo \"80000\" > timer_slack",
