@@ -39,7 +39,7 @@ public class Constants {
                 }
                 frequencyItems = fi;
                 frequencyNames = fn;
-                defFRPos=(Constants.getFrequencyItem(c,1).equals("1950000") ? 2 : 3);
+                defFRPos=2;
                 defTBPos=Constants.getFrequencyItems(c).length-2;
             }
         },30000);
