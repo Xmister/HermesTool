@@ -212,6 +212,10 @@ public class SUCommand {
         });
     }
 
+    public static void flashTWRP(final Shell.OnCommandResultListener ll) {
+        executeSu(dir + "busybox" + " dd if="+dir+"lib_twrp_.so of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+    }
+
     public static <T> T[] concat(T[] first, T[] second) {
         T[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);

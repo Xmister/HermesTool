@@ -34,7 +34,8 @@ public class OtherFragment extends MyFragment {
     private static CheckBox cbAutoMount;
     private static Button   btFormat,
                             btMount,
-                            sched;
+                            sched,
+                            flash_twrp;
     private static String[] schedulers=null;
     private static int selectSched=0;
 
@@ -143,10 +144,11 @@ public class OtherFragment extends MyFragment {
         btFormat=(Button)a.findViewById(R.id.btFormat);
         btMount=(Button)a.findViewById(R.id.btMount);
         sched=(Button)a.findViewById(R.id.sched);
+        flash_twrp=(Button)a.findViewById(R.id.b_flash_twrp);
         cbAutoMount.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                a.setP("cbAutoMount",""+isChecked);
+                a.setP("cbAutoMount", "" + isChecked);
             }
         });
         //if ( a.isSuperSU ) {
@@ -263,15 +265,14 @@ public class OtherFragment extends MyFragment {
                                 public void run() {
                                     if (exitCode > 0) {
                                         StringBuilder sb = new StringBuilder();
-                                        for (String line: output) {
-                                            sb.append(line+"\n");
+                                        for (String line : output) {
+                                            sb.append(line + "\n");
                                         }
                                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
                                         builder.setTitle(getString(R.string.mount_label))
-                                                .setMessage(getString(R.string.mount_error) + "\n"+sb.toString())
+                                                .setMessage(getString(R.string.mount_error) + "\n" + sb.toString())
                                                 .show();
-                                    }
-                                    else {
+                                    } else {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
                                         builder.setTitle(getString(R.string.mount_label))
                                                 .setMessage(getString(R.string.mount_success))
@@ -302,6 +303,54 @@ public class OtherFragment extends MyFragment {
                 md.show(getFragmentManager(), "scheduler");
             }
         });
+        flash_twrp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                flash_twrp.setEnabled(false);
+                if (SUCommand.linkBinaries(a) == false) {
+                    a.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                            builder.setTitle(getString(R.string.busybox_install_failed))
+                                    .setMessage(getString(R.string.busybox_install_failed_message))
+                                    .show();
+                            flash_twrp.setEnabled(true);
+                        }
+                    });
+                } else {
+                    SUCommand.flashTWRP(new Shell.OnCommandResultListener() {
+                        @Override
+                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                            if (exitCode == 0) {
+                                a.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                        builder.setTitle(R.string.set_inter_suc)
+                                                .setMessage(R.string.twrp_flash_success)
+                                                .show();
+                                        flash_twrp.setEnabled(true);
+                                    }
+                                });
+                            } else {
+                                a.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                        builder.setTitle(R.string.error)
+                                                .setMessage(R.string.twrp_flash_error)
+                                                .show();
+                                        flash_twrp.setEnabled(true);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
         super.onViewStateRestored(savedInstanceState);
+        }
     }
-}

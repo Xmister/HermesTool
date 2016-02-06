@@ -72,4 +72,7 @@
     <string name="unlimited">Nincs limit</string>
     <string name="donate">Fejlesztés támogatása</string>
     <string name="rb_gaming">Játék</string>
+    <string name="flash_twrp">TWRP flashelése</string>
+    <string name="twrp_flash_error">Hiba történt a TWRP flashelése közben. Kérlek próbáld újra</string>
+    <string name="twrp_flash_success">TWRP sikeresen flashelve</string>
 </resources>
