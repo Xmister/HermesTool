@@ -60,7 +60,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/b_flash_twrp"
+        android:id="@+id/b_flash_recovery"
         android:layout_row="7"
         android:layout_column="0"
         android:text="@string/flash_twrp" />

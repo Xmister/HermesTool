@@ -72,7 +72,8 @@
     <string name="unlimited">Nincs limit</string>
     <string name="donate">Fejlesztés támogatása</string>
     <string name="rb_gaming">Játék</string>
-    <string name="flash_twrp">TWRP flashelése</string>
-    <string name="twrp_flash_error">Hiba történt a TWRP flashelése közben. Kérlek próbáld újra</string>
-    <string name="twrp_flash_success">TWRP sikeresen flashelve</string>
+    <string name="flash_twrp">Recovery flashelése</string>
+    <string name="recovery_flash_error">Hiba történt a recovery flashelése közben. Kérlek próbáld újra</string>
+    <string name="recovery_flash_success">Recovery sikeresen flashelve</string>
+    <string name="choose_recovery">Válassz recovery-t</string>
 </resources>

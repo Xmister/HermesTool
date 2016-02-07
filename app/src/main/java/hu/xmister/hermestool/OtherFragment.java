@@ -3,9 +3,7 @@ package hu.xmister.hermestool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -35,7 +29,7 @@ public class OtherFragment extends MyFragment {
     private static Button   btFormat,
                             btMount,
                             sched,
-                            flash_twrp;
+                            flash_recovery;
     private static String[] schedulers=null;
     private static int selectSched=0;
 
@@ -144,7 +138,7 @@ public class OtherFragment extends MyFragment {
         btFormat=(Button)a.findViewById(R.id.btFormat);
         btMount=(Button)a.findViewById(R.id.btMount);
         sched=(Button)a.findViewById(R.id.sched);
-        flash_twrp=(Button)a.findViewById(R.id.b_flash_twrp);
+        flash_recovery =(Button)a.findViewById(R.id.b_flash_recovery);
         cbAutoMount.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -303,10 +297,9 @@ public class OtherFragment extends MyFragment {
                 md.show(getFragmentManager(), "scheduler");
             }
         });
-        flash_twrp.setOnClickListener(new View.OnClickListener() {
+        flash_recovery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                flash_twrp.setEnabled(false);
                 if (SUCommand.linkBinaries(a) == false) {
                     a.runOnUiThread(new Runnable() {
                         @Override
@@ -315,11 +308,11 @@ public class OtherFragment extends MyFragment {
                             builder.setTitle(getString(R.string.busybox_install_failed))
                                     .setMessage(getString(R.string.busybox_install_failed_message))
                                     .show();
-                            flash_twrp.setEnabled(true);
+                            flash_recovery.setEnabled(true);
                         }
                     });
                 } else {
-                    SUCommand.flashTWRP(new Shell.OnCommandResultListener() {
+                    final Shell.OnCommandResultListener ocr_Recovery = new Shell.OnCommandResultListener() {
                         @Override
                         public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                             if (exitCode == 0) {
@@ -328,9 +321,9 @@ public class OtherFragment extends MyFragment {
                                     public void run() {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
                                         builder.setTitle(R.string.set_inter_suc)
-                                                .setMessage(R.string.twrp_flash_success)
+                                                .setMessage(R.string.recovery_flash_success)
                                                 .show();
-                                        flash_twrp.setEnabled(true);
+                                        flash_recovery.setEnabled(true);
                                     }
                                 });
                             } else {
@@ -339,14 +332,26 @@ public class OtherFragment extends MyFragment {
                                     public void run() {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
                                         builder.setTitle(R.string.error)
-                                                .setMessage(R.string.twrp_flash_error)
+                                                .setMessage(R.string.recovery_flash_error)
                                                 .show();
-                                        flash_twrp.setEnabled(true);
+                                        flash_recovery.setEnabled(true);
                                     }
                                 });
                             }
                         }
-                    });
+                    };
+                    ChoiceDialog md = new ChoiceDialog(getString(R.string.choose_recovery), new String[]{"TWRP", "MiRecovery"}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            flash_recovery.setEnabled(false);
+                            if (which == 0) {
+                                SUCommand.flashTWRP(ocr_Recovery);
+                            } else if (which == 1) {
+                                SUCommand.flashMIRecovery(ocr_Recovery);
+                            }
+                        }
+                    }, null, null);
+                    md.show(getFragmentManager(), "recovery");
                 }
             }
         });

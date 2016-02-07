@@ -80,7 +80,8 @@
     <string name="rb_default">MIUI default</string>
     <string name="donate">Support the app - Donate</string>
     <string name="rb_gaming">Gaming</string>
-    <string name="flash_twrp">Flash TWRP Recovery</string>
-    <string name="twrp_flash_success">TWRP Flashed succesfully</string>
-    <string name="twrp_flash_error">There was an error flashing TWRP, please try again.</string>
+    <string name="flash_twrp">Flash Recovery</string>
+    <string name="recovery_flash_success">Recovery Flashed succesfully</string>
+    <string name="recovery_flash_error">There was an error flashing recovery, please try again.</string>
+    <string name="choose_recovery">Choose recovery</string>
 </resources>
