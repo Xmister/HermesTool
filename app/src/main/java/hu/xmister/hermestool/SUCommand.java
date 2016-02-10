@@ -241,6 +241,12 @@ public class SUCommand {
                 "cd /proc/cpufreq",
                 "chmod 644 cpufreq_limited_max_freq_by_user",
                 "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+Constants.defFRPos))) + " > cpufreq_limited_max_freq_by_user",
+                "chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq",
+                "chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq",
+                "echo " + Constants.getFrequencyItem(context, Constants.getFrequencyItems(context).length-1) + " > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq",
+                "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+Constants.defFRPos))) + " > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq",
+                "chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq",
+                "chmod 444 /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq",
                 "cd /sys/devices/system/cpu/cpufreq/interactive",
                 "chmod 644 *",
         };
