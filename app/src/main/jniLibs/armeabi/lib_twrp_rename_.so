@@ -1,0 +1,7 @@
+#!/system/bin/sh
+DIR="/storage/*/TWRP/BACKUPS"
+for D in ls $DIR
+do
+        cd "$D"
+        mv "reno2" "Redmi_Note_2"
+done

@@ -216,6 +216,10 @@ public class SUCommand {
         executeSu(dir + "busybox" + " dd if="+dir+"lib_twrp_.so of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
     }
 
+    public static void renameTWRPBackup(final Shell.OnCommandResultListener ll) {
+        executeSu(dir + "busybox" + " sh "+dir+"lib_twrp_rename_.so", ll);
+    }
+
     public static void flashMIRecovery(final Shell.OnCommandResultListener ll) {
         executeSu(dir + "busybox" + " dd if="+dir+"lib_mirecovery_.so of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
     }

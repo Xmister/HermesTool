@@ -84,4 +84,8 @@
     <string name="recovery_flash_success">Recovery Flashed succesfully</string>
     <string name="recovery_flash_error">There was an error flashing recovery, please try again.</string>
     <string name="choose_recovery">Choose recovery</string>
+    <string name="convert_backup">Convert TWRP2 backup to TWRP 3</string>
+    <string name="convert_success">Converting success (If there was any backup)</string>
+    <string name="convert_failed">Convert failed or backups not found</string>
+    <string name="no_backup">Didn\'t find any TWRP backup.</string>
 </resources>

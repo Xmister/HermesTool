@@ -76,4 +76,8 @@
     <string name="recovery_flash_error">Hiba történt a recovery flashelése közben. Kérlek próbáld újra</string>
     <string name="recovery_flash_success">Recovery sikeresen flashelve</string>
     <string name="choose_recovery">Válassz recovery-t</string>
+    <string name="convert_backup">TWRP2 backup konvertálása TWRP3-ra</string>
+    <string name="convert_failed">Sikertelen konvertálás, vagy nem található backup</string>
+    <string name="convert_success">Sikeres konvertálás (ha volt backup)</string>
+    <string name="no_backup">Nem található TWRP backup</string>
 </resources>

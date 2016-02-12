@@ -14,6 +14,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -29,7 +30,8 @@ public class OtherFragment extends MyFragment {
     private static Button   btFormat,
                             btMount,
                             sched,
-                            flash_recovery;
+                            flash_recovery,
+                            convert_backup;
     private static String[] schedulers=null;
     private static int selectSched=0;
 
@@ -139,6 +141,7 @@ public class OtherFragment extends MyFragment {
         btMount=(Button)a.findViewById(R.id.btMount);
         sched=(Button)a.findViewById(R.id.sched);
         flash_recovery =(Button)a.findViewById(R.id.b_flash_recovery);
+        convert_backup =(Button)a.findViewById(R.id.convert_backup);
         cbAutoMount.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -340,7 +343,7 @@ public class OtherFragment extends MyFragment {
                             }
                         }
                     };
-                    ChoiceDialog md = new ChoiceDialog(getString(R.string.choose_recovery), new String[]{"TWRP", "MiRecovery"}, new DialogInterface.OnClickListener() {
+                    ChoiceDialog md = new ChoiceDialog(getString(R.string.choose_recovery), new String[]{"TWRP3", "MiRecovery"}, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             flash_recovery.setEnabled(false);
@@ -356,6 +359,109 @@ public class OtherFragment extends MyFragment {
             }
         });
 
-        super.onViewStateRestored(savedInstanceState);
+        convert_backup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                convert_backup.setEnabled(false);
+                /*File storagePath=new File("/storage");
+                if (storagePath.isDirectory()) {
+                    for (String storage :storagePath.list() ) {
+                        File storage_F=new File(storage);
+                        if (storage_F.isDirectory() && storage_F.getName().startsWith("sdcard")) {
+                            for ( String sdcard : storage_F.list() ) {
+                                File sdcard_F=new File(sdcard);
+                                if (sdcard_F.getName().toLowerCase().equals("twrp")) {
+                                    for (String twrp : sdcard_F.list()) {
+                                        File twrp_F = new File(twrp);
+                                        if (twrp_F.getName().toLowerCase().equals("backups")) {
+                                            for (String backup : twrp_F.list() ) {
+                                                final File backup_F = new File(backup);
+                                                if (backup_F.getName().toLowerCase().equals("reno2")) {
+                                                    SUCommand.executeSu("mv " + backup_F.getAbsolutePath() + " " + backup_F.getParent() + "/Redmi_Note_2", new Shell.OnCommandResultListener() {
+                                                        @Override
+                                                        public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
+                                                            a.runOnUiThread(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    if (exitCode == 0) {
+                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                        builder.setTitle(R.string.set_inter_suc)
+                                                                                .setMessage(R.string.convert_success+": "+backup_F.getAbsolutePath())
+                                                                                .show();
+                                                                    }
+                                                                    else {
+                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                        builder.setTitle(R.string.error)
+                                                                                .setMessage(R.string.convert_failed+": "+backup_F.getAbsolutePath())
+                                                                                .show();
+                                                                    }
+                                                                    convert_backup.setEnabled(true);
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                    found=true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //Only if not found
+                if (!found) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                    builder.setTitle(R.string.error)
+                            .setMessage(R.string.no_backup)
+                            .show();
+                    convert_backup.setEnabled(true);
+                }*/
+                if (SUCommand.linkBinaries(a) == false) {
+                    a.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                            builder.setTitle(getString(R.string.busybox_install_failed))
+                                    .setMessage(getString(R.string.busybox_install_failed_message))
+                                    .show();
+                            convert_backup.setEnabled(true);
+                        }
+                    });
+                } else {
+                    SUCommand.renameTWRPBackup(new Shell.OnCommandResultListener() {
+                        @Override
+                        public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (exitCode == 0) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                        builder.setTitle(R.string.set_inter_suc)
+                                                .setMessage(R.string.convert_success)
+                                                .show();
+                                    } else {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                        builder.setTitle(R.string.error)
+                                                .setMessage(R.string.convert_failed)
+                                                .show();
+                                    }
+                                    convert_backup.setEnabled(true);
+                                }
+                            });
+
+                        }
+                    });
+                }
+            }
+
+            }
+
+            );
+
+            super.
+
+            onViewStateRestored(savedInstanceState);
         }
     }
