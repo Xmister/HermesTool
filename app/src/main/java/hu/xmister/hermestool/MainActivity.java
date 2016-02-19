@@ -63,8 +63,6 @@ public class MainActivity extends Activity
     private MyFragment curFrag=null;
 
     private void init() {
-        setContentView(R.layout.activity_main);
-
         SharedPreferences sharedPreferences =getSharedPreferences("default", 0);
         Map<String, String> all;
         all=(Map<String, String>)sharedPreferences.getAll();
@@ -73,6 +71,10 @@ public class MainActivity extends Activity
             p.setProperty(key,value);
         }
         onBoot=Boolean.valueOf(sharedPreferences.getString("onboot","false"));
+    }
+
+    private void guiInit() {
+        setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -88,7 +90,6 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
-        findViewById(R.id.container).setVisibility(View.INVISIBLE);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -128,6 +129,10 @@ public class MainActivity extends Activity
                                                     }
                                                 });
                                         builder.show();
+                                    }
+                                    else {
+                                        guiInit();
+                                        findViewById(R.id.container).setVisibility(View.INVISIBLE);
                                     }
                                 }
                             });
@@ -323,6 +328,7 @@ public class MainActivity extends Activity
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        if ( menu == null ) return false;
         super.onPrepareOptionsMenu(menu);
         if (noCPU) onBoot=false;
         menu.findItem(R.id.action_setOnBoot).setChecked(onBoot);
@@ -331,7 +337,7 @@ public class MainActivity extends Activity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (mNavigationDrawerFragment== null || !mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show frequencyItems in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
