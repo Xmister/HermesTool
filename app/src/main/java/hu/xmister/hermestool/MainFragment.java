@@ -99,50 +99,50 @@ public class MainFragment extends MyFragment {
         cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
         grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
         rg_profile = (RadioGroup) getActivity().findViewById(R.id.rg_profile);
-        rg_profile.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                a.setP("rg_profile",""+checkedId);
-            }
-        });
-        maxFreq.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Constants.getFrequencyNames(a) != null) {
-                    ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(a), di, null, null);
-                    md.show(getFragmentManager(), "maxfreq");
+        if ( rg_profile != null ) {
+            rg_profile.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    a.setP("rg_profile", "" + checkedId);
                 }
-                else {
-                    //TODO
-                }
-            }
-        });
-        freq.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Constants.getFrequencyNames(a) != null) {
-                    String tmpNames[] = new String[Constants.getFrequencyNames(a).length - 1];
-                    for (int i = 1; i < Constants.getFrequencyNames(a).length; i++) {
-                        tmpNames[i - 1] = Constants.getFrequencyNames(a)[i];
+            });
+            maxFreq.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Constants.getFrequencyNames(a) != null) {
+                        ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(a), di, null, null);
+                        md.show(getFragmentManager(), "maxfreq");
+                    } else {
+                        //TODO
                     }
-                    ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
-                    md.show(getFragmentManager(), "tbfreq");
                 }
-                else {
-                    //TODO
+            });
+            freq.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Constants.getFrequencyNames(a) != null) {
+                        String tmpNames[] = new String[Constants.getFrequencyNames(a).length - 1];
+                        for (int i = 1; i < Constants.getFrequencyNames(a).length; i++) {
+                            tmpNames[i - 1] = Constants.getFrequencyNames(a)[i];
+                        }
+                        ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
+                        md.show(getFragmentManager(), "tbfreq");
+                    } else {
+                        //TODO
+                    }
                 }
-            }
-        });
-        cbTouchBoost.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                a.setP("cbTouchBoost", "" + isChecked);
-                if (isChecked)
-                    grTouch.setVisibility(View.VISIBLE);
-                else
-                    grTouch.setVisibility(View.INVISIBLE);
-            }
-        });
+            });
+            cbTouchBoost.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    a.setP("cbTouchBoost", "" + isChecked);
+                    if (isChecked)
+                        grTouch.setVisibility(View.VISIBLE);
+                    else
+                        grTouch.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
         super.onViewStateRestored(savedInstanceState);
     }
 

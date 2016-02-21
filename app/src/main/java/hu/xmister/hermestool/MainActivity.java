@@ -51,7 +51,7 @@ public class MainActivity extends Activity
     }
 
     private Properties p = new Properties();
-    private boolean onBoot =false;
+    private boolean onBoot =false, firstInit=true;
     public static boolean isSuperSU=false,
                             noCPU=false;
 
@@ -74,15 +74,18 @@ public class MainActivity extends Activity
     }
 
     private void guiInit() {
-        setContentView(R.layout.activity_main);
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+        if (firstInit) {
+            firstInit=false;
+            setContentView(R.layout.activity_main);
+            mNavigationDrawerFragment = (NavigationDrawerFragment)
+                    getFragmentManager().findFragmentById(R.id.navigation_drawer);
+            mTitle = getTitle();
 
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+            // Set up the drawer.
+            mNavigationDrawerFragment.setUp(
+                    R.id.navigation_drawer,
+                    (DrawerLayout) findViewById(R.id.drawer_layout));
+        }
     }
 
 
@@ -273,6 +276,7 @@ public class MainActivity extends Activity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            guiInit();
                             findViewById(R.id.container).setVisibility(View.VISIBLE);
                         }
                     });
@@ -304,7 +308,7 @@ public class MainActivity extends Activity
                     break;
             }
             fT.replace(R.id.container, curFrag);
-            fT.commit();
+            fT.commitAllowingStateLoss();
         }
     }
 
