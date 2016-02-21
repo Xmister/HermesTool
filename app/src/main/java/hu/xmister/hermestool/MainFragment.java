@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -280,8 +281,8 @@ public class MainFragment extends MyFragment {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
                     } catch (Exception e) {
-                        a.setP("maxfreq", ""+Constants.defFRPos);
-                        maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
+                        a.setP("maxfreq", "" + Constants.defFRPos);
+                        maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
                     }
                 }
             });
@@ -289,8 +290,17 @@ public class MainFragment extends MyFragment {
             a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    a.setP("maxfreq", ""+Constants.defFRPos);
-                    maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
+                    a.setP("maxfreq", "" + Constants.defFRPos);
+                    try {
+                        maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
+                    } catch (IndexOutOfBoundsException e) {
+                        //TODO: Better solution
+                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                        builder.setTitle(getString(R.string.freq_error))
+                                .setMessage("Please restart the application!")
+                                .show();
+                        a.finish();
+                    }
                     a.setP("cbTouchBoost", "false");
                     cbTouchBoost.setChecked(false);
                     grTouch.setVisibility(View.INVISIBLE);
