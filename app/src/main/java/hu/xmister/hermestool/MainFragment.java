@@ -35,6 +35,16 @@ public class MainFragment extends MyFragment {
         private static TextView textCore,
                                 textFreq;
         private static RadioGroup rg_profile;
+        private static CompoundButton.OnCheckedChangeListener oCC=new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                a.setP("cbTouchBoost", "" + isChecked);
+                if (isChecked)
+                    grTouch.setVisibility(View.VISIBLE);
+                else
+                    grTouch.setVisibility(View.INVISIBLE);
+            }
+        };
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -133,16 +143,7 @@ public class MainFragment extends MyFragment {
                     }
                 }
             });
-            cbTouchBoost.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    a.setP("cbTouchBoost", "" + isChecked);
-                    if (isChecked)
-                        grTouch.setVisibility(View.VISIBLE);
-                    else
-                        grTouch.setVisibility(View.INVISIBLE);
-                }
-            });
+            cbTouchBoost.setOnCheckedChangeListener(oCC);
         }
         super.onViewStateRestored(savedInstanceState);
     }
@@ -177,6 +178,7 @@ public class MainFragment extends MyFragment {
         rg_profile.check(R.id.rb_slow);
         a.setP("rg_profile", "" + R.id.rb_slow);
         cbTouchBoost.setChecked(true);
+        oCC.onCheckedChanged(cbTouchBoost,true);
     }
 
     private synchronized void setFreqText(final String text) {
@@ -280,6 +282,7 @@ public class MainFragment extends MyFragment {
                     try {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
+                        oCC.onCheckedChanged(cbTouchBoost,true);
                     } catch (Exception e) {
                         a.setP("maxfreq", "" + Constants.defFRPos);
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
@@ -303,6 +306,7 @@ public class MainFragment extends MyFragment {
                     }
                     a.setP("cbTouchBoost", "false");
                     cbTouchBoost.setChecked(false);
+                    oCC.onCheckedChanged(cbTouchBoost,true);
                     grTouch.setVisibility(View.INVISIBLE);
                 }
             });

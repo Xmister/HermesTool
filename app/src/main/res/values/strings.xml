@@ -88,4 +88,6 @@
     <string name="convert_success">Converting success (If there was any backup)</string>
     <string name="convert_failed">Convert failed or backups not found</string>
     <string name="no_backup">Didn\'t find any TWRP backup.</string>
+    <string name="check_root">Checking root</string>
+    <string name="check_root_message">If you see this message for more than a few seconds, please check if you have root, and enabled Redmi Note 2 Tool!</string>
 </resources>

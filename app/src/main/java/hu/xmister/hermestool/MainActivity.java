@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Property;
@@ -93,10 +94,21 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.check_root)
+                .setMessage(R.string.check_root_message);
+        final AlertDialog rootCheckDialog = builder.create();
+        rootCheckDialog.show();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     if (Shell.SU.available()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                rootCheckDialog.dismiss();
+                            }
+                        });
                         String ver = Shell.SU.version(false);
                         if (!ver.toLowerCase().contains("supersu")) {
                             /*runOnUiThread(new Runnable() {
@@ -112,144 +124,155 @@ public class MainActivity extends Activity
                         } else {
                             isSuperSU = true;
                         }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (Constants.getFrequencyName(MainActivity.this,0) == null) {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                        builder.setTitle(getString(R.string.no_scaling))
-                                                .setMessage(getString(R.string.no_scaling_message))
-                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        finish();
-                                                    }
-                                                })
-                                                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                                    @Override
-                                                    public void onDismiss(DialogInterface dialog) {
-                                                        finish();
-                                                    }
-                                                });
-                                        builder.show();
+                        Constants.init(MainActivity.this, new Constants.InitComplete() {
+                            @Override
+                            public void onInitComplete() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (Constants.getFrequencyName(MainActivity.this, 0) == null) {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                            builder.setTitle(getString(R.string.no_scaling))
+                                                    .setMessage(getString(R.string.no_scaling_message))
+                                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            finish();
+                                                        }
+                                                    })
+                                                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                        @Override
+                                                        public void onDismiss(DialogInterface dialog) {
+                                                            finish();
+                                                        }
+                                                    });
+                                            builder.show();
+                                        } else {
+                                            guiInit();
+                                            findViewById(R.id.container).setVisibility(View.INVISIBLE);
+                                        }
                                     }
-                                    else {
-                                        guiInit();
-                                        findViewById(R.id.container).setVisibility(View.INVISIBLE);
-                                    }
-                                }
-                            });
-                        if (!noCPU) {
-                            SUCommand.executeSu("cd /sys/devices/system/cpu/cpufreq/interactive", new Shell.OnCommandResultListener() {
-                                @Override
-                                public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                    if (exitCode > 0) {
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                builder.setTitle(getString(R.string.no_inter))
-                                                        .setMessage(getString(R.string.no_inter_message))
-                                                        .setPositiveButton(R.string.change_inter, new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                SUCommand.executeSu(new String[]{
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor",
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor",
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor",
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor",
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu5/cpufreq/scaling_governor",
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu6/cpufreq/scaling_governor",
-                                                                        "chmod 644 /sys/devices/system/cpu/cpu7/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu5/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu6/cpufreq/scaling_governor",
-                                                                        "echo 'interactive' > /sys/devices/system/cpu/cpu7/cpufreq/scaling_governor",
-                                                                }, new Shell.OnCommandResultListener() {
+                                });
+                                if (!noCPU) {
+                                    SUCommand.executeSu("cd /sys/devices/system/cpu/cpufreq/interactive", new Shell.OnCommandResultListener() {
+                                        @Override
+                                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                            if (exitCode > 0) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                        builder.setTitle(getString(R.string.no_inter))
+                                                                .setMessage(getString(R.string.no_inter_message))
+                                                                .setPositiveButton(R.string.change_inter, new DialogInterface.OnClickListener() {
                                                                     @Override
-                                                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                                        SUCommand.executeSu("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", new Shell.OnCommandResultListener() {
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        SUCommand.executeSu(new String[]{
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor",
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor",
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor",
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor",
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu5/cpufreq/scaling_governor",
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu6/cpufreq/scaling_governor",
+                                                                                "chmod 644 /sys/devices/system/cpu/cpu7/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu5/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu6/cpufreq/scaling_governor",
+                                                                                "echo 'interactive' > /sys/devices/system/cpu/cpu7/cpufreq/scaling_governor",
+                                                                        }, new Shell.OnCommandResultListener() {
                                                                             @Override
                                                                             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                                                for (String line : output) {
-                                                                                    if (line.length() > 0 && line.trim().equals("interactive")) {
-                                                                                        runOnUiThread(new Runnable() {
-                                                                                            @Override
-                                                                                            public void run() {
-                                                                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                                                                builder.setTitle(getString(R.string.set_inter_suc))
-                                                                                                        .setMessage(getString(R.string.set_inter_suc_message))
-                                                                                                        .setPositiveButton("OK", null);
-                                                                                                builder.show();
+                                                                                SUCommand.executeSu("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", new Shell.OnCommandResultListener() {
+                                                                                    @Override
+                                                                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                                                        for (String line : output) {
+                                                                                            if (line.length() > 0 && line.trim().equals("interactive")) {
+                                                                                                runOnUiThread(new Runnable() {
+                                                                                                    @Override
+                                                                                                    public void run() {
+                                                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                                                        builder.setTitle(getString(R.string.set_inter_suc))
+                                                                                                                .setMessage(getString(R.string.set_inter_suc_message))
+                                                                                                                .setPositiveButton("OK", null);
+                                                                                                        builder.show();
+                                                                                                    }
+                                                                                                });
+                                                                                            } else {
+                                                                                                runOnUiThread(new Runnable() {
+                                                                                                    @Override
+                                                                                                    public void run() {
+                                                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                                                                                        builder.setTitle(getString(R.string.set_inter_fail))
+                                                                                                                .setMessage(getString(R.string.set_inter_fail_message))
+                                                                                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                                                                                    @Override
+                                                                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                                                                        finish();
+                                                                                                                    }
+                                                                                                                })
+                                                                                                                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                                                                                    @Override
+                                                                                                                    public void onDismiss(DialogInterface dialog) {
+                                                                                                                        finish();
+                                                                                                                    }
+                                                                                                                });
+                                                                                                        builder.show();
+                                                                                                    }
+                                                                                                });
                                                                                             }
-                                                                                        });
-                                                                                    } else {
-                                                                                        runOnUiThread(new Runnable() {
-                                                                                            @Override
-                                                                                            public void run() {
-                                                                                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                                                                                builder.setTitle(getString(R.string.set_inter_fail))
-                                                                                                        .setMessage(getString(R.string.set_inter_fail_message))
-                                                                                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                                                                            @Override
-                                                                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                                                                finish();
-                                                                                                            }
-                                                                                                        })
-                                                                                                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                                                                                            @Override
-                                                                                                            public void onDismiss(DialogInterface dialog) {
-                                                                                                                finish();
-                                                                                                            }
-                                                                                                        });
-                                                                                                builder.show();
-                                                                                            }
-                                                                                        });
+                                                                                        }
                                                                                     }
-                                                                                }
+                                                                                });
                                                                             }
                                                                         });
                                                                     }
-                                                                });
-                                                            }
-                                                        })
-                                                        .setNeutralButton(getString(R.string.disable_cpu), new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                noCPU = true;
-                                                                runOnUiThread(new Runnable() {
+                                                                })
+                                                                .setNeutralButton(getString(R.string.disable_cpu), new DialogInterface.OnClickListener() {
                                                                     @Override
-                                                                    public void run() {
-                                                                        onNavigationDrawerItemSelected(1);
-                                                                        onSectionAttached(2);
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        noCPU = true;
+                                                                        runOnUiThread(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+                                                                                onNavigationDrawerItemSelected(1);
+                                                                                onSectionAttached(2);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                })
+                                                                .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        finish();
+                                                                    }
+                                                                })
+                                                                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                                                    @Override
+                                                                    public void onCancel(DialogInterface dialog) {
+                                                                        finish();
                                                                     }
                                                                 });
-                                                            }
-                                                        })
-                                                        .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                finish();
-                                                            }
-                                                        })
-                                                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                                            @Override
-                                                            public void onCancel(DialogInterface dialog) {
-                                                                finish();
-                                                            }
-                                                        });
-                                                builder.show();
+                                                        builder.show();
+                                                    }
+                                                });
                                             }
-                                        });
-                                    }
+                                        }
+                                    });
                                 }
-                            });
-                        }
+                            }
+                        });
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                guiInit();
+                                findViewById(R.id.container).setVisibility(View.VISIBLE);
+                            }
+                        });
                     } else {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -273,13 +296,6 @@ public class MainActivity extends Activity
                             }
                         });
                     }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            guiInit();
-                            findViewById(R.id.container).setVisibility(View.VISIBLE);
-                        }
-                    });
                 }
             }).start();
     }

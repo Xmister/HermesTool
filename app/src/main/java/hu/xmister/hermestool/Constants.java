@@ -3,6 +3,8 @@ package hu.xmister.hermestool;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.List;
 import java.util.StringTokenizer;
@@ -16,7 +18,11 @@ public class Constants {
     public static int defFRPos=2;
     public static int defTBPos=5;
 
-    private synchronized static void fillArrays(final Context c) {
+    public interface InitComplete {
+        public void onInitComplete();
+    }
+    private synchronized static void fillArrays(final Context c) { fillArrays(c,null);}
+    private synchronized static void fillArrays(final Context c,final InitComplete iC) {
         if (filling) return;
         filling=true;
         SUCommand.executeSu("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies", new Shell.OnCommandResultListener() {
@@ -44,6 +50,34 @@ public class Constants {
             }
         },30000);
         filling=false;
+        if (iC != null) {
+            iC.onInitComplete();
+        }
+    }
+
+    public static void init(final Context c,final InitComplete iC) {
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+        }
+        final Handler h=new Handler();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                fillArrays(c, new InitComplete() {
+                    @Override
+                    public void onInitComplete() {
+                        h.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Looper.myLooper().quitSafely();
+                                iC.onInitComplete();
+                            }
+                        });
+                    }
+                });
+            }
+        }).start();
+        Looper.loop();
     }
 
     public static String[] getFrequencyNames(final Context c) {
