@@ -216,6 +216,7 @@ public class MainFragment extends MyFragment {
 
     @Override
     public void loadValues() {
+        if (getActivity() == null) return;
         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
             @Override
             public void onGotTB(String freq, String cores) {
@@ -273,7 +274,7 @@ public class MainFragment extends MyFragment {
         }
         else {
             setCoresText("2");
-            a.setP("tCores","2");
+            a.setP("tCores", "2");
         }
         if (a.getP("maxfreq") != null) {
             a.runOnUiThread(new Runnable() {
@@ -282,7 +283,7 @@ public class MainFragment extends MyFragment {
                     try {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
-                        oCC.onCheckedChanged(cbTouchBoost,Boolean.valueOf(a.getP("cbTouchBoost")));
+                        oCC.onCheckedChanged(cbTouchBoost, Boolean.valueOf(a.getP("cbTouchBoost")));
                     } catch (Exception e) {
                         a.setP("maxfreq", "" + Constants.defFRPos);
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
@@ -296,18 +297,27 @@ public class MainFragment extends MyFragment {
                     a.setP("maxfreq", "" + Constants.defFRPos);
                     try {
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
+                        a.setP("cbTouchBoost", "false");
+                        cbTouchBoost.setChecked(false);
+                        oCC.onCheckedChanged(cbTouchBoost, false);
+                        grTouch.setVisibility(View.INVISIBLE);
                     } catch (IndexOutOfBoundsException e) {
                         //TODO: Better solution
-                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                        builder.setTitle(getString(R.string.freq_error))
-                                .setMessage("Please restart the application!")
-                                .show();
-                        a.finish();
+                        try {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                            builder.setTitle(getString(R.string.freq_error))
+                                    .setMessage("Please restart the application!")
+                                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            a.finish();
+                                        }
+                                    })
+                                    .show();
+                        } catch (Exception ee) {
+                            a.finish();
+                        }
                     }
-                    a.setP("cbTouchBoost", "false");
-                    cbTouchBoost.setChecked(false);
-                    oCC.onCheckedChanged(cbTouchBoost,false);
-                    grTouch.setVisibility(View.INVISIBLE);
                 }
             });
         }

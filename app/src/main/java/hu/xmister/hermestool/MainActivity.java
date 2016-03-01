@@ -369,7 +369,9 @@ public class MainActivity extends Activity
     }
 
     private void loadDefaults() {
-        curFrag.loadDefaults();
+        if ( curFrag != null ) {
+            curFrag.loadDefaults();
+        }
     }
 
 
