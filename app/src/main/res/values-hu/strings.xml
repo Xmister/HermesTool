@@ -80,4 +80,6 @@
     <string name="convert_failed">Sikertelen konvertálás, vagy nem található backup</string>
     <string name="convert_success">Sikeres konvertálás (ha volt backup)</string>
     <string name="no_backup">Nem található TWRP backup</string>
+    <string name="check_root">Root ellenőrzése</string>
+    <string name="check_root_message">Ha több, mint egy pár másodpercig látod ezt az üznetet, akkor ellenőrízd, hogy adtál-e root jogot az alkalmazásnak!</string>
 </resources>

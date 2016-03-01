@@ -282,7 +282,7 @@ public class MainFragment extends MyFragment {
                     try {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
-                        oCC.onCheckedChanged(cbTouchBoost,true);
+                        oCC.onCheckedChanged(cbTouchBoost,Boolean.valueOf(a.getP("cbTouchBoost")));
                     } catch (Exception e) {
                         a.setP("maxfreq", "" + Constants.defFRPos);
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
@@ -306,7 +306,7 @@ public class MainFragment extends MyFragment {
                     }
                     a.setP("cbTouchBoost", "false");
                     cbTouchBoost.setChecked(false);
-                    oCC.onCheckedChanged(cbTouchBoost,true);
+                    oCC.onCheckedChanged(cbTouchBoost,false);
                     grTouch.setVisibility(View.INVISIBLE);
                 }
             });
