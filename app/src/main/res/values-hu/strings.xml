@@ -82,4 +82,8 @@
     <string name="no_backup">Nem található TWRP backup</string>
     <string name="check_root">Root ellenőrzése</string>
     <string name="check_root_message">Ha több, mint egy pár másodpercig látod ezt az üznetet, akkor ellenőrízd, hogy adtál-e root jogot az alkalmazásnak!</string>
+    <string name="recovery_download">Recovery letöltés</string>
+    <string name="recovery_download_error">Hiba történt a letöltés közben.\nKérlek próbáld újra később.</string>
+    <string name="recovery_download_need">Le kell tölteni a recovery fájlokat, kérlek várj...</string>
+    <string name="recovery_push_again">Kérlek nyomd meg újra a recovery flashelése gombot!</string>
 </resources>

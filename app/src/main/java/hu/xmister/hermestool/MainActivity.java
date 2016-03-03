@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,6 +15,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.Messenger;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Property;
@@ -26,6 +28,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.vending.expansion.downloader.DownloadProgressInfo;
+import com.google.android.vending.expansion.downloader.IDownloaderClient;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -35,7 +40,7 @@ import eu.chainfire.libsuperuser.Shell;
 
 
 public class MainActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, IDownloaderClient {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -62,6 +67,7 @@ public class MainActivity extends Activity
     private CharSequence mTitle;
 
     private MyFragment curFrag=null;
+    private ProgressDialog progess;
 
     private void init() {
         SharedPreferences sharedPreferences =getSharedPreferences("default", 0);
@@ -98,6 +104,8 @@ public class MainActivity extends Activity
         builder.setTitle(R.string.check_root)
                 .setMessage(R.string.check_root_message);
         final AlertDialog rootCheckDialog = builder.create();
+        rootCheckDialog.setCancelable(false);
+        rootCheckDialog.setCanceledOnTouchOutside(false);
         rootCheckDialog.show();
             new Thread(new Runnable() {
                 @Override
@@ -555,4 +563,62 @@ public class MainActivity extends Activity
     }
 
 
+    @Override
+    public void onServiceConnected(Messenger m) {
+
+    }
+
+    @Override
+    public void onDownloadStateChanged(int newState) {
+        if (progess == null) {
+            progess=new ProgressDialog(this);
+            progess.setCancelable(false);
+            progess.setCanceledOnTouchOutside(false);
+        }
+        switch (newState) {
+            case STATE_DOWNLOADING:
+            case STATE_CONNECTING:
+            case STATE_FETCHING_URL:
+                progess.setIndeterminate(true);
+                progess.show();
+                break;
+            case STATE_COMPLETED:
+                progess.dismiss();
+                onNavigationDrawerItemSelected(1);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.recovery_download)
+                        .setMessage(R.string.recovery_push_again)
+                        .show();
+                break;
+            default:
+                progess.dismiss();
+                builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.recovery_download)
+                        .setMessage(R.string.recovery_download_error)
+                        .show();
+        }
+    }
+
+    @Override
+    public void onDownloadProgress(DownloadProgressInfo progress) {
+        this.progess.setIndeterminate(false);
+        this.progess.setMax((int)progress.mOverallTotal);
+        this.progess.setProgress((int)progress.mOverallProgress);
+    }
+
+    @Override
+    protected void onResume() {
+        if (null != OtherFragment.mDownloaderClientStub) {
+            OtherFragment.mDownloaderClientStub.connect(this);
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        if (null != OtherFragment.mDownloaderClientStub) {
+            OtherFragment.mDownloaderClientStub.disconnect(this);
+        }
+        super.onStop();
+    }
 }

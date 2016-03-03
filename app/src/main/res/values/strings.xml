@@ -90,4 +90,8 @@
     <string name="no_backup">Didn\'t find any TWRP backup.</string>
     <string name="check_root">Checking root</string>
     <string name="check_root_message">If you see this message for more than a few seconds, please check if you have root, and enabled Redmi Note 2 Tool!</string>
+    <string name="recovery_download">Recovery download</string>
+    <string name="recovery_download_need">Recovery files needed to be downloaded, please wait...</string>
+    <string name="recovery_download_error">There was an error trying to download recovery.\nPlease try again later!</string>
+    <string name="recovery_push_again">Please push the recovery flash button again!</string>
 </resources>

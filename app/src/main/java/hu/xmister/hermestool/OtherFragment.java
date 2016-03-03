@@ -2,8 +2,11 @@ package hu.xmister.hermestool;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.vending.expansion.downloader.DownloaderClientMarshaller;
+import com.google.android.vending.expansion.downloader.IStub;
 
 import java.io.File;
 import java.util.Arrays;
@@ -34,6 +40,35 @@ public class OtherFragment extends MyFragment {
                             convert_backup;
     private static String[] schedulers=null;
     private static int selectSched=0;
+    public static IStub mDownloaderClientStub;
+    public static final Shell.OnCommandResultListener ocr_Recovery = new Shell.OnCommandResultListener() {
+        @Override
+        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+            if (exitCode == 0) {
+                a.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                        builder.setTitle(R.string.set_inter_suc)
+                                .setMessage(R.string.recovery_flash_success)
+                                .show();
+                        flash_recovery.setEnabled(true);
+                    }
+                });
+            } else {
+                a.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                        builder.setTitle(R.string.error)
+                                .setMessage(R.string.recovery_flash_error)
+                                .show();
+                        flash_recovery.setEnabled(true);
+                    }
+                });
+            }
+        }
+    };
 
 
     /**
@@ -91,7 +126,7 @@ public class OtherFragment extends MyFragment {
             else {
                 tmp="cfq";
             }
-            a.setP("sched",tmp);
+            a.setP("sched", tmp);
             sched.setText(tmp);
         }
     }
@@ -131,6 +166,48 @@ public class OtherFragment extends MyFragment {
             cbAutoMount.setChecked(Boolean.valueOf(a.getP("cbAutoMount")));
             sched.setText(a.getP("sched"));
         } else super.loadValues();
+    }
+
+    private void showRecoveryDialog() {
+        ChoiceDialog md = new ChoiceDialog(getString(R.string.choose_recovery), new String[]{"TWRP3", "MiRecovery"}, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Start the download service (if required)
+                Intent notifierIntent = new Intent(getActivity(), MainActivity.class);
+                notifierIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0,
+                        notifierIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                try {
+                    int startResult =
+                            DownloaderClientMarshaller.startDownloadServiceIfRequired(getActivity(),
+                                    pendingIntent, DownloaderService.class);
+                    if (startResult != DownloaderClientMarshaller.NO_DOWNLOAD_REQUIRED) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                        builder.setTitle(R.string.recovery_download)
+                                .setMessage(R.string.recovery_download_need)
+                                .show();
+                        mDownloaderClientStub = DownloaderClientMarshaller.CreateStub(((MainActivity)getActivity()),
+                                DownloaderService.class);
+                    }
+                    else { /*
+                        flash_recovery.setEnabled(false);
+                        if (which == 0) {
+                            SUCommand.flashTWRP(ocr_Recovery);
+                        } else if (which == 1) {
+                            SUCommand.flashMIRecovery(ocr_Recovery);
+                        }
+                        */
+                    }
+                } catch (Exception e) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                    builder.setTitle(R.string.recovery_download)
+                            .setMessage(R.string.recovery_download_error)
+                            .show();
+                }
+            }
+        }, null, null);
+        md.show(getFragmentManager(), "recovery");
     }
 
 
@@ -315,54 +392,19 @@ public class OtherFragment extends MyFragment {
                         }
                     });
                 } else {
-                    final Shell.OnCommandResultListener ocr_Recovery = new Shell.OnCommandResultListener() {
-                        @Override
-                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                            if (exitCode == 0) {
-                                a.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                        builder.setTitle(R.string.set_inter_suc)
-                                                .setMessage(R.string.recovery_flash_success)
-                                                .show();
-                                        flash_recovery.setEnabled(true);
-                                    }
-                                });
-                            } else {
-                                a.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                        builder.setTitle(R.string.error)
-                                                .setMessage(R.string.recovery_flash_error)
-                                                .show();
-                                        flash_recovery.setEnabled(true);
-                                    }
-                                });
-                            }
-                        }
-                    };
-                    ChoiceDialog md = new ChoiceDialog(getString(R.string.choose_recovery), new String[]{"TWRP3", "MiRecovery"}, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            flash_recovery.setEnabled(false);
-                            if (which == 0) {
-                                SUCommand.flashTWRP(ocr_Recovery);
-                            } else if (which == 1) {
-                                SUCommand.flashMIRecovery(ocr_Recovery);
-                            }
-                        }
-                    }, null, null);
-                    md.show(getFragmentManager(), "recovery");
+                    showRecoveryDialog();
                 }
             }
-        });
+            }
 
-        convert_backup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                convert_backup.setEnabled(false);
+            );
+
+            convert_backup.setOnClickListener(new View.OnClickListener()
+
+                                              {
+                                                  @Override
+                                                  public void onClick(View v) {
+                                                      convert_backup.setEnabled(false);
                 /*File storagePath=new File("/storage");
                 if (storagePath.isDirectory()) {
                     for (String storage :storagePath.list() ) {
@@ -418,45 +460,45 @@ public class OtherFragment extends MyFragment {
                             .show();
                     convert_backup.setEnabled(true);
                 }*/
-                if (SUCommand.linkBinaries(a) == false) {
-                    a.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                            builder.setTitle(getString(R.string.busybox_install_failed))
-                                    .setMessage(getString(R.string.busybox_install_failed_message))
-                                    .show();
-                            convert_backup.setEnabled(true);
-                        }
-                    });
-                } else {
-                    SUCommand.renameTWRPBackup(new Shell.OnCommandResultListener() {
-                        @Override
-                        public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (exitCode == 0) {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                        builder.setTitle(R.string.set_inter_suc)
-                                                .setMessage(R.string.convert_success)
-                                                .show();
-                                    } else {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                        builder.setTitle(R.string.error)
-                                                .setMessage(R.string.convert_failed)
-                                                .show();
-                                    }
-                                    convert_backup.setEnabled(true);
-                                }
-                            });
+                                                      if (SUCommand.linkBinaries(a) == false) {
+                                                          a.runOnUiThread(new Runnable() {
+                                                              @Override
+                                                              public void run() {
+                                                                  AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                  builder.setTitle(getString(R.string.busybox_install_failed))
+                                                                          .setMessage(getString(R.string.busybox_install_failed_message))
+                                                                          .show();
+                                                                  convert_backup.setEnabled(true);
+                                                              }
+                                                          });
+                                                      } else {
+                                                          SUCommand.renameTWRPBackup(new Shell.OnCommandResultListener() {
+                                                              @Override
+                                                              public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
+                                                                  getActivity().runOnUiThread(new Runnable() {
+                                                                      @Override
+                                                                      public void run() {
+                                                                          if (exitCode == 0) {
+                                                                              AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                              builder.setTitle(R.string.set_inter_suc)
+                                                                                      .setMessage(R.string.convert_success)
+                                                                                      .show();
+                                                                          } else {
+                                                                              AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                              builder.setTitle(R.string.error)
+                                                                                      .setMessage(R.string.convert_failed)
+                                                                                      .show();
+                                                                          }
+                                                                          convert_backup.setEnabled(true);
+                                                                      }
+                                                                  });
 
-                        }
-                    });
-                }
-            }
+                                                              }
+                                                          });
+                                                      }
+                                                  }
 
-            }
+                                              }
 
             );
 

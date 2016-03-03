@@ -2,6 +2,7 @@ package hu.xmister.hermestool;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 import java.io.File;
 import java.util.Arrays;
@@ -213,7 +214,13 @@ public class SUCommand {
     }
 
     public static void flashTWRP(final Shell.OnCommandResultListener ll) {
-        executeSu(dir + "busybox" + " dd if="+dir+"lib_twrp_.so of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+        String twrpPath=null;
+        for (File f: Environment.getExternalStorageDirectory().listFiles()) {
+            if (f.getName().startsWith("main")) twrpPath=f.getAbsolutePath();
+        }
+        if (twrpPath != null) {
+            executeSu(dir + "busybox" + " dd if="+twrpPath+" of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+        }
     }
 
     public static void renameTWRPBackup(final Shell.OnCommandResultListener ll) {
