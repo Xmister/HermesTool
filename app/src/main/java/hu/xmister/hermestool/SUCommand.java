@@ -248,15 +248,11 @@ public class SUCommand {
     public static void interTweak(Context context, Shell.OnCommandResultListener ll) {
         SharedPreferences sharedPreferences =context.getSharedPreferences("default", 0);
         String cmds[] = new String[]{
-                "chmod 644 /proc/hps/*",
-                "echo 2 > /proc/hps/input_boost_cpu_num",
-                "echo 0 > /proc/hps/input_boost_enable",
-                "echo 5 > /proc/hps/num_limit_low_battery",
-                "echo 5 > /proc/hps/num_limit_power_serv",
-                "echo 5 > /proc/hps/num_limit_thermal",
-                "echo 5 > /proc/hps/num_limit_ultra_power_saving",
-                "echo 0 > /proc/hps/rush_boost_enable",
-                "chmod 444 /proc/hps/*",
+                "chmod 664 /proc/hps/*",
+                "echo 8 > /proc/hps/num_limit_low_battery",
+                "echo 8 > /proc/hps/num_limit_power_serv",
+                "echo 8 > /proc/hps/num_limit_thermal",
+                "echo 8 > /proc/hps/num_limit_ultra_power_saving",
                 "cd /proc/cpufreq",
                 "chmod 644 cpufreq_limited_max_freq_by_user",
                 "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+Constants.defFRPos))) + " > cpufreq_limited_max_freq_by_user",
@@ -270,6 +266,19 @@ public class SUCommand {
                 "chmod 644 *",
         };
         try {
+            if (Boolean.valueOf(sharedPreferences.getString("cb_limitcores","false"))) {
+                int cores=Integer.valueOf(sharedPreferences.getString("tlimitcores", "5"));
+                cmds = concat(cmds,new String[] {
+                        "echo 2 > /proc/hps/input_boost_cpu_num",
+                        "echo 0 > /proc/hps/input_boost_enable",
+                        "echo "+cores+" > /proc/hps/num_limit_low_battery",
+                        "echo "+cores+" > /proc/hps/num_limit_power_serv",
+                        "echo "+cores+" > /proc/hps/num_limit_thermal",
+                        "echo "+cores+" > /proc/hps/num_limit_ultra_power_saving",
+                        "echo 0 > /proc/hps/rush_boost_enable",
+                        "chmod 444 /proc/hps/*",
+                });
+            }
             switch (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_slow))) {
                 case R.id.rb_gaming:
                     cmds = concat(cmds,new String[]{

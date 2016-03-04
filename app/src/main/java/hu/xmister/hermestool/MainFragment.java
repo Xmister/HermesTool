@@ -28,8 +28,10 @@ public class MainFragment extends MyFragment {
         private static MainFragment self=null;
         private static Button   maxFreq,
                                 freq=null;
-        private static EditText tCores;
-        private static CheckBox cbTouchBoost;
+        private static EditText tCores,
+                                tLimitCores;
+        private static CheckBox cbTouchBoost,
+                                cbLimitCores;
         private static GridLayout grTouch;
         private static TextView textCore,
                                 textFreq;
@@ -104,9 +106,11 @@ public class MainFragment extends MyFragment {
         maxFreq=(Button)getActivity().findViewById(R.id.maxFreq);
         freq=(Button)getActivity().findViewById(R.id.tFreq);
         tCores=(EditText)getActivity().findViewById(R.id.tCores);
+        tLimitCores=(EditText)getActivity().findViewById(R.id.tMaxCores);
         textFreq=(TextView)getActivity().findViewById(R.id.textFreq);
         textCore=(TextView)getActivity().findViewById(R.id.textCore);
         cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
+        cbLimitCores=(CheckBox)getActivity().findViewById(R.id.cb_limitCore);
         grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
         rg_profile = (RadioGroup) getActivity().findViewById(R.id.rg_profile);
         if ( rg_profile != null ) {
@@ -151,10 +155,12 @@ public class MainFragment extends MyFragment {
     public void beforeSave() {
         super.beforeSave();
         a.setP("tCores", tCores.getText().toString());
+        a.setP("tLimitCores", tLimitCores.getText().toString());
+        a.setP("cb_limitCores", ""+cbLimitCores.isChecked());
     }
 
     public void loadDefaults() {
-        a.setP("maxfreq", ""+Constants.defFRPos);
+        a.setP("maxfreq", "" + Constants.defFRPos);
         maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
         try {
             a.setP("tbFreq", "" + Constants.defTBPos);
@@ -173,7 +179,11 @@ public class MainFragment extends MyFragment {
         freq.setText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
         a.setP("tCores", "2");
         tCores.setText("2");
+        a.setP("tLimitCores", "5");
+        tLimitCores.setText("5");
         a.setP("cbTouchBoost", "true");
+        a.setP("cb_limitCores", "false");
+        cbLimitCores.setChecked(false);
         rg_profile.check(R.id.rb_slow);
         a.setP("rg_profile", "" + R.id.rb_slow);
         cbTouchBoost.setChecked(true);
@@ -198,12 +208,22 @@ public class MainFragment extends MyFragment {
             }
         });
     }
+
+    private synchronized void setLimitCoresText(final String text) {
+        if (getActivity() == null) return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (tLimitCores != null) tLimitCores.setText(text);
+            }
+        });
+    }
     private synchronized void setReadFreqText(final String text) {
         if (getActivity() == null) return;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if ( freq != null ) textFreq.setText(text);
+                if ( textFreq != null ) textFreq.setText(text);
             }
         });
     }
@@ -212,7 +232,7 @@ public class MainFragment extends MyFragment {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if ( tCores != null ) textCore.setText(text);
+                if ( textCore!= null ) textCore.setText(text);
             }
         });
     }
@@ -278,6 +298,13 @@ public class MainFragment extends MyFragment {
             setCoresText("2");
             a.setP("tCores", "2");
         }
+        if ( a.getP("tLimitCores") != null) {
+            setLimitCoresText(a.getP("tLimitCores"));
+        }
+        else {
+            setLimitCoresText("5");
+            a.setP("tLimitCores", "5");
+        }
         if (a.getP("maxfreq") != null) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -286,6 +313,7 @@ public class MainFragment extends MyFragment {
                     try {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
+                        cbLimitCores.setChecked(Boolean.valueOf(a.getP("cb_limitCores")));
                         oCC.onCheckedChanged(cbTouchBoost, Boolean.valueOf(a.getP("cbTouchBoost")));
                     } catch (Exception e) {
                         a.setP("maxfreq", "" + Constants.defFRPos);
@@ -303,6 +331,8 @@ public class MainFragment extends MyFragment {
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
                         a.setP("cbTouchBoost", "false");
                         cbTouchBoost.setChecked(false);
+                        a.setP("cb_limitCores", "false");
+                        cbLimitCores.setChecked(false);
                         oCC.onCheckedChanged(cbTouchBoost, false);
                         grTouch.setVisibility(View.INVISIBLE);
                     } catch (IndexOutOfBoundsException e) {
