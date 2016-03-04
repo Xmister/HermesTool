@@ -17,6 +17,10 @@ public class Constants {
     private static boolean filling=false;
     public static int defFRPos=2;
     public static int defTBPos=5;
+    public static final int TWRP_VER=46;
+    public static final long TWRP_SIZE=13910016L;
+    public static final int MIREC_VER=47;
+    public static final long MIREC_SIZE=10330112L;
 
     public interface InitComplete {
         public void onInitComplete();

@@ -3,10 +3,10 @@ package hu.xmister.hermestool;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.vending.expansion.downloader.DownloaderClientMarshaller;
-import com.google.android.vending.expansion.downloader.IStub;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -31,7 +29,6 @@ import eu.chainfire.libsuperuser.Shell;
 public class OtherFragment extends MyFragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static OtherFragment self=null;
-    private static MainActivity a;
     private static CheckBox cbAutoMount;
     private static Button   btFormat,
                             btMount,
@@ -40,35 +37,72 @@ public class OtherFragment extends MyFragment {
                             convert_backup;
     private static String[] schedulers=null;
     private static int selectSched=0;
-    public static IStub mDownloaderClientStub;
-    public static final Shell.OnCommandResultListener ocr_Recovery = new Shell.OnCommandResultListener() {
+    public int flashRec=-1;
+    public final DialogInterface.OnClickListener recButtonOnClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            flashRecovery(getActivity(),which);
+        }
+    };
+    public final Shell.OnCommandResultListener ocr_Recovery = new Shell.OnCommandResultListener() {
         @Override
         public void onCommandResult(int commandCode, int exitCode, List<String> output) {
             if (exitCode == 0) {
-                a.runOnUiThread(new Runnable() {
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                        builder.setTitle(R.string.set_inter_suc)
-                                .setMessage(R.string.recovery_flash_success)
-                                .show();
+                        dialog(R.string.set_inter_suc,R.string.recovery_flash_success);
                         flash_recovery.setEnabled(true);
                     }
                 });
             } else {
-                a.runOnUiThread(new Runnable() {
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                        builder.setTitle(R.string.error)
-                                .setMessage(R.string.recovery_flash_error)
-                                .show();
+                        dialog(R.string.error, R.string.recovery_flash_error);
                         flash_recovery.setEnabled(true);
                     }
                 });
             }
         }
     };
+
+    public void flashRecovery(Context ctx, int which) {
+        AlertDialog waitDialog = new AlertDialog.Builder(ctx)
+                .setTitle(R.string.recovery_download)
+                .setCancelable(false)
+                .setMessage(R.string.please_wait)
+                .create();
+        waitDialog.setCanceledOnTouchOutside(false);
+        // Start the download service (if required)
+        Intent notifierIntent = new Intent(ctx, MainActivity.class);
+        notifierIntent.setAction("download");
+        notifierIntent.putExtra("which",which);
+        PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0,
+                notifierIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        try {
+            int startResult =
+                    DownloaderClientMarshaller.startDownloadServiceIfRequired(ctx,
+                            pendingIntent, DownloaderService.class);
+            if (startResult != DownloaderClientMarshaller.NO_DOWNLOAD_REQUIRED) {
+                pendingIntent.send();
+            }
+            else {
+                flash_recovery.setEnabled(false);
+                if (which == 0) {
+                    SUCommand.flashTWRP(ctx,ocr_Recovery);
+                } else if (which == 1) {
+                    SUCommand.flashMIRecovery(ctx,ocr_Recovery);
+                }
+            }
+        } catch (Exception e) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+            builder.setTitle(R.string.recovery_download)
+                    .setMessage(R.string.recovery_download_error)
+                    .show();
+        }
+        waitDialog.dismiss();
+    }
 
 
     /**
@@ -79,12 +113,10 @@ public class OtherFragment extends MyFragment {
      */
     // TODO: Rename and change types and number of parameters
     public static OtherFragment newInstance(int sectionNumber) {
-        if ( self == null ) {
             self = new OtherFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             self.setArguments(args);
-        }
         return self;
     }
 
@@ -153,7 +185,7 @@ public class OtherFragment extends MyFragment {
                             }
                         }
                     }
-                    a.runOnUiThread(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             sched.setText(schedulers[selectSched]);
@@ -169,38 +201,7 @@ public class OtherFragment extends MyFragment {
     }
 
     private void showRecoveryDialog() {
-        ChoiceDialog md = new ChoiceDialog(getString(R.string.choose_recovery), new String[]{"TWRP3", "MiRecovery"}, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Start the download service (if required)
-                Intent notifierIntent = new Intent(getActivity(), MainActivity.class);
-                notifierIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0,
-                        notifierIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                try {
-                    int startResult =
-                            DownloaderClientMarshaller.startDownloadServiceIfRequired(getActivity(),
-                                    pendingIntent, DownloaderService.class);
-                    if (startResult != DownloaderClientMarshaller.NO_DOWNLOAD_REQUIRED) {
-                        pendingIntent.send();
-                    }
-                    else {
-                        flash_recovery.setEnabled(false);
-                        if (which == 0) {
-                            SUCommand.flashTWRP(ocr_Recovery);
-                        } else if (which == 1) {
-                            SUCommand.flashMIRecovery(ocr_Recovery);
-                        }
-                    }
-                } catch (Exception e) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                    builder.setTitle(R.string.recovery_download)
-                            .setMessage(R.string.recovery_download_error)
-                            .show();
-                }
-            }
-        }, null, null);
+        ChoiceDialog md = new ChoiceDialog(getString(R.string.choose_recovery), new String[]{"TWRP3", "MiRecovery"}, recButtonOnClick, null, null);
         md.show(getFragmentManager(), "recovery");
     }
 
@@ -233,7 +234,7 @@ public class OtherFragment extends MyFragment {
                                         @Override
                                         public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                                             if (exitCode == 127) {
-                                                a.runOnUiThread(new Runnable() {
+                                                runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
                                                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -244,7 +245,7 @@ public class OtherFragment extends MyFragment {
                                                 });
                                             } else {
                                                 if (SUCommand.linkBinaries(a) == false ) {
-                                                    a.runOnUiThread(new Runnable() {
+                                                    runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
                                                             AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -254,7 +255,7 @@ public class OtherFragment extends MyFragment {
                                                         }
                                                     });
                                                 }else {
-                                                    a.runOnUiThread(new Runnable() {
+                                                    runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
                                                             Toast.makeText(a, "Please wait...", Toast.LENGTH_LONG).show();
@@ -269,7 +270,7 @@ public class OtherFragment extends MyFragment {
                                                                                     SUCommand.mountSD(new Shell.OnCommandResultListener() {
                                                                                         @Override
                                                                                         public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                                                            a.runOnUiThread(new Runnable() {
+                                                                                            runOnUiThread(new Runnable() {
                                                                                                 @Override
                                                                                                 public void run() {
                                                                                                     a.setP("cbAutoMount", "true");
@@ -287,7 +288,7 @@ public class OtherFragment extends MyFragment {
                                                                                     });
                                                                                 }
                                                                                 else {
-                                                                                    a.runOnUiThread(new Runnable() {
+                                                                                    runOnUiThread(new Runnable() {
                                                                                         @Override
                                                                                         public void run() {
                                                                                             AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -328,7 +329,7 @@ public class OtherFragment extends MyFragment {
                     SUCommand.mountSD(new Shell.OnCommandResultListener() {
                         @Override
                         public void onCommandResult(int commandCode, final int exitCode, final List<String> output) {
-                            a.runOnUiThread(new Runnable() {
+                            runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     if (exitCode > 0) {
@@ -375,7 +376,7 @@ public class OtherFragment extends MyFragment {
             @Override
             public void onClick(View v) {
                 if (SUCommand.linkBinaries(a) == false) {
-                    a.runOnUiThread(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -416,7 +417,7 @@ public class OtherFragment extends MyFragment {
                                                     SUCommand.executeSu("mv " + backup_F.getAbsolutePath() + " " + backup_F.getParent() + "/Redmi_Note_2", new Shell.OnCommandResultListener() {
                                                         @Override
                                                         public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
-                                                            a.runOnUiThread(new Runnable() {
+                                                            runOnUiThread(new Runnable() {
                                                                 @Override
                                                                 public void run() {
                                                                     if (exitCode == 0) {
@@ -455,7 +456,7 @@ public class OtherFragment extends MyFragment {
                     convert_backup.setEnabled(true);
                 }*/
                                                       if (SUCommand.linkBinaries(a) == false) {
-                                                          a.runOnUiThread(new Runnable() {
+                                                          runOnUiThread(new Runnable() {
                                                               @Override
                                                               public void run() {
                                                                   AlertDialog.Builder builder = new AlertDialog.Builder(a);

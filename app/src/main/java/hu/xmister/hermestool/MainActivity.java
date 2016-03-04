@@ -4,38 +4,31 @@ import android.app.Activity;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
+import android.os.Handler;
 import android.os.Messenger;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.Property;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.vending.expansion.downloader.DownloadProgressInfo;
 import com.google.android.vending.expansion.downloader.DownloaderClientMarshaller;
+import com.google.android.vending.expansion.downloader.DownloaderServiceMarshaller;
 import com.google.android.vending.expansion.downloader.IDownloaderClient;
+import com.google.android.vending.expansion.downloader.IDownloaderService;
+import com.google.android.vending.expansion.downloader.IStub;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import eu.chainfire.libsuperuser.Shell;
 
@@ -61,6 +54,8 @@ public class MainActivity extends Activity
     private boolean onBoot =false, firstInit=true;
     public static boolean isSuperSU=false,
                             noCPU=false;
+    private IStub mDownloaderClientStub;
+    private IDownloaderService mRemoteService;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -68,7 +63,7 @@ public class MainActivity extends Activity
     private CharSequence mTitle;
 
     private MyFragment curFrag=null;
-    private ProgressDialog progess;
+    private ProgressDialog progress;
 
     private void init() {
         SharedPreferences sharedPreferences =getSharedPreferences("default", 0);
@@ -101,6 +96,7 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
+        guiInit();
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.check_root)
                 .setMessage(R.string.check_root_message);
@@ -157,7 +153,6 @@ public class MainActivity extends Activity
                                                     });
                                             builder.show();
                                         } else {
-                                            guiInit();
                                             findViewById(R.id.container).setVisibility(View.INVISIBLE);
                                         }
                                     }
@@ -278,7 +273,6 @@ public class MainActivity extends Activity
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                guiInit();
                                 findViewById(R.id.container).setVisibility(View.VISIBLE);
                             }
                         });
@@ -566,34 +560,61 @@ public class MainActivity extends Activity
 
     @Override
     public void onServiceConnected(Messenger m) {
+        mRemoteService = DownloaderServiceMarshaller.CreateProxy(m);
+        mRemoteService.onClientUpdated(mDownloaderClientStub.getMessenger());
+    }
 
+    private void createProgress() {
+        if (progress == null) {
+            progress =new ProgressDialog(this);
+            progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progress.setCancelable(false);
+            progress.setCanceledOnTouchOutside(false);
+        }
     }
 
     @Override
     public void onDownloadStateChanged(int newState) {
-        if (progess == null) {
-            progess=new ProgressDialog(this);
-            progess.setCancelable(false);
-            progess.setCanceledOnTouchOutside(false);
-        }
+        createProgress();
+        AlertDialog.Builder builder;
         switch (newState) {
-            case STATE_DOWNLOADING:
+            case STATE_IDLE:
+                mRemoteService.requestContinueDownload();
+                break;
             case STATE_CONNECTING:
             case STATE_FETCHING_URL:
-                progess.setTitle(R.string.recovery_download);
-                progess.setIndeterminate(true);
-                progess.show();
+                progress.setTitle(R.string.recovery_download);
+                progress.setIndeterminate(true);
+                progress.show();
+                break;
+            case STATE_DOWNLOADING:
+                progress.setTitle(R.string.recovery_download);
+                progress.setIndeterminate(false);
+                progress.show();
                 break;
             case STATE_COMPLETED:
-                progess.dismiss();
+                progress.setIndeterminate(true);
                 onNavigationDrawerItemSelected(1);
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.recovery_download)
-                        .setMessage(R.string.recovery_push_again)
-                        .show();
+                if (getIntent().hasExtra("which")) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                                if (curFrag instanceof OtherFragment) {
+                                    ((OtherFragment)curFrag).flashRecovery(MainActivity.this, getIntent().getIntExtra("which", 0));
+                                    progress.dismiss();
+                                }
+                        }
+                    },2500);
+                }
+                else {
+                    builder = new AlertDialog.Builder(this);
+                    builder.setTitle(R.string.recovery_download)
+                            .setMessage(R.string.recovery_push_again)
+                            .show();
+                }
                 break;
             default:
-                progess.dismiss();
+                progress.dismiss();
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.recovery_download)
                         .setMessage(R.string.recovery_download_error)
@@ -601,27 +622,31 @@ public class MainActivity extends Activity
         }
     }
 
+
     @Override
     public void onDownloadProgress(DownloadProgressInfo progress) {
-        this.progess.setIndeterminate(false);
-        this.progess.setMax((int)progress.mOverallTotal);
-        this.progess.setProgress((int)progress.mOverallProgress);
+        createProgress();
+        this.progress.setIndeterminate(false);
+        this.progress.setMax(100);
+        this.progress.setProgress((int) (((double) progress.mOverallProgress / (double) progress.mOverallTotal) * 100.0));
     }
 
     @Override
     protected void onResume() {
-        if (null == OtherFragment.mDownloaderClientStub) {
-            OtherFragment.mDownloaderClientStub = DownloaderClientMarshaller.CreateStub(this,
+        if (getIntent().getAction().equals("download")) {
+            mDownloaderClientStub = DownloaderClientMarshaller.CreateStub(this,
                     DownloaderService.class);
+            if (null != mDownloaderClientStub) {
+                mDownloaderClientStub.connect(this);
+            }
         }
-        OtherFragment.mDownloaderClientStub.connect(this);
         super.onResume();
     }
 
     @Override
     protected void onStop() {
-        if (null != OtherFragment.mDownloaderClientStub) {
-            OtherFragment.mDownloaderClientStub.disconnect(this);
+        if (null != mDownloaderClientStub) {
+            mDownloaderClientStub.disconnect(this);
         }
         super.onStop();
     }

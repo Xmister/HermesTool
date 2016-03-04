@@ -86,4 +86,5 @@
     <string name="recovery_download_error">Hiba történt a letöltés közben.\nKérlek próbáld újra később.</string>
     <string name="recovery_download_need">Le kell tölteni a recovery fájlokat, kérlek várj...</string>
     <string name="recovery_push_again">Kérlek nyomd meg újra a recovery flashelése gombot!</string>
+    <string name="please_wait">Kérlek várj</string>
 </resources>

@@ -26,7 +26,6 @@ public class MainFragment extends MyFragment {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static MainFragment self=null;
-        private static MainActivity a;
         private static Button   maxFreq,
                                 freq=null;
         private static EditText tCores;
@@ -35,7 +34,7 @@ public class MainFragment extends MyFragment {
         private static TextView textCore,
                                 textFreq;
         private static RadioGroup rg_profile;
-        private static CompoundButton.OnCheckedChangeListener oCC=new CompoundButton.OnCheckedChangeListener() {
+        private CompoundButton.OnCheckedChangeListener oCC=new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 a.setP("cbTouchBoost", "" + isChecked);
@@ -63,7 +62,7 @@ public class MainFragment extends MyFragment {
         public MainFragment() {
         }
 
-        private static DialogInterface.OnClickListener di = new DialogInterface.OnClickListener() {
+        private  DialogInterface.OnClickListener di = new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -74,7 +73,7 @@ public class MainFragment extends MyFragment {
             }
         };
 
-        private static DialogInterface.OnClickListener tdi = new DialogInterface.OnClickListener() {
+        private  DialogInterface.OnClickListener tdi = new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -160,7 +159,7 @@ public class MainFragment extends MyFragment {
         try {
             a.setP("tbFreq", "" + Constants.defTBPos);
         } catch ( Resources.NotFoundException e ) {
-            a.runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -183,7 +182,7 @@ public class MainFragment extends MyFragment {
 
     private synchronized void setFreqText(final String text) {
         if (getActivity() == null) return;
-        a.runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (freq != null) freq.setText(text);
@@ -192,7 +191,7 @@ public class MainFragment extends MyFragment {
     }
     private synchronized void setCoresText(final String text) {
         if (getActivity() == null) return;
-        a.runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (tCores != null) tCores.setText(text);
@@ -201,7 +200,7 @@ public class MainFragment extends MyFragment {
     }
     private synchronized void setReadFreqText(final String text) {
         if (getActivity() == null) return;
-        a.runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if ( freq != null ) textFreq.setText(text);
@@ -210,7 +209,7 @@ public class MainFragment extends MyFragment {
     }
     private synchronized void setReadCoresText(final String text) {
         if (getActivity() == null) return;
-        a.runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if ( tCores != null ) textCore.setText(text);
@@ -237,7 +236,7 @@ public class MainFragment extends MyFragment {
                     }
                     setReadCoresText(cores);
                 } else {
-                    a.runOnUiThread(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -260,7 +259,7 @@ public class MainFragment extends MyFragment {
             try {
                 a.setP("tbFreq", "" + Constants.defTBPos);
             } catch (Exception e ) {
-                a.runOnUiThread(new Runnable() {
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -280,7 +279,7 @@ public class MainFragment extends MyFragment {
             a.setP("tCores", "2");
         }
         if (a.getP("maxfreq") != null) {
-            a.runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (getActivity() == null) return;
@@ -295,7 +294,7 @@ public class MainFragment extends MyFragment {
                 }
             });
         } else {
-            a.runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (getActivity() == null) return;
@@ -327,7 +326,7 @@ public class MainFragment extends MyFragment {
             });
         }
         if (a.getP("rg_profile") != null) {
-            a.runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (getActivity() == null) return;

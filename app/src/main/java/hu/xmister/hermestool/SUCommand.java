@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 
+import com.google.android.vending.expansion.downloader.Helpers;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -213,13 +215,13 @@ public class SUCommand {
         });
     }
 
-    public static void flashTWRP(final Shell.OnCommandResultListener ll) {
-        String recoveryPath=null;
-        for (File f: Environment.getExternalStorageDirectory().listFiles()) {
-            if (f.getName().startsWith("main")) recoveryPath=f.getAbsolutePath();
+    public static void flashTWRP(Context ctx,final Shell.OnCommandResultListener ll) {
+        String recoveryPath=Helpers.getExpansionAPKFileName(ctx,true,Constants.TWRP_VER);
+        if (Helpers.doesFileExist(ctx,recoveryPath,Constants.TWRP_SIZE,true)) {
+            executeSu(dir + "busybox" + " dd if=" + Helpers.getSaveFilePath(ctx) + "/" + recoveryPath + " of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
         }
-        if (recoveryPath != null) {
-            executeSu(dir + "busybox" + " dd if="+recoveryPath+" of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+        else {
+            ll.onCommandResult(0, 127, null);
         }
     }
 
@@ -227,13 +229,13 @@ public class SUCommand {
         executeSu(dir + "busybox" + " sh "+dir+"lib_twrp_rename_.so", ll);
     }
 
-    public static void flashMIRecovery(final Shell.OnCommandResultListener ll) {
-        String recoveryPath=null;
-        for (File f: Environment.getExternalStorageDirectory().listFiles()) {
-            if (f.getName().startsWith("patch")) recoveryPath=f.getAbsolutePath();
+    public static void flashMIRecovery(Context ctx,final Shell.OnCommandResultListener ll) {
+        String recoveryPath=Helpers.getExpansionAPKFileName(ctx,false,Constants.MIREC_VER);
+        if (Helpers.doesFileExist(ctx,recoveryPath,Constants.MIREC_SIZE,true)) {
+            executeSu(dir + "busybox" + " dd if=" + Helpers.getSaveFilePath(ctx) + "/" + recoveryPath+" of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
         }
-        if (recoveryPath != null) {
-            executeSu(dir + "busybox" + " dd if="+recoveryPath+" of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+        else {
+            ll.onCommandResult(0, 127, null);
         }
     }
 
