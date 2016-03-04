@@ -110,11 +110,14 @@ public class RNT2BootService extends Service {
                             SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                                 @Override
                                 public void onGotTB(String freq, String cores) {
-                                    try {
-                                        if (!freq.equals(Constants.getFrequencyItem(RNT2BootService.this,Integer.valueOf(sharedPreferences.getString("tbfreq", "" + Constants.defTBPos)))) || !cores.equals(sharedPreferences.getString("tcores", "2"))) {
-                                            sendNotify(3, getString(R.string.tb_different));
+                                    if ( freq != null && cores != null) {
+                                        try {
+                                            if (!freq.equals(Constants.getFrequencyItem(RNT2BootService.this, Integer.valueOf(sharedPreferences.getString("tbfreq", "" + Constants.defTBPos)))) || !cores.equals(sharedPreferences.getString("tcores", "2"))) {
+                                                sendNotify(3, getString(R.string.tb_different));
+                                            }
+                                        } catch (Resources.NotFoundException e) {
                                         }
-                                    } catch (Resources.NotFoundException e) {}
+                                    }
                                     canStop();
                                 }
                             });

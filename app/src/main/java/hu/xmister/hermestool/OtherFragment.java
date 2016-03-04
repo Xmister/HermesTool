@@ -183,21 +183,15 @@ public class OtherFragment extends MyFragment {
                             DownloaderClientMarshaller.startDownloadServiceIfRequired(getActivity(),
                                     pendingIntent, DownloaderService.class);
                     if (startResult != DownloaderClientMarshaller.NO_DOWNLOAD_REQUIRED) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                        builder.setTitle(R.string.recovery_download)
-                                .setMessage(R.string.recovery_download_need)
-                                .show();
-                        mDownloaderClientStub = DownloaderClientMarshaller.CreateStub(((MainActivity)getActivity()),
-                                DownloaderService.class);
+                        pendingIntent.send();
                     }
-                    else { /*
+                    else {
                         flash_recovery.setEnabled(false);
                         if (which == 0) {
                             SUCommand.flashTWRP(ocr_Recovery);
                         } else if (which == 1) {
                             SUCommand.flashMIRecovery(ocr_Recovery);
                         }
-                        */
                     }
                 } catch (Exception e) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -243,7 +237,7 @@ public class OtherFragment extends MyFragment {
                                                     @Override
                                                     public void run() {
                                                         AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                        builder.setTitle(getString(R.string.missing_binaries))
+                                                        builder.setTitle(R.string.missing_binaries)
                                                                 .setMessage(getString(R.string.missing_binaries_message))
                                                                 .show();
                                                     }

@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.vending.expansion.downloader.DownloadProgressInfo;
+import com.google.android.vending.expansion.downloader.DownloaderClientMarshaller;
 import com.google.android.vending.expansion.downloader.IDownloaderClient;
 
 import java.util.List;
@@ -579,6 +580,7 @@ public class MainActivity extends Activity
             case STATE_DOWNLOADING:
             case STATE_CONNECTING:
             case STATE_FETCHING_URL:
+                progess.setTitle(R.string.recovery_download);
                 progess.setIndeterminate(true);
                 progess.show();
                 break;
@@ -608,9 +610,11 @@ public class MainActivity extends Activity
 
     @Override
     protected void onResume() {
-        if (null != OtherFragment.mDownloaderClientStub) {
-            OtherFragment.mDownloaderClientStub.connect(this);
+        if (null == OtherFragment.mDownloaderClientStub) {
+            OtherFragment.mDownloaderClientStub = DownloaderClientMarshaller.CreateStub(this,
+                    DownloaderService.class);
         }
+        OtherFragment.mDownloaderClientStub.connect(this);
         super.onResume();
     }
 

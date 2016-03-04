@@ -214,12 +214,12 @@ public class SUCommand {
     }
 
     public static void flashTWRP(final Shell.OnCommandResultListener ll) {
-        String twrpPath=null;
+        String recoveryPath=null;
         for (File f: Environment.getExternalStorageDirectory().listFiles()) {
-            if (f.getName().startsWith("main")) twrpPath=f.getAbsolutePath();
+            if (f.getName().startsWith("main")) recoveryPath=f.getAbsolutePath();
         }
-        if (twrpPath != null) {
-            executeSu(dir + "busybox" + " dd if="+twrpPath+" of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+        if (recoveryPath != null) {
+            executeSu(dir + "busybox" + " dd if="+recoveryPath+" of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
         }
     }
 
@@ -228,7 +228,13 @@ public class SUCommand {
     }
 
     public static void flashMIRecovery(final Shell.OnCommandResultListener ll) {
-        executeSu(dir + "busybox" + " dd if="+dir+"lib_mirecovery_.so of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+        String recoveryPath=null;
+        for (File f: Environment.getExternalStorageDirectory().listFiles()) {
+            if (f.getName().startsWith("patch")) recoveryPath=f.getAbsolutePath();
+        }
+        if (recoveryPath != null) {
+            executeSu(dir + "busybox" + " dd if="+recoveryPath+" of=/dev/block/platform/mtk-msdc.0/by-name/recovery", ll);
+        }
     }
 
     public static <T> T[] concat(T[] first, T[] second) {

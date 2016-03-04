@@ -182,6 +182,7 @@ public class MainFragment extends MyFragment {
     }
 
     private synchronized void setFreqText(final String text) {
+        if (getActivity() == null) return;
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -190,6 +191,7 @@ public class MainFragment extends MyFragment {
         });
     }
     private synchronized void setCoresText(final String text) {
+        if (getActivity() == null) return;
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -198,6 +200,7 @@ public class MainFragment extends MyFragment {
         });
     }
     private synchronized void setReadFreqText(final String text) {
+        if (getActivity() == null) return;
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -206,6 +209,7 @@ public class MainFragment extends MyFragment {
         });
     }
     private synchronized void setReadCoresText(final String text) {
+        if (getActivity() == null) return;
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -216,7 +220,6 @@ public class MainFragment extends MyFragment {
 
     @Override
     public void loadValues() {
-        if (getActivity() == null) return;
         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
             @Override
             public void onGotTB(String freq, String cores) {
@@ -280,6 +283,7 @@ public class MainFragment extends MyFragment {
             a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (getActivity() == null) return;
                     try {
                         maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
@@ -294,6 +298,7 @@ public class MainFragment extends MyFragment {
             a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (getActivity() == null) return;
                     a.setP("maxfreq", "" + Constants.defFRPos);
                     try {
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
@@ -325,6 +330,7 @@ public class MainFragment extends MyFragment {
             a.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (getActivity() == null) return;
                     rg_profile.check(Integer.valueOf(a.getP("rg_profile")));
                 }
             });
