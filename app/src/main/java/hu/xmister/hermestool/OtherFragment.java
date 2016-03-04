@@ -37,7 +37,6 @@ public class OtherFragment extends MyFragment {
                             convert_backup;
     private static String[] schedulers=null;
     private static int selectSched=0;
-    public int flashRec=-1;
     public final DialogInterface.OnClickListener recButtonOnClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -77,9 +76,11 @@ public class OtherFragment extends MyFragment {
         // Start the download service (if required)
         Intent notifierIntent = new Intent(ctx, MainActivity.class);
         notifierIntent.setAction("download");
+        notifierIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notifierIntent.putExtra("which",which);
         PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 0,
-                notifierIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                notifierIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         try {
             int startResult =
                     DownloaderClientMarshaller.startDownloadServiceIfRequired(ctx,
