@@ -52,4 +52,17 @@ public abstract class MyFragment extends Fragment {
                     .show();
         }
     }
+
+    protected void setP(String param, String value) {
+        if (a != null) {
+            a.setP(param, value);
+        }
+    }
+
+    protected String getP(String param) {
+        if (a != null) {
+            return a.getP(param);
+        }
+        return null;
+    }
 }

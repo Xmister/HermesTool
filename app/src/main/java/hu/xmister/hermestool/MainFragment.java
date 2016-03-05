@@ -39,7 +39,7 @@ public class MainFragment extends MyFragment {
         private CompoundButton.OnCheckedChangeListener oCC=new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                a.setP("cbTouchBoost", "" + isChecked);
+                setP("cbTouchBoost", "" + isChecked);
                 if (isChecked)
                     grTouch.setVisibility(View.VISIBLE);
                 else
@@ -69,7 +69,7 @@ public class MainFragment extends MyFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if ( Constants.getFrequencyName(a,which) != null ) {
-                    a.setP("maxfreq",""+which);
+                    setP("maxfreq",""+which);
                     maxFreq.setText(Constants.getFrequencyName(a,which));
                 }
             }
@@ -80,7 +80,7 @@ public class MainFragment extends MyFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if ( Constants.getFrequencyName(a,which) != null ) {
-                    a.setP("tbFreq",""+(which+1));
+                    setP("tbFreq",""+(which+1));
                     freq.setText(Constants.getFrequencyName(a,which+1));
                 }
             }
@@ -117,7 +117,7 @@ public class MainFragment extends MyFragment {
             rg_profile.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    a.setP("rg_profile", "" + checkedId);
+                    setP("rg_profile", "" + checkedId);
                 }
             });
             maxFreq.setOnClickListener(new View.OnClickListener() {
@@ -154,16 +154,16 @@ public class MainFragment extends MyFragment {
     @Override
     public void beforeSave() {
         super.beforeSave();
-        a.setP("tCores", tCores.getText().toString());
-        a.setP("tLimitCores", tLimitCores.getText().toString());
-        a.setP("cb_limitCores", ""+cbLimitCores.isChecked());
+        setP("tCores", tCores.getText().toString());
+        setP("tLimitCores", tLimitCores.getText().toString());
+        setP("cb_limitCores", ""+cbLimitCores.isChecked());
     }
 
     public void loadDefaults() {
-        a.setP("maxfreq", "" + Constants.defFRPos);
+        setP("maxfreq", "" + Constants.defFRPos);
         maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
         try {
-            a.setP("tbFreq", "" + Constants.defTBPos);
+            setP("tbFreq", "" + Constants.defTBPos);
         } catch ( Resources.NotFoundException e ) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -177,15 +177,15 @@ public class MainFragment extends MyFragment {
             });
         }
         freq.setText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
-        a.setP("tCores", "2");
+        setP("tCores", "2");
         tCores.setText("2");
-        a.setP("tLimitCores", "5");
+        setP("tLimitCores", "5");
         tLimitCores.setText("5");
-        a.setP("cbTouchBoost", "true");
-        a.setP("cb_limitCores", "false");
+        setP("cbTouchBoost", "true");
+        setP("cb_limitCores", "false");
         cbLimitCores.setChecked(false);
         rg_profile.check(R.id.rb_slow);
-        a.setP("rg_profile", "" + R.id.rb_slow);
+        setP("rg_profile", "" + R.id.rb_slow);
         cbTouchBoost.setChecked(true);
         oCC.onCheckedChanged(cbTouchBoost,true);
     }
@@ -268,16 +268,16 @@ public class MainFragment extends MyFragment {
                 }
             }
         });
-        if ( a.getP("tbFreq") != null) {
+        if ( getP("tbFreq") != null) {
             try {
-                setFreqText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("tbFreq"))));
+                setFreqText(Constants.getFrequencyName(a, Integer.valueOf(getP("tbFreq"))));
             } catch (Exception e) {
                 setFreqText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
             }
         }
         else {
             try {
-                a.setP("tbFreq", "" + Constants.defTBPos);
+                setP("tbFreq", "" + Constants.defTBPos);
             } catch (Exception e ) {
                 runOnUiThread(new Runnable() {
                     @Override
@@ -291,32 +291,32 @@ public class MainFragment extends MyFragment {
                 });
             }
         }
-        if ( a.getP("tCores")!=null) {
-            setCoresText(a.getP("tCores"));
+        if ( getP("tCores")!=null) {
+            setCoresText(getP("tCores"));
         }
         else {
             setCoresText("2");
-            a.setP("tCores", "2");
+            setP("tCores", "2");
         }
-        if ( a.getP("tLimitCores") != null) {
-            setLimitCoresText(a.getP("tLimitCores"));
+        if ( getP("tLimitCores") != null) {
+            setLimitCoresText(getP("tLimitCores"));
         }
         else {
             setLimitCoresText("5");
-            a.setP("tLimitCores", "5");
+            setP("tLimitCores", "5");
         }
-        if (a.getP("maxfreq") != null) {
+        if (getP("maxfreq") != null) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (getActivity() == null) return;
                     try {
-                        maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(a.getP("maxfreq"))));
-                        cbTouchBoost.setChecked(Boolean.valueOf(a.getP("cbTouchBoost")));
-                        cbLimitCores.setChecked(Boolean.valueOf(a.getP("cb_limitCores")));
-                        oCC.onCheckedChanged(cbTouchBoost, Boolean.valueOf(a.getP("cbTouchBoost")));
+                        maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(getP("maxfreq"))));
+                        cbTouchBoost.setChecked(Boolean.valueOf(getP("cbTouchBoost")));
+                        cbLimitCores.setChecked(Boolean.valueOf(getP("cb_limitCores")));
+                        oCC.onCheckedChanged(cbTouchBoost, Boolean.valueOf(getP("cbTouchBoost")));
                     } catch (Exception e) {
-                        a.setP("maxfreq", "" + Constants.defFRPos);
+                        setP("maxfreq", "" + Constants.defFRPos);
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
                     }
                 }
@@ -326,12 +326,12 @@ public class MainFragment extends MyFragment {
                 @Override
                 public void run() {
                     if (getActivity() == null) return;
-                    a.setP("maxfreq", "" + Constants.defFRPos);
+                    setP("maxfreq", "" + Constants.defFRPos);
                     try {
                         maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
-                        a.setP("cbTouchBoost", "false");
+                        setP("cbTouchBoost", "false");
                         cbTouchBoost.setChecked(false);
-                        a.setP("cb_limitCores", "false");
+                        setP("cb_limitCores", "false");
                         cbLimitCores.setChecked(false);
                         oCC.onCheckedChanged(cbTouchBoost, false);
                         grTouch.setVisibility(View.INVISIBLE);
@@ -355,12 +355,12 @@ public class MainFragment extends MyFragment {
                 }
             });
         }
-        if (a.getP("rg_profile") != null) {
+        if (getP("rg_profile") != null) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (getActivity() == null) return;
-                    rg_profile.check(Integer.valueOf(a.getP("rg_profile")));
+                    rg_profile.check(Integer.valueOf(getP("rg_profile")));
                 }
             });
         }

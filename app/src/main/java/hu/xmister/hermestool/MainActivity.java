@@ -633,7 +633,8 @@ public class MainActivity extends Activity
 
     @Override
     protected void onResume() {
-        if (getIntent().getAction().equals("download")) {
+
+        if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals("download")) {
             mDownloaderClientStub = DownloaderClientMarshaller.CreateStub(this,
                     DownloaderService.class);
             if (null != mDownloaderClientStub) {

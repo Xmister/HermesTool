@@ -145,7 +145,7 @@ public class OtherFragment extends MyFragment {
 
     @Override
     public void loadDefaults() {
-        a.setP("cbAutoMount", "false");
+        setP("cbAutoMount", "false");
         cbAutoMount.setChecked(false);
         if (schedulers != null) {
             List<String> al = Arrays.asList(schedulers);
@@ -159,7 +159,7 @@ public class OtherFragment extends MyFragment {
             else {
                 tmp="cfq";
             }
-            a.setP("sched", tmp);
+            setP("sched", tmp);
             sched.setText(tmp);
         }
     }
@@ -195,9 +195,9 @@ public class OtherFragment extends MyFragment {
                 }
             });
         }
-        if (a.getP("cbAutoMount") != null) {
-            cbAutoMount.setChecked(Boolean.valueOf(a.getP("cbAutoMount")));
-            sched.setText(a.getP("sched"));
+        if (getP("cbAutoMount") != null) {
+            cbAutoMount.setChecked(Boolean.valueOf(getP("cbAutoMount")));
+            sched.setText(getP("sched"));
         } else super.loadValues();
     }
 
@@ -218,7 +218,7 @@ public class OtherFragment extends MyFragment {
         cbAutoMount.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                a.setP("cbAutoMount", "" + isChecked);
+                setP("cbAutoMount", "" + isChecked);
             }
         });
         //if ( a.isSuperSU ) {
@@ -274,7 +274,7 @@ public class OtherFragment extends MyFragment {
                                                                                             runOnUiThread(new Runnable() {
                                                                                                 @Override
                                                                                                 public void run() {
-                                                                                                    a.setP("cbAutoMount", "true");
+                                                                                                    setP("cbAutoMount", "true");
                                                                                                     cbAutoMount.setChecked(true);
                                                                                                     a.saveValues();
                                                                                                     AlertDialog.Builder builder = new AlertDialog.Builder(a);
@@ -367,7 +367,7 @@ public class OtherFragment extends MyFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         selectSched = which;
                         sched.setText(schedulers[selectSched]);
-                        a.setP("sched", schedulers[selectSched]);
+                        setP("sched", schedulers[selectSched]);
                     }
                 }, null, null);
                 md.show(getFragmentManager(), "scheduler");
