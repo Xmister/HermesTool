@@ -96,7 +96,6 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
-        guiInit();
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.check_root)
                 .setMessage(R.string.check_root_message);
@@ -135,6 +134,7 @@ public class MainActivity extends Activity
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        guiInit();
                                         if (Constants.getFrequencyName(MainActivity.this, 0) == null) {
                                             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                                             builder.setTitle(getString(R.string.no_scaling))

@@ -62,13 +62,37 @@
             android:width="50dp" />
     </GridLayout>
 
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/grGpuFreq"
+        android:layout_column="0"
+        android:layout_row="3"
+        android:columnCount="2"
+        android:layout_columnSpan="2" >
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cbLimitGpuFreq"
+            android:id="@+id/cbLimitGpuFreq" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bLimitGpuFreq"
+            android:layout_column="1"
+            android:layout_row="0" />
+
+    </GridLayout>
+
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/touchboost"
         android:id="@+id/cbTouchBoost"
         android:layout_column="0"
-        android:layout_row="3"
+        android:layout_row="4"
         android:elegantTextHeight="false"
         android:elevation="1dp"
         android:layout_marginBottom="10dp"
@@ -80,7 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_column="0"
         android:layout_columnSpan="2"
-        android:layout_row="4"
+        android:layout_row="5"
         android:columnCount="4"
         android:rowCount="3"
         android:id="@+id/grTouch"

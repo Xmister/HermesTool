@@ -96,4 +96,5 @@
     <string name="recovery_push_again">Please push the recovery flash button again!</string>
     <string name="please_wait">Please wait</string>
     <string name="cb_limitCore">Limit cores to</string>
+    <string name="cbLimitGpuFreq">Limit GPU Frequency</string>
 </resources>

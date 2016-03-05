@@ -253,6 +253,8 @@ public class SUCommand {
                 "echo 8 > /proc/hps/num_limit_power_serv",
                 "echo 8 > /proc/hps/num_limit_thermal",
                 "echo 8 > /proc/hps/num_limit_ultra_power_saving",
+                "chmod 644 /proc/gpufreq/gpufreq_opp_max_freq",
+                "echo 0 > /proc/gpufreq/gpufreq_opp_max_freq",
                 "cd /proc/cpufreq",
                 "chmod 644 cpufreq_limited_max_freq_by_user",
                 "echo " + Constants.getFrequencyItem(context, Integer.valueOf(sharedPreferences.getString("maxfreq", ""+Constants.defFRPos))) + " > cpufreq_limited_max_freq_by_user",
@@ -277,6 +279,14 @@ public class SUCommand {
                         "echo "+cores+" > /proc/hps/num_limit_ultra_power_saving",
                         "echo 0 > /proc/hps/rush_boost_enable",
                         "chmod 444 /proc/hps/*",
+                });
+            }
+            if (Boolean.valueOf(sharedPreferences.getString("cblimitgpufreq","false"))) {
+                int freq=Integer.valueOf(sharedPreferences.getString("gpufreq", "0"));
+                cmds = concat(cmds,new String[] {
+                        "chmod 644 /proc/gpufreq/gpufreq_opp_max_freq",
+                        "echo "+Constants.getGpuFrequencyItem(context,freq)+" > /proc/gpufreq/gpufreq_opp_max_freq",
+                        "chmod 444 /proc/gpufreq/gpufreq_opp_max_freq",
                 });
             }
             switch (Integer.valueOf(sharedPreferences.getString("rg_profile",""+R.id.rb_slow))) {

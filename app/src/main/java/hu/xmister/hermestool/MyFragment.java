@@ -1,8 +1,10 @@
 package hu.xmister.hermestool;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 
 public abstract class MyFragment extends Fragment {
@@ -15,6 +17,13 @@ public abstract class MyFragment extends Fragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         loadValues();
+    }
+
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        a=(MainActivity) activity;
     }
 
     @Override

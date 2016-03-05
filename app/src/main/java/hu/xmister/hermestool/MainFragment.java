@@ -27,10 +27,12 @@ public class MainFragment extends MyFragment {
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static MainFragment self=null;
         private static Button   maxFreq,
+                                gpuFreq,
                                 freq=null;
         private static EditText tCores,
                                 tLimitCores;
         private static CheckBox cbTouchBoost,
+                                cbLimitGpuFreq,
                                 cbLimitCores;
         private static GridLayout grTouch;
         private static TextView textCore,
@@ -80,8 +82,19 @@ public class MainFragment extends MyFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if ( Constants.getFrequencyName(a,which) != null ) {
-                    setP("tbFreq",""+(which+1));
+                    setP("tbFreq", "" + (which + 1));
                     freq.setText(Constants.getFrequencyName(a,which+1));
+                }
+            }
+        };
+
+        private  DialogInterface.OnClickListener gdi = new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if ( Constants.getGpuFrequencyName(a, which) != null ) {
+                    setP("gpufreq", "" + which);
+                    gpuFreq.setText(Constants.getGpuFrequencyName(a, which));
                 }
             }
         };
@@ -93,17 +106,11 @@ public class MainFragment extends MyFragment {
             return rootView;
         }
 
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-            a=(MainActivity) activity;
-        }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         maxFreq=(Button)getActivity().findViewById(R.id.maxFreq);
+        gpuFreq=(Button)getActivity().findViewById(R.id.bLimitGpuFreq);
         freq=(Button)getActivity().findViewById(R.id.tFreq);
         tCores=(EditText)getActivity().findViewById(R.id.tCores);
         tLimitCores=(EditText)getActivity().findViewById(R.id.tMaxCores);
@@ -111,6 +118,7 @@ public class MainFragment extends MyFragment {
         textCore=(TextView)getActivity().findViewById(R.id.textCore);
         cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
         cbLimitCores=(CheckBox)getActivity().findViewById(R.id.cb_limitCore);
+        cbLimitGpuFreq=(CheckBox)getActivity().findViewById(R.id.cbLimitGpuFreq);
         grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
         rg_profile = (RadioGroup) getActivity().findViewById(R.id.rg_profile);
         if ( rg_profile != null ) {
@@ -126,6 +134,17 @@ public class MainFragment extends MyFragment {
                     if (Constants.getFrequencyNames(a) != null) {
                         ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(a), di, null, null);
                         md.show(getFragmentManager(), "maxfreq");
+                    } else {
+                        //TODO
+                    }
+                }
+            });
+            gpuFreq.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Constants.getGpuFrequencyNames(a) != null) {
+                        ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getGpuFrequencyNames(a), gdi, null, null);
+                        md.show(getFragmentManager(), "gpufreq");
                     } else {
                         //TODO
                     }
@@ -156,7 +175,8 @@ public class MainFragment extends MyFragment {
         super.beforeSave();
         setP("tCores", tCores.getText().toString());
         setP("tLimitCores", tLimitCores.getText().toString());
-        setP("cb_limitCores", ""+cbLimitCores.isChecked());
+        setP("cb_limitCores", "" + cbLimitCores.isChecked());
+        setP("cbLimitGpuFreq", "" + cbLimitGpuFreq.isChecked());
     }
 
     public void loadDefaults() {
@@ -335,6 +355,48 @@ public class MainFragment extends MyFragment {
                         cbLimitCores.setChecked(false);
                         oCC.onCheckedChanged(cbTouchBoost, false);
                         grTouch.setVisibility(View.INVISIBLE);
+                    } catch (IndexOutOfBoundsException e) {
+                        //TODO: Better solution
+                        try {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                            builder.setTitle(getString(R.string.freq_error))
+                                    .setMessage("Please restart the application!")
+                                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            a.finish();
+                                        }
+                                    })
+                                    .show();
+                        } catch (Exception ee) {
+                            a.finish();
+                        }
+                    }
+                }
+            });
+        }
+        if (getP("gpufreq") != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() == null) return;
+                    try {
+                        gpuFreq.setText(Constants.getGpuFrequencyName(a, Integer.valueOf(getP("gpufreq"))));
+                        cbLimitGpuFreq.setChecked(Boolean.valueOf(getP("cbLimitGpuFreq")));
+                    } catch (Exception e) {
+                        setP("gpufreq", "" + Constants.defGPUPos);
+                        gpuFreq.setText(Constants.getGpuFrequencyName(getActivity(), Constants.defGPUPos));
+                    }
+                }
+            });
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() == null) return;
+                    setP("gpufreq", "" + Constants.defGPUPos);
+                    try {
+                        gpuFreq.setText(Constants.getGpuFrequencyName(getActivity(), Constants.defGPUPos));
                     } catch (IndexOutOfBoundsException e) {
                         //TODO: Better solution
                         try {
