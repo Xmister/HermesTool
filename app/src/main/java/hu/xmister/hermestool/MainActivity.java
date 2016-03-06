@@ -546,7 +546,9 @@ public class MainActivity extends Activity
     }
 
     public void saveValues() {
-        curFrag.beforeSave();
+        if (curFrag != null) {
+            curFrag.beforeSave();
+        }
         p.setProperty("onboot",""+onBoot);
         SharedPreferences sharedPreferences =getSharedPreferences("default", 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();

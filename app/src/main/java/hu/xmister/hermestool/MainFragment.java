@@ -26,6 +26,7 @@ public class MainFragment extends MyFragment {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         private static MainFragment self=null;
+        private boolean initDone=false;
         private static Button   maxFreq,
                                 gpuFreq,
                                 freq=null;
@@ -106,21 +107,27 @@ public class MainFragment extends MyFragment {
             return rootView;
         }
 
+    private void initValues() {
+        if (!initDone) {
+            maxFreq = (Button) getActivity().findViewById(R.id.maxFreq);
+            gpuFreq = (Button) getActivity().findViewById(R.id.bLimitGpuFreq);
+            freq = (Button) getActivity().findViewById(R.id.tFreq);
+            tCores = (EditText) getActivity().findViewById(R.id.tCores);
+            tLimitCores = (EditText) getActivity().findViewById(R.id.tMaxCores);
+            textFreq = (TextView) getActivity().findViewById(R.id.textFreq);
+            textCore = (TextView) getActivity().findViewById(R.id.textCore);
+            cbTouchBoost = (CheckBox) getActivity().findViewById(R.id.cbTouchBoost);
+            cbLimitCores = (CheckBox) getActivity().findViewById(R.id.cb_limitCore);
+            cbLimitGpuFreq = (CheckBox) getActivity().findViewById(R.id.cbLimitGpuFreq);
+            grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
+            rg_profile = (RadioGroup) getActivity().findViewById(R.id.rg_profile);
+            initDone = true;
+        }
+    }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
-        maxFreq=(Button)getActivity().findViewById(R.id.maxFreq);
-        gpuFreq=(Button)getActivity().findViewById(R.id.bLimitGpuFreq);
-        freq=(Button)getActivity().findViewById(R.id.tFreq);
-        tCores=(EditText)getActivity().findViewById(R.id.tCores);
-        tLimitCores=(EditText)getActivity().findViewById(R.id.tMaxCores);
-        textFreq=(TextView)getActivity().findViewById(R.id.textFreq);
-        textCore=(TextView)getActivity().findViewById(R.id.textCore);
-        cbTouchBoost=(CheckBox)getActivity().findViewById(R.id.cbTouchBoost);
-        cbLimitCores=(CheckBox)getActivity().findViewById(R.id.cb_limitCore);
-        cbLimitGpuFreq=(CheckBox)getActivity().findViewById(R.id.cbLimitGpuFreq);
-        grTouch = (GridLayout) getActivity().findViewById(R.id.grTouch);
-        rg_profile = (RadioGroup) getActivity().findViewById(R.id.rg_profile);
+        initValues();
         if ( rg_profile != null ) {
             rg_profile.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
@@ -128,44 +135,52 @@ public class MainFragment extends MyFragment {
                     setP("rg_profile", "" + checkedId);
                 }
             });
-            maxFreq.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (Constants.getFrequencyNames(a) != null) {
-                        ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(a), di, null, null);
-                        md.show(getFragmentManager(), "maxfreq");
-                    } else {
-                        //TODO
-                    }
-                }
-            });
-            gpuFreq.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (Constants.getGpuFrequencyNames(a) != null) {
-                        ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getGpuFrequencyNames(a), gdi, null, null);
-                        md.show(getFragmentManager(), "gpufreq");
-                    } else {
-                        //TODO
-                    }
-                }
-            });
-            freq.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (Constants.getFrequencyNames(a) != null) {
-                        String tmpNames[] = new String[Constants.getFrequencyNames(a).length - 1];
-                        for (int i = 1; i < Constants.getFrequencyNames(a).length; i++) {
-                            tmpNames[i - 1] = Constants.getFrequencyNames(a)[i];
+            if (maxFreq != null) {
+                maxFreq.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (Constants.getFrequencyNames(a) != null) {
+                            ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getFrequencyNames(a), di, null, null);
+                            md.show(getFragmentManager(), "maxfreq");
+                        } else {
+                            //TODO
                         }
-                        ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
-                        md.show(getFragmentManager(), "tbfreq");
-                    } else {
-                        //TODO
                     }
-                }
-            });
-            cbTouchBoost.setOnCheckedChangeListener(oCC);
+                });
+            }
+            if (gpuFreq != null) {
+                gpuFreq.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (Constants.getGpuFrequencyNames(a) != null) {
+                            ChoiceDialog md = new ChoiceDialog("Maximum Frequency", Constants.getGpuFrequencyNames(a), gdi, null, null);
+                            md.show(getFragmentManager(), "gpufreq");
+                        } else {
+                            //TODO
+                        }
+                    }
+                });
+            }
+            if (freq != null) {
+                freq.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (Constants.getFrequencyNames(a) != null) {
+                            String tmpNames[] = new String[Constants.getFrequencyNames(a).length - 1];
+                            for (int i = 1; i < Constants.getFrequencyNames(a).length; i++) {
+                                tmpNames[i - 1] = Constants.getFrequencyNames(a)[i];
+                            }
+                            ChoiceDialog md = new ChoiceDialog("Touchboost Frequency", tmpNames, tdi, null, null);
+                            md.show(getFragmentManager(), "tbfreq");
+                        } else {
+                            //TODO
+                        }
+                    }
+                });
+            }
+            if (cbTouchBoost != null) {
+                cbTouchBoost.setOnCheckedChangeListener(oCC);
+            }
         }
         super.onViewStateRestored(savedInstanceState);
     }
@@ -180,10 +195,23 @@ public class MainFragment extends MyFragment {
     }
 
     public void loadDefaults() {
-        setP("maxfreq", "" + Constants.defFRPos);
-        maxFreq.setText(Constants.getFrequencyName(getActivity(),Constants.defFRPos));
+        initValues();
         try {
+            setP("maxfreq", "" + Constants.defFRPos);
             setP("tbFreq", "" + Constants.defTBPos);
+            setP("tCores", "2");
+            setP("tLimitCores", "5");
+            setP("cbTouchBoost", "true");
+            setP("cb_limitCores", "false");
+            setP("rg_profile", "" + R.id.rb_slow);
+            maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
+            freq.setText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
+            tCores.setText("2");
+            tLimitCores.setText("5");
+            cbLimitCores.setChecked(false);
+            rg_profile.check(R.id.rb_slow);
+            cbTouchBoost.setChecked(true);
+            oCC.onCheckedChanged(cbTouchBoost,true);
         } catch ( Resources.NotFoundException e ) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -195,19 +223,7 @@ public class MainFragment extends MyFragment {
                     a.finish();
                 }
             });
-        }
-        freq.setText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
-        setP("tCores", "2");
-        tCores.setText("2");
-        setP("tLimitCores", "5");
-        tLimitCores.setText("5");
-        setP("cbTouchBoost", "true");
-        setP("cb_limitCores", "false");
-        cbLimitCores.setChecked(false);
-        rg_profile.check(R.id.rb_slow);
-        setP("rg_profile", "" + R.id.rb_slow);
-        cbTouchBoost.setChecked(true);
-        oCC.onCheckedChanged(cbTouchBoost,true);
+        } catch (Exception e) {}
     }
 
     private synchronized void setFreqText(final String text) {
@@ -219,6 +235,26 @@ public class MainFragment extends MyFragment {
             }
         });
     }
+    private synchronized void setMaxFreqText(final String text) {
+        if (getActivity() == null) return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (maxFreq != null) maxFreq.setText(text);
+            }
+        });
+    }
+
+    private synchronized void setGpuFreqText(final String text) {
+        if (getActivity() == null) return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (gpuFreq != null) gpuFreq.setText(text);
+            }
+        });
+    }
+
     private synchronized void setCoresText(final String text) {
         if (getActivity() == null) return;
         runOnUiThread(new Runnable() {
@@ -259,6 +295,7 @@ public class MainFragment extends MyFragment {
 
     @Override
     public void loadValues() {
+        initValues();
         SUCommand.getTouchBoost(new SUCommand.tbCallback() {
             @Override
             public void onGotTB(String freq, String cores) {
@@ -331,13 +368,16 @@ public class MainFragment extends MyFragment {
                 public void run() {
                     if (getActivity() == null) return;
                     try {
-                        maxFreq.setText(Constants.getFrequencyName(a, Integer.valueOf(getP("maxfreq"))));
+                        setMaxFreqText(Constants.getFrequencyName(a, Integer.valueOf(getP("maxfreq"))));
                         cbTouchBoost.setChecked(Boolean.valueOf(getP("cbTouchBoost")));
                         cbLimitCores.setChecked(Boolean.valueOf(getP("cb_limitCores")));
                         oCC.onCheckedChanged(cbTouchBoost, Boolean.valueOf(getP("cbTouchBoost")));
                     } catch (Exception e) {
                         setP("maxfreq", "" + Constants.defFRPos);
-                        maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
+                        try {
+                            setMaxFreqText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
+                        } catch (Exception ee) {
+                        }
                     }
                 }
             });
@@ -348,7 +388,7 @@ public class MainFragment extends MyFragment {
                     if (getActivity() == null) return;
                     setP("maxfreq", "" + Constants.defFRPos);
                     try {
-                        maxFreq.setText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
+                        setMaxFreqText(Constants.getFrequencyName(getActivity(), Constants.defFRPos));
                         setP("cbTouchBoost", "false");
                         cbTouchBoost.setChecked(false);
                         setP("cb_limitCores", "false");
@@ -369,7 +409,10 @@ public class MainFragment extends MyFragment {
                                     })
                                     .show();
                         } catch (Exception ee) {
-                            a.finish();
+                            try {
+                                a.finish();
+                            } catch (Exception eee) {
+                            }
                         }
                     }
                 }
@@ -381,11 +424,13 @@ public class MainFragment extends MyFragment {
                 public void run() {
                     if (getActivity() == null) return;
                     try {
-                        gpuFreq.setText(Constants.getGpuFrequencyName(a, Integer.valueOf(getP("gpufreq"))));
+                        setGpuFreqText(Constants.getGpuFrequencyName(a, Integer.valueOf(getP("gpufreq"))));
                         cbLimitGpuFreq.setChecked(Boolean.valueOf(getP("cbLimitGpuFreq")));
                     } catch (Exception e) {
                         setP("gpufreq", "" + Constants.defGPUPos);
-                        gpuFreq.setText(Constants.getGpuFrequencyName(getActivity(), Constants.defGPUPos));
+                        try {
+                            setGpuFreqText(Constants.getGpuFrequencyName(getActivity(), Constants.defGPUPos));
+                        } catch (Exception ee) {}
                     }
                 }
             });
@@ -396,7 +441,7 @@ public class MainFragment extends MyFragment {
                     if (getActivity() == null) return;
                     setP("gpufreq", "" + Constants.defGPUPos);
                     try {
-                        gpuFreq.setText(Constants.getGpuFrequencyName(getActivity(), Constants.defGPUPos));
+                        setGpuFreqText(Constants.getGpuFrequencyName(getActivity(), Constants.defGPUPos));
                     } catch (IndexOutOfBoundsException e) {
                         //TODO: Better solution
                         try {
@@ -411,7 +456,9 @@ public class MainFragment extends MyFragment {
                                     })
                                     .show();
                         } catch (Exception ee) {
-                            a.finish();
+                            try {
+                                a.finish();
+                            } catch (Exception eee) {}
                         }
                     }
                 }

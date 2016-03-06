@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.widget.Button;
 
 public abstract class MyFragment extends Fragment {
     public abstract void loadDefaults();

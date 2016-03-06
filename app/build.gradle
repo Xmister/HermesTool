@@ -17,8 +17,8 @@ android {
         applicationId "hu.xmister.hermestool"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 53
-        versionName '1.26'
+        versionCode 54
+        versionName '1.27'
     }
     buildTypes {
         release {
