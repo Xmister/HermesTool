@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="C:\Users\sarko_000\Documents\Projects\HermesTool\playlicensing\src\main\res"/><source path="C:\Users\sarko_000\Documents\Projects\HermesTool\playlicensing\build\generated\res\rs\debug"/><source path="C:\Users\sarko_000\Documents\Projects\HermesTool\playlicensing\build\generated\res\generated\debug"/></dataSet><dataSet config="debug"><source path="C:\Users\sarko_000\Documents\Projects\HermesTool\playlicensing\src\debug\res"/></dataSet><mergedItems/></merger>

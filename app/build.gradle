@@ -17,8 +17,8 @@ android {
         applicationId "hu.xmister.hermestool"
         minSdkVersion 21
         targetSdkVersion 23
-        versionCode 52
-        versionName '1.25'
+        versionCode 53
+        versionName '1.26'
     }
     buildTypes {
         release {
@@ -34,4 +34,5 @@ dependencies {
     apk fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:support-v4:23.1.1'
     compile project(':googleplaydownloaderlibrary')
+    compile project(':playlicensing')
 }
