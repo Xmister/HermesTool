@@ -51,7 +51,8 @@ public class MainActivity extends Activity
     }
 
     private Properties p = new Properties();
-    private boolean onBoot =false, firstInit=true;
+    private boolean onBoot =false;
+    private boolean firstInit=true;
     public static boolean isSuperSU=false,
                             noCPU=false;
     private IStub mDownloaderClientStub;
@@ -327,7 +328,7 @@ public class MainActivity extends Activity
                     break;
             }
             fT.replace(R.id.container, curFrag);
-            fT.commitAllowingStateLoss();
+            fT.commit();
         }
     }
 
@@ -473,17 +474,18 @@ public class MainActivity extends Activity
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        SUCommand.saveTouchBoost(MainActivity.this,getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
+                                        SUCommand.saveTouchBoost(MainActivity.this, getP("tCores"), getP("tbFreq"), new Shell.OnCommandResultListener() {
                                             @Override
                                             public void onCommandResult(int commandCode, int exitCode, List<String> output) {
                                                 SUCommand.getTouchBoost(new SUCommand.tbCallback() {
                                                     @Override
                                                     public void onGotTB(final String freq, final String cores) {
-                                                        boolean error=false;
-                                                            if (freq == null || cores == null) error=true;
-                                                            else if (!freq.equals(Constants.getFrequencyItem(MainActivity.this,Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores")) ) {
-                                                                error=true;
-                                                            }
+                                                        boolean error = false;
+                                                        if (freq == null || cores == null)
+                                                            error = true;
+                                                        else if (!freq.equals(Constants.getFrequencyItem(MainActivity.this, Integer.valueOf(getP("tbFreq")))) || !cores.equals(getP("tCores"))) {
+                                                            error = true;
+                                                        }
                                                         if (error) {
                                                             runOnUiThread(new Runnable() {
                                                                 @Override
@@ -495,7 +497,7 @@ public class MainActivity extends Activity
                                                                             .setOnDismissListener(new DialogInterface.OnDismissListener() {
                                                                                 @Override
                                                                                 public void onDismiss(DialogInterface dialog) {
-                                                                                    tb.onGotTB("0","0");
+                                                                                    tb.onGotTB("0", "0");
                                                                                 }
                                                                             });
                                                                     builder.show();
@@ -531,13 +533,13 @@ public class MainActivity extends Activity
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                tb.onGotTB("0","0");
+                                tb.onGotTB("0", "0");
                             }
                         })
                         .setOnCancelListener(new DialogInterface.OnCancelListener() {
                             @Override
                             public void onCancel(DialogInterface dialog) {
-                                tb.onGotTB("0","0");
+                                tb.onGotTB("0", "0");
                             }
                         });
                 builder.show();
@@ -635,7 +637,6 @@ public class MainActivity extends Activity
 
     @Override
     protected void onResume() {
-
         if (getIntent() != null && getIntent().getAction() != null && getIntent().getAction().equals("download")) {
             mDownloaderClientStub = DownloaderClientMarshaller.CreateStub(this,
                     DownloaderService.class);
@@ -645,6 +646,7 @@ public class MainActivity extends Activity
         }
         super.onResume();
     }
+
 
     @Override
     protected void onStop() {

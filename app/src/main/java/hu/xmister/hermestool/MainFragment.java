@@ -25,20 +25,20 @@ public class MainFragment extends MyFragment {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
-        private static MainFragment self=null;
+        private MainFragment self=null;
         private boolean initDone=false;
-        private static Button   maxFreq,
+        private Button   maxFreq,
                                 gpuFreq,
                                 freq=null;
-        private static EditText tCores,
+        private EditText tCores,
                                 tLimitCores;
-        private static CheckBox cbTouchBoost,
+        private CheckBox cbTouchBoost,
                                 cbLimitGpuFreq,
                                 cbLimitCores;
-        private static GridLayout grTouch;
-        private static TextView textCore,
+        private GridLayout grTouch;
+        private TextView textCore,
                                 textFreq;
-        private static RadioGroup rg_profile;
+        private RadioGroup rg_profile;
         private CompoundButton.OnCheckedChangeListener oCC=new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -55,6 +55,7 @@ public class MainFragment extends MyFragment {
          * number.
          */
         public static MainFragment newInstance(int sectionNumber) {
+            MainFragment self=null;
             if ( self == null ) {
                 self = new MainFragment();
                 Bundle args = new Bundle();
@@ -293,6 +294,7 @@ public class MainFragment extends MyFragment {
         });
     }
 
+
     @Override
     public void loadValues() {
         initValues();
@@ -329,24 +331,17 @@ public class MainFragment extends MyFragment {
             try {
                 setFreqText(Constants.getFrequencyName(a, Integer.valueOf(getP("tbFreq"))));
             } catch (Exception e) {
-                setFreqText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
+                try {
+                    setFreqText(Constants.getFrequencyName(getActivity(),Constants.defTBPos));
+                    setP("tbFreq", "" + Constants.defTBPos);
+                } catch (Exception ee) {}
             }
         }
         else {
             try {
                 setP("tbFreq", "" + Constants.defTBPos);
-            } catch (Exception e ) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                        builder.setTitle(getString(R.string.freq_error))
-                                .setMessage("This is probably not a Redmi Note 2 device!")
-                                .show();
-                        a.finish();
-                    }
-                });
-            }
+                setFreqText(Constants.getFrequencyName(getActivity(), Constants.defTBPos));
+            } catch (Exception e ) {}
         }
         if ( getP("tCores")!=null) {
             setCoresText(getP("tCores"));
@@ -363,9 +358,6 @@ public class MainFragment extends MyFragment {
             setP("tLimitCores", "5");
         }
         if (getP("maxfreq") != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
                     if (getActivity() == null) return;
                     try {
                         setMaxFreqText(Constants.getFrequencyName(a, Integer.valueOf(getP("maxfreq"))));
@@ -379,12 +371,7 @@ public class MainFragment extends MyFragment {
                         } catch (Exception ee) {
                         }
                     }
-                }
-            });
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
                     if (getActivity() == null) return;
                     setP("maxfreq", "" + Constants.defFRPos);
                     try {
@@ -414,14 +401,9 @@ public class MainFragment extends MyFragment {
                             } catch (Exception eee) {
                             }
                         }
-                    }
-                }
-            });
+                    } catch (Exception e) {}
         }
         if (getP("gpufreq") != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
                     if (getActivity() == null) return;
                     try {
                         setGpuFreqText(Constants.getGpuFrequencyName(a, Integer.valueOf(getP("gpufreq"))));
@@ -430,14 +412,10 @@ public class MainFragment extends MyFragment {
                         setP("gpufreq", "" + Constants.defGPUPos);
                         try {
                             setGpuFreqText(Constants.getGpuFrequencyName(getActivity(), Constants.defGPUPos));
-                        } catch (Exception ee) {}
+                        } catch (Exception ee) {
+                        }
                     }
-                }
-            });
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
                     if (getActivity() == null) return;
                     setP("gpufreq", "" + Constants.defGPUPos);
                     try {
@@ -458,20 +436,16 @@ public class MainFragment extends MyFragment {
                         } catch (Exception ee) {
                             try {
                                 a.finish();
-                            } catch (Exception eee) {}
+                            } catch (Exception eee) {
+                            }
                         }
                     }
-                }
-            });
         }
         if (getP("rg_profile") != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
                     if (getActivity() == null) return;
-                    rg_profile.check(Integer.valueOf(getP("rg_profile")));
-                }
-            });
+                    try {
+                        rg_profile.check(Integer.valueOf(getP("rg_profile")));
+                    } catch (Exception e) {}
         }
     }
 }

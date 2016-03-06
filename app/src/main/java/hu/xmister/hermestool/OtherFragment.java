@@ -28,15 +28,14 @@ import eu.chainfire.libsuperuser.Shell;
 
 public class OtherFragment extends MyFragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static OtherFragment self=null;
-    private static CheckBox cbAutoMount;
-    private static Button   btFormat,
+    private CheckBox cbAutoMount;
+    private Button   btFormat,
                             btMount,
                             sched,
                             flash_recovery,
                             convert_backup;
-    private static String[] schedulers=null;
-    private static int selectSched=0;
+    private String[] schedulers=null;
+    private int selectSched=0;
     public final DialogInterface.OnClickListener recButtonOnClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -114,6 +113,7 @@ public class OtherFragment extends MyFragment {
      */
     // TODO: Rename and change types and number of parameters
     public static OtherFragment newInstance(int sectionNumber) {
+        OtherFragment self = null;
             self = new OtherFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
@@ -166,39 +166,40 @@ public class OtherFragment extends MyFragment {
 
     @Override
     public void loadValues() {
-        if (schedulers == null) {
-            SUCommand.executeSu(new String[]{"cd /sys/block/mmcblk0/queue", "cat scheduler"}, new Shell.OnCommandResultListener() {
-                @Override
-                public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                    for (String line: output) {
-                        if (line.length()>1) {
-                            StringTokenizer st=new StringTokenizer(line," ");
-                            int i=0;
-                            schedulers=new String[st.countTokens()];
-                            while (st.hasMoreTokens()) {
-                                String curr=st.nextToken();
-                                if (curr.indexOf('[')==0) {
-                                    schedulers[i]=curr.substring(1,curr.length()-1);
-                                    selectSched=i;
+        if (a.findViewById(R.id.container) != null) {
+            if (schedulers == null) {
+                SUCommand.executeSu(new String[]{"cd /sys/block/mmcblk0/queue", "cat scheduler"}, new Shell.OnCommandResultListener() {
+                    @Override
+                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                        for (String line : output) {
+                            if (line.length() > 1) {
+                                StringTokenizer st = new StringTokenizer(line, " ");
+                                int i = 0;
+                                schedulers = new String[st.countTokens()];
+                                while (st.hasMoreTokens()) {
+                                    String curr = st.nextToken();
+                                    if (curr.indexOf('[') == 0) {
+                                        schedulers[i] = curr.substring(1, curr.length() - 1);
+                                        selectSched = i;
+                                    } else schedulers[i] = curr;
+                                    i++;
                                 }
-                                else schedulers[i]=curr;
-                                i++;
                             }
                         }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sched.setText(schedulers[selectSched]);
+                            }
+                        });
                     }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            sched.setText(schedulers[selectSched]);
-                        }
-                    });
-                }
-            });
+                });
+            }
+            if (getP("cbAutoMount") != null) {
+                cbAutoMount.setChecked(Boolean.valueOf(getP("cbAutoMount")));
+                sched.setText(getP("sched"));
+            } else super.loadValues();
         }
-        if (getP("cbAutoMount") != null) {
-            cbAutoMount.setChecked(Boolean.valueOf(getP("cbAutoMount")));
-            sched.setText(getP("sched"));
-        } else super.loadValues();
     }
 
     private void showRecoveryDialog() {
@@ -209,198 +210,203 @@ public class OtherFragment extends MyFragment {
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
-        cbAutoMount=(CheckBox)a.findViewById(R.id.cbAutoMount);
-        btFormat=(Button)a.findViewById(R.id.btFormat);
-        btMount=(Button)a.findViewById(R.id.btMount);
-        sched=(Button)a.findViewById(R.id.sched);
-        flash_recovery =(Button)a.findViewById(R.id.b_flash_recovery);
-        convert_backup =(Button)a.findViewById(R.id.convert_backup);
-        cbAutoMount.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setP("cbAutoMount", "" + isChecked);
-            }
-        });
-        //if ( a.isSuperSU ) {
-            btFormat.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                    builder.setTitle(getString(R.string.warning))
-                            .setMessage(getString(R.string.format_sd_message))
-                            .setPositiveButton(getString(R.string.do_format), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    SUCommand.executeSu("mke2fs", new Shell.OnCommandResultListener() {
-                                        @Override
-                                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                            if (exitCode == 127) {
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                        builder.setTitle(R.string.missing_binaries)
-                                                                .setMessage(getString(R.string.missing_binaries_message))
-                                                                .show();
-                                                    }
-                                                });
-                                            } else {
-                                                if (SUCommand.linkBinaries(a) == false ) {
+        if (a.findViewById(R.id.container) != null) {
+            cbAutoMount = (CheckBox) a.findViewById(R.id.cbAutoMount);
+            btFormat = (Button) a.findViewById(R.id.btFormat);
+            btMount = (Button) a.findViewById(R.id.btMount);
+            sched = (Button) a.findViewById(R.id.sched);
+            flash_recovery = (Button) a.findViewById(R.id.b_flash_recovery);
+            convert_backup = (Button) a.findViewById(R.id.convert_backup);
+            if (cbAutoMount != null)
+                cbAutoMount.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        setP("cbAutoMount", "" + isChecked);
+                    }
+                });
+            //if ( a.isSuperSU ) {
+            if (btFormat != null)
+                btFormat.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                        builder.setTitle(getString(R.string.warning))
+                                .setMessage(getString(R.string.format_sd_message))
+                                .setPositiveButton(getString(R.string.do_format), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        SUCommand.executeSu("mke2fs", new Shell.OnCommandResultListener() {
+                                            @Override
+                                            public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                if (exitCode == 127) {
                                                     runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
                                                             AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                            builder.setTitle(getString(R.string.busybox_install_failed))
-                                                                    .setMessage(getString(R.string.busybox_install_failed_message))
+                                                            builder.setTitle(R.string.missing_binaries)
+                                                                    .setMessage(getString(R.string.missing_binaries_message))
                                                                     .show();
                                                         }
                                                     });
-                                                }else {
-                                                    runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            Toast.makeText(a, "Please wait...", Toast.LENGTH_LONG).show();
-                                                            a.findViewById(R.id.container).setVisibility(View.GONE);
-                                                            ((TextView)a.findViewById(R.id.tStatus)).setText(getString(R.string.take_a_minute));
-                                                            a.findViewById(R.id.prog).setVisibility(View.VISIBLE);
-                                                            if (SUCommand.uMountSD()) {
-                                                                        SUCommand.formatSD(new Shell.OnCommandResultListener() {
-                                                                            @Override
-                                                                            public void onCommandResult(int commandCode, int exitCode, final List<String> output) {
-                                                                                if (exitCode == 0) {
-                                                                                    SUCommand.mountSD(new Shell.OnCommandResultListener() {
-                                                                                        @Override
-                                                                                        public void onCommandResult(int commandCode, int exitCode, List<String> output) {
-                                                                                            runOnUiThread(new Runnable() {
-                                                                                                @Override
-                                                                                                public void run() {
-                                                                                                    setP("cbAutoMount", "true");
-                                                                                                    cbAutoMount.setChecked(true);
-                                                                                                    a.saveValues();
-                                                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                                                    builder.setTitle(getString(R.string.format_complete))
-                                                                                                            .setMessage(getString(R.string.format_complete_message))
-                                                                                                            .show();
-                                                                                                    a.findViewById(R.id.prog).setVisibility(View.GONE);
-                                                                                                    a.findViewById(R.id.container).setVisibility(View.VISIBLE);
-                                                                                                }
-                                                                                            });
-                                                                                        }
-                                                                                    });
-                                                                                }
-                                                                                else {
-                                                                                    runOnUiThread(new Runnable() {
-                                                                                        @Override
-                                                                                        public void run() {
-                                                                                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                                            builder.setTitle(getString(R.string.error))
-                                                                                                    .setMessage(TextUtils.join("\n", output))
-                                                                                                    .show();
-                                                                                            a.findViewById(R.id.prog).setVisibility(View.GONE);
-                                                                                            a.findViewById(R.id.container).setVisibility(View.VISIBLE);
-                                                                                        }
-                                                                                    });
-                                                                                }
-                                                                            }
-                                                                        });
-                                                                }
-                                                            else {
-                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                        builder.setTitle(getString(R.string.unable_umount))
-                                                                                .setMessage(getString(R.string.unable_umount_message))
-                                                                                .show();
-                                                                a.findViewById(R.id.prog).setVisibility(View.GONE);
-                                                                a.findViewById(R.id.container).setVisibility(View.VISIBLE);
+                                                } else {
+                                                    if (SUCommand.linkBinaries(a) == false) {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                builder.setTitle(getString(R.string.busybox_install_failed))
+                                                                        .setMessage(getString(R.string.busybox_install_failed_message))
+                                                                        .show();
                                                             }
-                                                    }});
+                                                        });
+                                                    } else {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(a, "Please wait...", Toast.LENGTH_LONG).show();
+                                                                a.findViewById(R.id.container).setVisibility(View.GONE);
+                                                                ((TextView) a.findViewById(R.id.tStatus)).setText(getString(R.string.take_a_minute));
+                                                                a.findViewById(R.id.prog).setVisibility(View.VISIBLE);
+                                                                if (SUCommand.uMountSD()) {
+                                                                    SUCommand.formatSD(new Shell.OnCommandResultListener() {
+                                                                        @Override
+                                                                        public void onCommandResult(int commandCode, int exitCode, final List<String> output) {
+                                                                            if (exitCode == 0) {
+                                                                                SUCommand.mountSD(new Shell.OnCommandResultListener() {
+                                                                                    @Override
+                                                                                    public void onCommandResult(int commandCode, int exitCode, List<String> output) {
+                                                                                        runOnUiThread(new Runnable() {
+                                                                                            @Override
+                                                                                            public void run() {
+                                                                                                setP("cbAutoMount", "true");
+                                                                                                cbAutoMount.setChecked(true);
+                                                                                                a.saveValues();
+                                                                                                AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                                                builder.setTitle(getString(R.string.format_complete))
+                                                                                                        .setMessage(getString(R.string.format_complete_message))
+                                                                                                        .show();
+                                                                                                a.findViewById(R.id.prog).setVisibility(View.GONE);
+                                                                                                a.findViewById(R.id.container).setVisibility(View.VISIBLE);
+                                                                                            }
+                                                                                        });
+                                                                                    }
+                                                                                });
+                                                                            } else {
+                                                                                runOnUiThread(new Runnable() {
+                                                                                    @Override
+                                                                                    public void run() {
+                                                                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                                        builder.setTitle(getString(R.string.error))
+                                                                                                .setMessage(TextUtils.join("\n", output))
+                                                                                                .show();
+                                                                                        a.findViewById(R.id.prog).setVisibility(View.GONE);
+                                                                                        a.findViewById(R.id.container).setVisibility(View.VISIBLE);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                } else {
+                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                    builder.setTitle(getString(R.string.unable_umount))
+                                                                            .setMessage(getString(R.string.unable_umount_message))
+                                                                            .show();
+                                                                    a.findViewById(R.id.prog).setVisibility(View.GONE);
+                                                                    a.findViewById(R.id.container).setVisibility(View.VISIBLE);
+                                                                }
+                                                            }
+                                                        });
 
+                                                    }
                                                 }
                                             }
-                                        }
-                                    });
-                                }
-                            })
-                            .setNegativeButton(getString(R.string.nothanks), null);
-                    builder.show();
-                }
-            });
-            btMount.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SUCommand.mountSD(new Shell.OnCommandResultListener() {
-                        @Override
-                        public void onCommandResult(int commandCode, final int exitCode, final List<String> output) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (exitCode > 0) {
-                                        StringBuilder sb = new StringBuilder();
-                                        for (String line : output) {
-                                            sb.append(line + "\n");
-                                        }
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                        builder.setTitle(getString(R.string.mount_label))
-                                                .setMessage(getString(R.string.mount_error) + "\n" + sb.toString())
-                                                .show();
-                                    } else {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                        builder.setTitle(getString(R.string.mount_label))
-                                                .setMessage(getString(R.string.mount_success))
-                                                .show();
+                                        });
                                     }
-                                }
-                            });
-                        }
-                    });
-                }
-            });
+                                })
+                                .setNegativeButton(getString(R.string.nothanks), null);
+                        builder.show();
+                    }
+                });
+            if (btMount != null)
+                btMount.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SUCommand.mountSD(new Shell.OnCommandResultListener() {
+                            @Override
+                            public void onCommandResult(int commandCode, final int exitCode, final List<String> output) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (exitCode > 0) {
+                                            StringBuilder sb = new StringBuilder();
+                                            for (String line : output) {
+                                                sb.append(line + "\n");
+                                            }
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                            builder.setTitle(getString(R.string.mount_label))
+                                                    .setMessage(getString(R.string.mount_error) + "\n" + sb.toString())
+                                                    .show();
+                                        } else {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                            builder.setTitle(getString(R.string.mount_label))
+                                                    .setMessage(getString(R.string.mount_success))
+                                                    .show();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
         /*}
         else {
             btFormat.setEnabled(false);
             btMount.setEnabled(false);
         }*/
-        sched.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ChoiceDialog md = new ChoiceDialog("Scheduler", schedulers, new DialogInterface.OnClickListener() {
+            if (sched != null)
+                sched.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        selectSched = which;
-                        sched.setText(schedulers[selectSched]);
-                        setP("sched", schedulers[selectSched]);
+                    public void onClick(View v) {
+                        ChoiceDialog md = new ChoiceDialog("Scheduler", schedulers, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectSched = which;
+                                sched.setText(schedulers[selectSched]);
+                                setP("sched", schedulers[selectSched]);
+                            }
+                        }, null, null);
+                        md.show(getFragmentManager(), "scheduler");
                     }
-                }, null, null);
-                md.show(getFragmentManager(), "scheduler");
-            }
-        });
-        flash_recovery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (SUCommand.linkBinaries(a) == false) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                            builder.setTitle(getString(R.string.busybox_install_failed))
-                                    .setMessage(getString(R.string.busybox_install_failed_message))
-                                    .show();
-                            flash_recovery.setEnabled(true);
-                        }
-                    });
-                } else {
-                    showRecoveryDialog();
-                }
-            }
-            }
+                });
+            if (flash_recovery != null)
+                flash_recovery.setOnClickListener(new View.OnClickListener() {
+                                                      @Override
+                                                      public void onClick(View v) {
+                                                          if (SUCommand.linkBinaries(a) == false) {
+                                                              runOnUiThread(new Runnable() {
+                                                                  @Override
+                                                                  public void run() {
+                                                                      AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                      builder.setTitle(getString(R.string.busybox_install_failed))
+                                                                              .setMessage(getString(R.string.busybox_install_failed_message))
+                                                                              .show();
+                                                                      flash_recovery.setEnabled(true);
+                                                                  }
+                                                              });
+                                                          } else {
+                                                              showRecoveryDialog();
+                                                          }
+                                                      }
+                                                  }
 
-            );
+                );
+            if (convert_backup != null)
+                convert_backup.setOnClickListener(new View.OnClickListener()
 
-            convert_backup.setOnClickListener(new View.OnClickListener()
-
-                                              {
-                                                  @Override
-                                                  public void onClick(View v) {
-                                                      convert_backup.setEnabled(false);
+                                                  {
+                                                      @Override
+                                                      public void onClick(View v) {
+                                                          convert_backup.setEnabled(false);
                 /*File storagePath=new File("/storage");
                 if (storagePath.isDirectory()) {
                     for (String storage :storagePath.list() ) {
@@ -456,50 +462,48 @@ public class OtherFragment extends MyFragment {
                             .show();
                     convert_backup.setEnabled(true);
                 }*/
-                                                      if (SUCommand.linkBinaries(a) == false) {
-                                                          runOnUiThread(new Runnable() {
-                                                              @Override
-                                                              public void run() {
-                                                                  AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                  builder.setTitle(getString(R.string.busybox_install_failed))
-                                                                          .setMessage(getString(R.string.busybox_install_failed_message))
-                                                                          .show();
-                                                                  convert_backup.setEnabled(true);
-                                                              }
-                                                          });
-                                                      } else {
-                                                          SUCommand.renameTWRPBackup(new Shell.OnCommandResultListener() {
-                                                              @Override
-                                                              public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
-                                                                  getActivity().runOnUiThread(new Runnable() {
-                                                                      @Override
-                                                                      public void run() {
-                                                                          if (exitCode == 0) {
-                                                                              AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                              builder.setTitle(R.string.set_inter_suc)
-                                                                                      .setMessage(R.string.convert_success)
-                                                                                      .show();
-                                                                          } else {
-                                                                              AlertDialog.Builder builder = new AlertDialog.Builder(a);
-                                                                              builder.setTitle(R.string.error)
-                                                                                      .setMessage(R.string.convert_failed)
-                                                                                      .show();
+                                                          if (SUCommand.linkBinaries(a) == false) {
+                                                              runOnUiThread(new Runnable() {
+                                                                  @Override
+                                                                  public void run() {
+                                                                      AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                      builder.setTitle(getString(R.string.busybox_install_failed))
+                                                                              .setMessage(getString(R.string.busybox_install_failed_message))
+                                                                              .show();
+                                                                      convert_backup.setEnabled(true);
+                                                                  }
+                                                              });
+                                                          } else {
+                                                              SUCommand.renameTWRPBackup(new Shell.OnCommandResultListener() {
+                                                                  @Override
+                                                                  public void onCommandResult(int commandCode, final int exitCode, List<String> output) {
+                                                                      getActivity().runOnUiThread(new Runnable() {
+                                                                          @Override
+                                                                          public void run() {
+                                                                              if (exitCode == 0) {
+                                                                                  AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                                  builder.setTitle(R.string.set_inter_suc)
+                                                                                          .setMessage(R.string.convert_success)
+                                                                                          .show();
+                                                                              } else {
+                                                                                  AlertDialog.Builder builder = new AlertDialog.Builder(a);
+                                                                                  builder.setTitle(R.string.error)
+                                                                                          .setMessage(R.string.convert_failed)
+                                                                                          .show();
+                                                                              }
+                                                                              convert_backup.setEnabled(true);
                                                                           }
-                                                                          convert_backup.setEnabled(true);
-                                                                      }
-                                                                  });
+                                                                      });
 
-                                                              }
-                                                          });
+                                                                  }
+                                                              });
+                                                          }
                                                       }
+
                                                   }
 
-                                              }
-
-            );
-
-            super.
-
-            onViewStateRestored(savedInstanceState);
+                );
+        }
+        super.onViewStateRestored(savedInstanceState);
         }
     }
