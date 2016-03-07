@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/sarko_000/Documents/Projects/HermesTool/googleplaydownloaderlibrary/build/intermediates/bundles/debug/res/values/values.xml -->
+    <!-- From: file:/C:/Users/psarkozi/StudioProjects/HermesTool/googleplaydownloaderlibrary/build/intermediates/bundles/debug/res/values/values.xml -->
     <eat-comment/>
     <string name="kilobytes_per_second">%1$s KB/s</string>
     <string name="notification_download_complete">Download complete</string>

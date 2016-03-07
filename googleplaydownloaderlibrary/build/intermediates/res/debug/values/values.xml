@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/sarko_000/Documents/Projects/HermesTool/googleplaydownloaderlibrary/src/main/res/values/strings.xml -->
+    <!-- From: file:/C:/Users/psarkozi/StudioProjects/HermesTool/googleplaydownloaderlibrary/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="kilobytes_per_second">%1$s KB/s</string>
     <string name="notification_download_complete">Download complete</string>
@@ -25,7 +25,7 @@
     <string name="state_unknown">Starting..."</string>
     <string name="time_remaining">Time remaining: %1$s</string>
     <string name="time_remaining_notification">%1$s left</string>
-    <!-- From: file:/C:/Users/sarko_000/Documents/Projects/HermesTool/googleplaydownloaderlibrary/src/main/res/values/styles.xml -->
+    <!-- From: file:/C:/Users/psarkozi/StudioProjects/HermesTool/googleplaydownloaderlibrary/src/main/res/values/styles.xml -->
     <eat-comment/>
     <style name="ButtonBackground">
         <item name="android:background">@android:color/background_dark</item>
