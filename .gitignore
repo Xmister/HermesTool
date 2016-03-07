@@ -5,5 +5,5 @@
 /build
 /captures
 .apk
-/outputs
-/tmp
+outputs
+tmp
