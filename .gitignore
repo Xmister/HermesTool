@@ -2,8 +2,8 @@
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
-/build
+**/build
 /captures
-.apk
-outputs
-tmp
+*.apk
+**/outputs
+**/tmp
