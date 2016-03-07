@@ -3,7 +3,5 @@
     package="com.android.vending.expansion.downloader"
     android:versionCode="2"
     android:versionName="1.1" >
-
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="15"/>
     
 </manifest>
