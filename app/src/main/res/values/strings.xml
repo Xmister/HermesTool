@@ -97,4 +97,5 @@
     <string name="please_wait">Please wait</string>
     <string name="cb_limitCore">Limit cores to</string>
     <string name="cbLimitGpuFreq">Limit GPU Frequency</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-6857992441643320/9849578919</string>
 </resources>

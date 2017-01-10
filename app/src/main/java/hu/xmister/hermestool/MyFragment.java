@@ -75,4 +75,10 @@ public abstract class MyFragment extends Fragment {
         }
         return null;
     }
+
+    protected void finish() {
+        if (a != null) {
+            a.finish();
+        }
+    }
 }

@@ -221,7 +221,7 @@ public class MainFragment extends MyFragment {
                     builder.setTitle(getString(R.string.freq_error))
                             .setMessage("This is probably not a Redmi Note 2 device!")
                             .show();
-                    a.finish();
+                    finish();
                 }
             });
         } catch (Exception e) {}
@@ -391,13 +391,13 @@ public class MainFragment extends MyFragment {
                                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                                         @Override
                                         public void onDismiss(DialogInterface dialog) {
-                                            a.finish();
+                                            finish();
                                         }
                                     })
                                     .show();
                         } catch (Exception ee) {
                             try {
-                                a.finish();
+                                finish();
                             } catch (Exception eee) {
                             }
                         }
@@ -429,13 +429,13 @@ public class MainFragment extends MyFragment {
                                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
                                         @Override
                                         public void onDismiss(DialogInterface dialog) {
-                                            a.finish();
+                                            finish();
                                         }
                                     })
                                     .show();
                         } catch (Exception ee) {
                             try {
-                                a.finish();
+                                finish();
                             } catch (Exception eee) {
                             }
                         }

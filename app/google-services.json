@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "1092045347457",
+    "firebase_url": "https://geofences-94a4.firebaseio.com",
+    "project_id": "geofences-94a4",
+    "storage_bucket": "geofences-94a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092045347457:android:b39b4a84aee50372",
+        "android_client_info": {
+          "package_name": "hu.xmister.geofences"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1092045347457-au58i8ka1npst715mtndsp31r733ge4r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hu.xmister.geofences",
+            "certificate_hash": "68EA601F19428186DE1DCF3561490D82578CABF3"
+          }
+        },
+        {
+          "client_id": "1092045347457-8ai3o3kh022gjt6g4k5g7fj7k99abqc0.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "1092045347457-4eqqnntvq0d9iihrcd5jjk3fruurub1q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7vsaOj8V1_vDBtXLx51SjogFuGXllfqI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092045347457-8ai3o3kh022gjt6g4k5g7fj7k99abqc0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092045347457:android:d2848bb2775bd9cb",
+        "android_client_info": {
+          "package_name": "hu.xmister.hermestool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1092045347457-jreqsb42oshb7e2a6lp0oqugm7v0m6c7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hu.xmister.hermestool",
+            "certificate_hash": "146CD8DDD3C0B56AFA24AB8EBCCFDE45BE5A3102"
+          }
+        },
+        {
+          "client_id": "1092045347457-8ai3o3kh022gjt6g4k5g7fj7k99abqc0.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "1092045347457-4eqqnntvq0d9iihrcd5jjk3fruurub1q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7vsaOj8V1_vDBtXLx51SjogFuGXllfqI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092045347457-8ai3o3kh022gjt6g4k5g7fj7k99abqc0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
